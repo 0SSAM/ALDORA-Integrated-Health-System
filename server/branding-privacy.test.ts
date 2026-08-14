@@ -14,4 +14,11 @@ describe("ALDO visible branding privacy", () => {
     expect(source).toContain("%VITE_APP_TITLE%");
     expect(source).not.toMatch(/<title>[^<]*manus[^<]*<\/title>/i);
   });
+
+  it("does not print provider branding from the shipped debug asset", async () => {
+    const source = await readFile(new URL("../client/public/__manus__/debug-collector.js", import.meta.url), "utf8");
+    expect(source).not.toMatch(/Manus Debug Collector|\[Manus\]/);
+    expect(source).toContain("ALDO Debug Collector");
+    expect(source).toContain("[ALDO]");
+  });
 });
