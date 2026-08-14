@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
-import { Activity, AlertTriangle, ArrowLeftRight, BarChart3, Bell, Boxes, BrainCircuit, Building2, ChevronLeft, ClipboardCheck, FileText, FlaskConical, HeartPulse, LayoutDashboard, LockKeyhole, Menu, PackageSearch, Receipt, Search, ShieldCheck, ShoppingCart, Stethoscope, Users, WalletCards, X } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeftRight, BarChart3, Bell, Boxes, BrainCircuit, Building2, ChevronLeft, ClipboardCheck, Database, FileText, FlaskConical, HeartPulse, LayoutDashboard, LockKeyhole, Menu, PackageSearch, PhoneCall, Plus, Receipt, Search, ShieldCheck, ShoppingCart, Stethoscope, Ticket, UserRound, Users, WalletCards, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const modules = [
@@ -20,6 +20,9 @@ const modules = [
   { id: "compounding", label: "التحضير الصيدلي", icon: FlaskConical },
   { id: "finance", label: "المالية والتقارير", icon: WalletCards },
   { id: "people", label: "الموظفون والفروع", icon: Users },
+  { id: "customerCare", label: "خدمة العملاء", icon: UserRound },
+  { id: "callCentre", label: "مركز الاتصال", icon: PhoneCall },
+  { id: "catalog", label: "كتالوج الأصناف", icon: Database },
 ];
 
 const metrics = [
@@ -37,7 +40,7 @@ export default function Home() {
   const role = user?.role as "admin" | "manager" | "pharmacist" | "cashier" | "user" | undefined;
   const allowedModules = useMemo(() => {
     if (!role) return modules.filter(item => item.id === "overview");
-    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], people: ["admin", "manager"] };
+    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], people: ["admin", "manager"], customerCare: ["admin", "manager", "pharmacist", "cashier"], callCentre: ["admin", "manager", "pharmacist", "cashier"], catalog: ["admin", "manager", "pharmacist"] };
     return modules.filter(item => access[item.id]?.includes(role));
   }, [role]);
   const activeModule = allowedModules.find(item => item.id === active) ?? allowedModules[0] ?? modules[0];
@@ -85,9 +88,15 @@ function ModulePanel({ active }: { active: string }) {
     compounding: { title: "التحضير الصيدلي", description: "تركيبات وBOM وتكلفة مع سجل مسؤولية.", items: ["تركيبة ومكونات", "خصم BOM", "تتبع التحضير المعقم"] },
     finance: { title: "المالية والتقارير", description: "تقارير على بيانات فعلية مع حدود دفع وتسوية واضحة.", items: ["دفتر وحركة نقدية", "Meeza / InstaPay", "تسوية ومراجعة"] },
     people: { title: "الموظفون والفروع", description: "أدوار مرتبطة بالفروع مع أساس حساب ورديات ورواتب مصرية.", items: ["أدوار وصلاحيات", "وردية ورمضان", "إجازات ورواتب"] },
+    customerCare: { title: "خدمة العملاء", description: "ملفات العملاء، الموافقات، المتابعة، والشكاوى مع سجل قابل للتدقيق.", items: ["ملف عميل", "متابعة علاجية", "موافقة وخصوصية"] },
+    callCentre: { title: "مركز الاتصال", description: "استقبال المكالمات وتوزيع التذاكر ومواعيد إعادة الاتصال دون حفظ تسجيلات حساسة تلقائياً.", items: ["تذكرة جديدة", "أولوية وتصعيد", "موعد متابعة"] },
+    catalog: { title: "كتالوج الأصناف", description: "بحث في الأدوية والتجميل والمستلزمات مع مصدر ودرجة تحقق لكل صنف.", items: ["أدوية مصرية", "تجميل", "مستلزمات طبية"] },
   };
   const panel = panels[active] ?? panels.overview;
   if (active === "prescriptions") return <PrescriptionWorkspace />;
+  if (active === "customerCare") return <CustomerCareWorkspace />;
+  if (active === "callCentre") return <CallCentreWorkspace />;
+  if (active === "catalog") return <CatalogWorkspace />;
   return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardContent className="p-0"><div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div><div className="mb-2 flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-cyan-500" /><span className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700">مساحة عمل</span></div><h2 className="text-xl font-bold tracking-tight">{panel.title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{panel.description}</p></div><div className="grid grid-cols-1 gap-2 sm:min-w-[300px] sm:grid-cols-3">{panel.items.map(item => <div key={item} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-xs font-medium text-slate-600">{item}</div>)}</div></div></CardContent></Card>;
 }
 
@@ -132,3 +141,45 @@ function PrescriptionWorkspace() {
 }
 
 function UploadIcon() { return <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-cyan-600 shadow-sm"><FileText className="h-6 w-6" /></div>; }
+
+function WorkspaceShell({ title, children }: { title: string; children: React.ReactNode }) {
+  return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardHeader><CardTitle className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-cyan-500" />{title}</CardTitle></CardHeader><CardContent>{children}</CardContent></Card>;
+}
+
+function CustomerCareWorkspace() {
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [status, setStatus] = useState("");
+  const create = trpc.erp.customerCare.create.useMutation();
+  const customers = trpc.erp.customerCare.list.useQuery(undefined, { retry: false });
+  const submit = async () => {
+    if (!fullName.trim() || !phone.trim()) { setStatus("أدخل الاسم ورقم الهاتف بعد الحصول على الموافقة اللازمة."); return; }
+    try { const result = await create.mutateAsync({ fullName, phone, consentStatus: "pending", chronicCareEnabled: false }); setStatus(`تم إنشاء ملف عميل رقم ${result.customerId} بحالة موافقة معلقة.`); setFullName(""); setPhone(""); await customers.refetch(); } catch (error) { setStatus(error instanceof Error ? error.message : "تعذر إنشاء الملف"); }
+  };
+  return <WorkspaceShell title="خدمة العملاء"><div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]"><div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4"><p className="text-sm font-semibold">ملف عميل جديد</p><Input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="الاسم الكامل" aria-label="الاسم الكامل" /><Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="رقم الهاتف" aria-label="رقم الهاتف" /><p className="text-xs leading-5 text-slate-500">سيظل consent بحالة معلقة حتى يتم توثيق موافقة العميل وفق سياسة الفرع.</p><Button onClick={submit} disabled={create.isPending} className="w-full bg-[#0d1b2a]">{create.isPending ? "جارٍ الحفظ…" : <><Plus className="ml-2 h-4 w-4" />إنشاء ملف</>}</Button>{status && <Badge variant="outline">{status}</Badge>}</div><div><p className="mb-3 text-sm font-semibold">آخر الملفات</p>{customers.isLoading ? <p className="text-sm text-slate-500">جارٍ التحميل…</p> : customers.data?.length ? <div className="space-y-2">{customers.data.slice(0, 5).map(customer => <div key={customer.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3"><div><p className="font-medium">{customer.fullName}</p><p className="text-xs text-slate-500">{customer.phone}</p></div><Badge variant="secondary">{customer.consentStatus}</Badge></div>)}</div> : <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">لا توجد ملفات فعلية بعد.</p>}</div></div></WorkspaceShell>;
+}
+
+function CallCentreWorkspace() {
+  const [subject, setSubject] = useState("");
+  const [status, setStatus] = useState("");
+  const create = trpc.erp.callCentre.create.useMutation();
+  const tickets = trpc.erp.callCentre.list.useQuery(undefined, { retry: false });
+  const submit = async () => { if (!subject.trim()) { setStatus("اكتب موضوع التذكرة."); return; } try { const result = await create.mutateAsync({ subject, channel: "phone", direction: "inbound", priority: "normal" }); setStatus(`تم إنشاء التذكرة #${result.ticketId}`); setSubject(""); await tickets.refetch(); } catch (error) { setStatus(error instanceof Error ? error.message : "تعذر إنشاء التذكرة"); } };
+  return <WorkspaceShell title="مركز الاتصال"><div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]"><div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4"><p className="text-sm font-semibold">مكالمة واردة</p><Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="موضوع الاتصال أو الطلب" aria-label="موضوع الاتصال" /><p className="text-xs leading-5 text-slate-500">لا يتم حفظ تسجيل صوتي تلقائياً؛ يُحفظ فقط مرجع التسجيل عند تفعيل سياسة قانونية واضحة.</p><Button onClick={submit} disabled={create.isPending} className="w-full bg-[#0d1b2a]">{create.isPending ? "جارٍ الإنشاء…" : <><Ticket className="ml-2 h-4 w-4" />فتح تذكرة</>}</Button>{status && <Badge variant="outline">{status}</Badge>}</div><div><p className="mb-3 text-sm font-semibold">طابور التذاكر</p>{tickets.isLoading ? <p className="text-sm text-slate-500">جارٍ التحميل…</p> : tickets.data?.length ? <div className="space-y-2">{tickets.data.slice(0, 6).map(ticket => <div key={ticket.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3"><div><p className="font-medium">{ticket.subject}</p><p className="text-xs text-slate-500">{ticket.channel} · {ticket.direction}</p></div><Badge variant="secondary">{ticket.status}</Badge></div>)}</div> : <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">لا توجد تذاكر مفتوحة.</p>}</div></div></WorkspaceShell>;
+}
+
+function CatalogWorkspace() {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<"medicine" | "cosmetic" | "medical_supply" | undefined>(undefined);
+  const [nameAr, setNameAr] = useState("");
+  const [sku, setSku] = useState("");
+  const [sourceAuthority, setSourceAuthority] = useState<"EDA" | "NFSA" | "LOCAL_PENDING_REVIEW">("LOCAL_PENDING_REVIEW");
+  const [status, setStatus] = useState("");
+  const catalog = trpc.erp.catalog.search.useQuery({ query, category }, { retry: false });
+  const createItem = trpc.erp.catalog.createItem.useMutation();
+  const submitItem = async () => {
+    if (!nameAr.trim() || !sku.trim() || !category) { setStatus("اختر الفئة وأدخل الاسم العربي وSKU."); return; }
+    try { const result = await createItem.mutateAsync({ category, nameAr, sku, sourceAuthority }); setStatus(`تم تسجيل الصنف #${result.itemId} بحالة ${result.verificationStatus}`); setNameAr(""); setSku(""); await catalog.refetch(); } catch (error) { setStatus(error instanceof Error ? error.message : "تعذر تسجيل الصنف"); }
+  };
+  return <WorkspaceShell title="كتالوج الأصناف"><div className="space-y-4"><div className="rounded-2xl border border-cyan-100 bg-cyan-50/50 p-4"><div className="mb-3 flex items-center gap-2"><Plus className="h-4 w-4 text-cyan-700" /><p className="text-sm font-semibold text-cyan-950">إضافة صنف للمراجعة</p></div><div className="grid gap-2 md:grid-cols-4"><Input value={nameAr} onChange={e => setNameAr(e.target.value)} placeholder="الاسم العربي" aria-label="اسم الصنف" /><Input value={sku} onChange={e => setSku(e.target.value)} placeholder="SKU داخلي" aria-label="SKU" /><select value={category ?? ""} onChange={e => setCategory((e.target.value || undefined) as typeof category)} className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm"><option value="">الفئة</option><option value="medicine">دواء</option><option value="cosmetic">تجميل</option><option value="medical_supply">مستلزم</option></select><select value={sourceAuthority} onChange={e => setSourceAuthority(e.target.value as typeof sourceAuthority)} className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm"><option value="LOCAL_PENDING_REVIEW">إدخال محلي يحتاج مراجعة</option><option value="EDA">مرجع EDA</option><option value="NFSA">مرجع NFSA</option></select></div><div className="mt-3 flex flex-wrap items-center gap-3"><Button onClick={submitItem} disabled={createItem.isPending} className="bg-[#0d1b2a]">{createItem.isPending ? "جارٍ التسجيل…" : "إرسال للمراجعة"}</Button>{status && <Badge variant="outline">{status}</Badge>}</div></div><div className="flex flex-col gap-2 sm:flex-row"><Input value={query} onChange={e => setQuery(e.target.value)} placeholder="ابحث بالاسم العربي" aria-label="بحث الكتالوج" /><select value={category ?? ""} onChange={e => setCategory((e.target.value || undefined) as typeof category)} className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm"><option value="">كل الفئات</option><option value="medicine">أدوية</option><option value="cosmetic">مستحضرات تجميل</option><option value="medical_supply">مستلزمات طبية</option></select></div>{catalog.isLoading ? <p className="text-sm text-slate-500">جارٍ البحث…</p> : catalog.data?.length ? <div className="grid gap-2 md:grid-cols-2">{catalog.data.map(item => <div key={item.id} className="rounded-xl border border-slate-200 p-3"><div className="flex items-start justify-between gap-3"><div><p className="font-medium">{item.nameAr}</p><p className="text-xs text-slate-500">{item.sku} · {item.category}</p></div><Badge variant="outline">{item.verificationStatus}</Badge></div><p className="mt-2 text-xs text-slate-500">المصدر: {item.sourceAuthority}{item.registrationNumber ? ` · ${item.registrationNumber}` : ""}</p></div>)}</div> : <div className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500"><Database className="mx-auto mb-2 h-6 w-6 text-slate-300" />لا توجد أصناف موثقة مطابقة. يمكن للمصرّح له إضافة صنف مع مصدر ومراجعة.</div>}</div></WorkspaceShell>;
+}

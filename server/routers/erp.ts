@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
-import { eq } from "drizzle-orm";
+import { and, desc, eq, like } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, scheduledJobs } from "../../drizzle/schema";
+import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -16,6 +16,20 @@ const pharmacistProcedure = protectedProcedure.use(({ ctx, next }) => {
   const role = ctx.user.role as AppRole;
   if (!["admin", "manager", "pharmacist"].includes(role)) {
     throw new TRPCError({ code: "FORBIDDEN", message: "Pharmacist review permission required" });
+  }
+  return next();
+});
+
+const catalogEditorProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!["admin", "manager", "pharmacist"].includes(ctx.user.role)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Catalog editor permission required" });
+  }
+  return next();
+});
+
+const customerCareProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!["admin", "manager", "pharmacist", "cashier"].includes(ctx.user.role)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Customer care permission required" });
   }
   return next();
 });
@@ -141,6 +155,82 @@ export const erpRouter = router({
         const content = result.choices?.[0]?.message?.content;
         if (typeof content !== "string") throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Vision model returned no structured result" });
         return { extraction: JSON.parse(content), status: "PENDING_REVIEW" as const, model: "gemini-3-flash-preview" };
+      }),
+  }),
+  customerCare: router({
+    list: customerCareProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      return db.select().from(customerProfiles).orderBy(desc(customerProfiles.updatedAt)).limit(100);
+    }),
+    create: customerCareProcedure
+      .input(z.object({ fullName: z.string().min(2).max(220), phone: z.string().min(7).max(40), consentStatus: z.enum(["pending", "granted", "withdrawn"]).default("pending"), chronicCareEnabled: z.boolean().default(false), notes: z.string().max(4000).optional(), branchId: z.number().int().positive().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const inserted = await db.insert(customerProfiles).values({ ...input, chronicCareEnabled: input.chronicCareEnabled ? 1 : 0, createdByUserId: ctx.user.id });
+        return { customerId: Number(inserted[0].insertId) };
+      }),
+    addInteraction: customerCareProcedure
+      .input(z.object({ customerId: z.number().int().positive(), interactionType: z.enum(["follow_up", "complaint", "counseling", "chronic_care"]), summary: z.string().min(3).max(6000), nextActionAt: z.coerce.date().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const inserted = await db.insert(careInteractions).values({ ...input, userId: ctx.user.id });
+        return { interactionId: Number(inserted[0].insertId) };
+      }),
+  }),
+  callCentre: router({
+    list: customerCareProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      return db.select().from(callTickets).orderBy(desc(callTickets.updatedAt)).limit(100);
+    }),
+    create: customerCareProcedure
+      .input(z.object({ subject: z.string().min(2).max(220), channel: z.enum(["phone", "whatsapp", "web", "in_person"]), direction: z.enum(["inbound", "outbound"]), priority: z.enum(["low", "normal", "high", "urgent"]).default("normal"), customerId: z.number().int().positive().optional(), branchId: z.number().int().positive().optional(), callbackAt: z.coerce.date().optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const inserted = await db.insert(callTickets).values({ ...input, createdByUserId: ctx.user.id });
+        return { ticketId: Number(inserted[0].insertId), status: "open" as const };
+      }),
+    updateStatus: customerCareProcedure
+      .input(z.object({ ticketId: z.number().int().positive(), status: z.enum(["open", "pending", "resolved", "closed"]), disposition: z.string().max(120).optional(), assignedUserId: z.number().int().positive().optional() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await db.update(callTickets).set(input).where(eq(callTickets.id, input.ticketId));
+        return { success: true } as const;
+      }),
+  }),
+  catalog: router({
+    search: protectedProcedure
+      .input(z.object({ query: z.string().max(120).default(""), category: z.enum(["medicine", "cosmetic", "medical_supply"]).optional() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const filters = [];
+        if (input.query) filters.push(like(catalogItems.nameAr, `%${input.query}%`));
+        if (input.category) filters.push(eq(catalogItems.category, input.category));
+        return db.select().from(catalogItems).where(filters.length ? and(...filters) : undefined).orderBy(desc(catalogItems.updatedAt)).limit(100);
+      }),
+    createItem: catalogEditorProcedure
+      .input(z.object({ category: z.enum(["medicine", "cosmetic", "medical_supply"]), sku: z.string().min(2).max(80), barcode: z.string().max(80).optional(), nameAr: z.string().min(2).max(240), nameEn: z.string().max(240).optional(), genericName: z.string().max(240).optional(), manufacturer: z.string().max(220).optional(), registrationNumber: z.string().max(120).optional(), sourceAuthority: z.enum(["EDA", "NFSA", "LOCAL_PENDING_REVIEW"]), sourceRecordId: z.string().max(160).optional(), sourceUrl: z.string().url().max(500).optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const inserted = await db.insert(catalogItems).values({ ...input, verificationStatus: input.sourceAuthority === "LOCAL_PENDING_REVIEW" ? "PENDING_REVIEW" : "UNVERIFIED", createdByUserId: ctx.user.id, sourceRetrievedAt: new Date() });
+        const itemId = Number(inserted[0].insertId);
+        await db.insert(catalogSyncQueue).values({ entityType: input.category, operation: "create", entityId: itemId, idempotencyKey: `catalog-create-${itemId}-${ctx.user.id}`, payloadJson: JSON.stringify(input), createdByUserId: ctx.user.id });
+        return { itemId, verificationStatus: input.sourceAuthority === "LOCAL_PENDING_REVIEW" ? "PENDING_REVIEW" as const : "UNVERIFIED" as const };
+      }),
+    approveItem: catalogEditorProcedure
+      .input(z.object({ itemId: z.number().int().positive(), approved: z.boolean() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await db.update(catalogItems).set({ verificationStatus: input.approved ? "VERIFIED" : "REJECTED", approvedByUserId: ctx.user.id }).where(eq(catalogItems.id, input.itemId));
+        return { itemId: input.itemId, status: input.approved ? "VERIFIED" as const : "REJECTED" as const };
       }),
   }),
 });

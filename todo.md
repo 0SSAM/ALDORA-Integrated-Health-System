@@ -66,3 +66,22 @@
 - [x] Add authority-specific artifact boundary documentation for EDA, ETA, MOH, NFSA, UHIA, and syndicate workflows, including QR/barcode legal-label fields.
 - [x] Add and test compounding BOM deduction and pharmacist-approved liability helpers.
 - [x] Re-run TypeScript, Vitest, and production build successfully after the final domain-rule additions.
+
+# Expansion TODO — Customer Care, Call Centre, Catalogs, AI Review, Offline
+
+- [ ] Add full customer/patient care module with profiles, chronic-care boundary, follow-ups, complaints, consent, and audit trail.
+- [ ] Add full call-centre module with inbound/outbound calls, ticketing, callback tasks, priority, disposition, recording metadata boundary, and escalation.
+- [ ] Add real-time AI review orchestration with human approval gates, explainable findings, audit logs, and safe fallback when the model is unavailable.
+- [ ] Improve UI simplicity, friendliness, accessibility, keyboard navigation, and clear empty/loading/error states.
+- [ ] Add offline-first draft queue with local persistence, conflict handling, idempotency keys, and secure online synchronization; never complete regulated transactions offline without server confirmation.
+- [ ] Identify authoritative Egyptian sources for medicines, cosmetics, and medical supplies catalogs and document licensing/data-refresh requirements.
+- [ ] Add catalog model for medicines, cosmetics, and medical supplies with source provenance, approval status, codes, pricing fields, and searchable categories.
+- [ ] Add authorized item creation workflow with role guard, duplicate detection, review status, audit event, and approval history.
+- [ ] Add tests for customer care, call centre, AI review safety, offline queue synchronization, catalog provenance, and authorized item creation.
+- [ ] Verify responsive UX and online/offline behavior on desktop Windows and mobile browsers.
+- [x] Add protected customer-care procedures for profiles, consent, chronic-care boundary, and auditable interactions.
+- [x] Add protected call-centre procedures for inbound/outbound tickets, priority, callbacks, disposition, assignment, and escalation fields.
+- [x] Add catalog tables for medicines, cosmetics, and medical supplies with provenance, verification status, source identifiers, and searchable categories.
+- [x] Add authorized catalog-item creation and approval workflow with role guard and idempotent sync queue record.
+- [x] Add customer-care, call-centre, and catalog UI workspaces with clear empty/loading/error states and mobile-friendly controls.
+- [x] Run TypeScript, Vitest, and production build successfully after the customer-care, call-centre, catalog, and authorized-item changes.

@@ -117,3 +117,84 @@ export const prescriptionIntakes = mysqlTable("prescription_intakes", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
+
+
+export const customerProfiles = mysqlTable("customer_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  branchId: int("branchId"),
+  fullName: varchar("fullName", { length: 220 }).notNull(),
+  phone: varchar("phone", { length: 40 }).notNull(),
+  nationalIdHash: varchar("nationalIdHash", { length: 128 }),
+  consentStatus: mysqlEnum("consentStatus", ["pending", "granted", "withdrawn"]).default("pending").notNull(),
+  chronicCareEnabled: int("chronicCareEnabled").default(0).notNull(),
+  notes: text("notes"),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ phoneIdx: index("customer_profiles_phone_idx").on(table.phone) }));
+
+export const careInteractions = mysqlTable("care_interactions", {
+  id: int("id").autoincrement().primaryKey(),
+  customerId: int("customerId").notNull(),
+  userId: int("userId").notNull(),
+  interactionType: mysqlEnum("interactionType", ["follow_up", "complaint", "counseling", "chronic_care"]).notNull(),
+  summary: text("summary").notNull(),
+  nextActionAt: timestamp("nextActionAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const callTickets = mysqlTable("call_tickets", {
+  id: int("id").autoincrement().primaryKey(),
+  customerId: int("customerId"),
+  branchId: int("branchId"),
+  assignedUserId: int("assignedUserId"),
+  channel: mysqlEnum("channel", ["phone", "whatsapp", "web", "in_person"]).notNull(),
+  direction: mysqlEnum("direction", ["inbound", "outbound"]).notNull(),
+  subject: varchar("subject", { length: 220 }).notNull(),
+  priority: mysqlEnum("priority", ["low", "normal", "high", "urgent"]).default("normal").notNull(),
+  status: mysqlEnum("status", ["open", "pending", "resolved", "closed"]).default("open").notNull(),
+  disposition: varchar("disposition", { length: 120 }),
+  callbackAt: timestamp("callbackAt"),
+  escalationAt: timestamp("escalationAt"),
+  recordingRef: varchar("recordingRef", { length: 255 }),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ statusIdx: index("call_tickets_status_idx").on(table.status, table.priority) }));
+
+export const catalogItems = mysqlTable("catalog_items", {
+  id: int("id").autoincrement().primaryKey(),
+  category: mysqlEnum("category", ["medicine", "cosmetic", "medical_supply"]).notNull(),
+  sku: varchar("sku", { length: 80 }).notNull(),
+  barcode: varchar("barcode", { length: 80 }),
+  nameAr: varchar("nameAr", { length: 240 }).notNull(),
+  nameEn: varchar("nameEn", { length: 240 }),
+  genericName: varchar("genericName", { length: 240 }),
+  manufacturer: varchar("manufacturer", { length: 220 }),
+  registrationNumber: varchar("registrationNumber", { length: 120 }),
+  sourceAuthority: varchar("sourceAuthority", { length: 40 }).notNull(),
+  sourceRecordId: varchar("sourceRecordId", { length: 160 }),
+  sourceUrl: varchar("sourceUrl", { length: 500 }),
+  sourceRetrievedAt: timestamp("sourceRetrievedAt"),
+  verificationStatus: mysqlEnum("verificationStatus", ["UNVERIFIED", "PENDING_REVIEW", "VERIFIED", "REJECTED"]).default("UNVERIFIED").notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  approvedByUserId: int("approvedByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ catalogSkuIdx: uniqueIndex("catalog_items_sku_idx").on(table.sku), catalogBarcodeIdx: index("catalog_items_barcode_idx").on(table.barcode) }));
+
+export const catalogSyncQueue = mysqlTable("catalog_sync_queue", {
+  id: int("id").autoincrement().primaryKey(),
+  entityType: mysqlEnum("entityType", ["medicine", "cosmetic", "medical_supply"]).notNull(),
+  operation: mysqlEnum("operation", ["create", "update", "review"]).notNull(),
+  entityId: int("entityId"),
+  idempotencyKey: varchar("idempotencyKey", { length: 100 }).notNull(),
+  payloadJson: text("payloadJson").notNull(),
+  status: mysqlEnum("status", ["pending", "synced", "conflict", "failed"]).default("pending").notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ idempotencyIdx: uniqueIndex("catalog_sync_idempotency_idx").on(table.idempotencyKey) }));
+
+export type CustomerProfile = typeof customerProfiles.$inferSelect;
+export type CallTicket = typeof callTickets.$inferSelect;
+export type CatalogItem = typeof catalogItems.$inferSelect;
