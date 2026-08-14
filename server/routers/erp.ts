@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
 import { and, desc, eq, inArray, like } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, sales, saleItems } from "../../drizzle/schema";
+import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, sales, saleItems, branches, organizationMemberships } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -22,6 +22,17 @@ async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>
   if (role === "admin") return null;
   const memberships = await db.select({ branchId: branchUsers.branchId }).from(branchUsers).where(and(eq(branchUsers.userId, userId), eq(branchUsers.active, 1)));
   return memberships.map(({ branchId }) => branchId);
+}
+
+async function getBranchOrganizationId(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, branchId: number) {
+  const branch = (await db.select({ organizationId: branches.organizationId }).from(branches).where(eq(branches.id, branchId)).limit(1))[0];
+  if (!branch?.organizationId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Branch has no organization scope" });
+  return branch.organizationId;
+}
+
+async function getUserOrganizationIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number) {
+  const memberships = await db.select({ organizationId: organizationMemberships.organizationId }).from(organizationMemberships).where(and(eq(organizationMemberships.userId, userId), eq(organizationMemberships.active, 1)));
+  return memberships.map((membership) => membership.organizationId);
 }
 
 async function assertUserBranchAccess(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string, branchId: number) {
@@ -280,7 +291,8 @@ export const erpRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
-        const inserted = await db.insert(customerProfiles).values({ ...input, chronicCareEnabled: input.chronicCareEnabled ? 1 : 0, createdByUserId: ctx.user.id });
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
+        const inserted = await db.insert(customerProfiles).values({ ...input, organizationId, chronicCareEnabled: input.chronicCareEnabled ? 1 : 0, createdByUserId: ctx.user.id });
         return { customerId: Number(inserted[0].insertId) };
       }),
     addInteraction: customerCareProcedure
@@ -310,7 +322,8 @@ export const erpRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
-        const inserted = await db.insert(callTickets).values({ ...input, createdByUserId: ctx.user.id });
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
+        const inserted = await db.insert(callTickets).values({ ...input, organizationId, createdByUserId: ctx.user.id });
         return { ticketId: Number(inserted[0].insertId), status: "open" as const };
       }),
     updateStatus: customerCareProcedure
@@ -389,10 +402,14 @@ export const erpRouter = router({
         if (input.query) filters.push(like(catalogItems.nameAr, `%${input.query}%`));
         filters.push(eq(catalogItems.jurisdictionId, input.jurisdictionId));
         if (input.category) filters.push(eq(catalogItems.category, input.category));
+        if (ctx.user.role !== "admin") {
+          const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
+          filters.push(organizationIds.length ? inArray(catalogItems.organizationId, organizationIds) : eq(catalogItems.id, -1));
+        }
         return db.select().from(catalogItems).where(and(...filters)).orderBy(desc(catalogItems.updatedAt)).limit(100);
       }),
     createItem: catalogEditorProcedure
-      .input(z.object({ jurisdictionId: z.number().int().positive(), category: z.enum(["medicine", "cosmetic", "medical_supply"]), sku: z.string().min(2).max(80), barcode: z.string().max(80).optional(), nameAr: z.string().min(2).max(240), nameEn: z.string().max(240).optional(), genericName: z.string().max(240).optional(), manufacturer: z.string().max(220).optional(), registrationNumber: z.string().max(120).optional(), sourceAuthority: z.string().min(2).max(40), sourceRecordId: z.string().max(160).optional(), sourceUrl: z.string().url().max(500).optional() }))
+      .input(z.object({ jurisdictionId: z.number().int().positive(), organizationId: z.number().int().positive().optional(), category: z.enum(["medicine", "cosmetic", "medical_supply"]), sku: z.string().min(2).max(80), barcode: z.string().max(80).optional(), nameAr: z.string().min(2).max(240), nameEn: z.string().max(240).optional(), genericName: z.string().max(240).optional(), manufacturer: z.string().max(220).optional(), registrationNumber: z.string().max(120).optional(), sourceAuthority: z.string().min(2).max(40), sourceRecordId: z.string().max(160).optional(), sourceUrl: z.string().url().max(500).optional() }))
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
@@ -400,7 +417,10 @@ export const erpRouter = router({
         if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "Jurisdiction not found" });
         try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: String(error) }); }
         try { assertJurisdictionProfileReady({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
-        const inserted = await db.insert(catalogItems).values({ ...input, verificationStatus: input.sourceAuthority === "LOCAL_PENDING_REVIEW" ? "PENDING_REVIEW" : "UNVERIFIED", createdByUserId: ctx.user.id, sourceRetrievedAt: new Date() });
+        const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
+        const organizationId = input.organizationId ?? (organizationIds.length === 1 ? organizationIds[0] : null);
+        if (!organizationId || (ctx.user.role !== "admin" && !organizationIds.includes(organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item requires an authorized organization scope" });
+        const inserted = await db.insert(catalogItems).values({ ...input, organizationId, verificationStatus: input.sourceAuthority === "LOCAL_PENDING_REVIEW" ? "PENDING_REVIEW" : "UNVERIFIED", createdByUserId: ctx.user.id, sourceRetrievedAt: new Date() });
         const itemId = Number(inserted[0].insertId);
         await db.insert(catalogSyncQueue).values({ entityType: input.category, operation: "create", entityId: itemId, idempotencyKey: `catalog-create-${itemId}-${ctx.user.id}`, payloadJson: JSON.stringify(input), createdByUserId: ctx.user.id });
         return { itemId, verificationStatus: input.sourceAuthority === "LOCAL_PENDING_REVIEW" ? "PENDING_REVIEW" as const : "UNVERIFIED" as const };

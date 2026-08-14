@@ -51,6 +51,7 @@ export const branchUsers = mysqlTable("branch_users", {
 export const products = mysqlTable("products", {
   id: int("id").autoincrement().primaryKey(),
   jurisdictionId: int("jurisdictionId"),
+  organizationId: int("organizationId"),
   catalogItemId: int("catalogItemId"),
   sku: varchar("sku", { length: 64 }).notNull(),
   barcode: varchar("barcode", { length: 64 }),
@@ -64,6 +65,7 @@ export const products = mysqlTable("products", {
 export const inventoryBatches = mysqlTable("inventory_batches", {
   id: int("id").autoincrement().primaryKey(),
   jurisdictionId: int("jurisdictionId"),
+  organizationId: int("organizationId"),
   branchId: int("branchId").notNull(),
   productId: int("productId").notNull(),
   batchNumber: varchar("batchNumber", { length: 80 }).notNull(),
@@ -76,6 +78,7 @@ export const inventoryBatches = mysqlTable("inventory_batches", {
 export const sales = mysqlTable("sales", {
   id: int("id").autoincrement().primaryKey(),
   jurisdictionId: int("jurisdictionId"),
+  organizationId: int("organizationId"),
   branchId: int("branchId").notNull(),
   cashierId: int("cashierId").notNull(),
   invoiceNumber: varchar("invoiceNumber", { length: 80 }).notNull(),
@@ -101,6 +104,7 @@ export const saleItems = mysqlTable("sale_items", {
 export const auditLogs = mysqlTable("audit_logs", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId"),
+  organizationId: int("organizationId"),
   branchId: int("branchId"),
   action: varchar("action", { length: 80 }).notNull(),
   entityType: varchar("entityType", { length: 80 }).notNull(),
@@ -128,6 +132,7 @@ export type OrganizationRole = OrganizationMembership["organizationRole"];
 
 export const branchAlerts = mysqlTable("branch_alerts", {
   id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId"),
   branchId: int("branchId").notNull(),
   managerUserId: int("managerUserId").notNull(),
   alertType: mysqlEnum("alertType", ["reorder", "expiry"]).notNull(),
@@ -161,6 +166,7 @@ export type Notification = typeof notifications.$inferSelect;
 
 export const prescriptionIntakes = mysqlTable("prescription_intakes", {
   id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId"),
   branchId: int("branchId"),
   jurisdictionId: int("jurisdictionId"),
   createdByUserId: int("createdByUserId").notNull(),
@@ -175,6 +181,7 @@ export const prescriptionIntakes = mysqlTable("prescription_intakes", {
 
 export const customerProfiles = mysqlTable("customer_profiles", {
   id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId"),
   branchId: int("branchId"),
   fullName: varchar("fullName", { length: 220 }).notNull(),
   phone: varchar("phone", { length: 40 }).notNull(),
@@ -199,6 +206,7 @@ export const careInteractions = mysqlTable("care_interactions", {
 
 export const callTickets = mysqlTable("call_tickets", {
   id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId"),
   customerId: int("customerId"),
   branchId: int("branchId"),
   assignedUserId: int("assignedUserId"),
@@ -219,6 +227,7 @@ export const callTickets = mysqlTable("call_tickets", {
 export const catalogItems = mysqlTable("catalog_items", {
   id: int("id").autoincrement().primaryKey(),
   jurisdictionId: int("jurisdictionId"),
+  organizationId: int("organizationId"),
   category: mysqlEnum("category", ["medicine", "cosmetic", "medical_supply"]).notNull(),
   sku: varchar("sku", { length: 80 }).notNull(),
   barcode: varchar("barcode", { length: 80 }),
@@ -241,6 +250,7 @@ export const catalogItems = mysqlTable("catalog_items", {
 export const catalogSyncQueue = mysqlTable("catalog_sync_queue", {
   id: int("id").autoincrement().primaryKey(),
   jurisdictionId: int("jurisdictionId"),
+  organizationId: int("organizationId"),
   entityType: mysqlEnum("entityType", ["medicine", "cosmetic", "medical_supply"]).notNull(),
   operation: mysqlEnum("operation", ["create", "update", "review"]).notNull(),
   entityId: int("entityId"),
