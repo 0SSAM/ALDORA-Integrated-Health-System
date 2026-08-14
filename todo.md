@@ -214,4 +214,10 @@
 
 - [x] Persist non-regulated drafts in IndexedDB with a localStorage fallback and stable idempotency keys.
 - [x] Store auditable queued/conflict/failed status metadata and expose durable listing and conflict marking helpers.
-- [ ] Connect draft replay to authenticated server procedures with explicit idempotency validation; the visible review/removal panel is implemented.
+- [x] Connect draft replay to authenticated server procedures with explicit idempotency validation; the visible review/removal panel is implemented.
+
+# Authenticated Draft Replay
+
+- [x] Add a server-side offline_drafts idempotency ledger with authenticated ownership, module allow-list, payload, status, and conflict metadata.
+- [x] Add protected tRPC procedures to submit/replay only customer-care and call-centre drafts; reject regulated modules and duplicate keys deterministically.
+- [x] Connect the visible draft panel to authenticated replay and refresh the local queue only after server acknowledgement.

@@ -284,3 +284,19 @@ export const complianceEvidence = mysqlTable("compliance_evidence", {
 }, table => ({ sourceIdx: index("compliance_evidence_source_idx").on(table.jurisdictionId, table.packId, table.operation) }));
 
 export type ComplianceEvidence = typeof complianceEvidence.$inferSelect;
+
+
+export const offlineDrafts = mysqlTable("offline_drafts", {
+  id: int("id").autoincrement().primaryKey(),
+  idempotencyKey: varchar("idempotencyKey", { length: 120 }).notNull(),
+  module: mysqlEnum("module", ["customerCare", "callCentre"]).notNull(),
+  payloadJson: text("payloadJson").notNull(),
+  status: mysqlEnum("status", ["queued", "replayed", "conflict", "failed"]).default("queued").notNull(),
+  errorCode: varchar("errorCode", { length: 80 }),
+  createdByUserId: int("createdByUserId").notNull(),
+  replayedEntityId: int("replayedEntityId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ idempotencyIdx: uniqueIndex("offline_drafts_idempotency_idx").on(table.idempotencyKey), ownerStatusIdx: index("offline_drafts_owner_status_idx").on(table.createdByUserId, table.status) }));
+
+export type OfflineDraft = typeof offlineDrafts.$inferSelect;

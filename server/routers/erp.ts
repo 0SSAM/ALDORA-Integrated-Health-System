@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
 import { and, desc, eq, like } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, inventoryBatches, products, sales, saleItems } from "../../drizzle/schema";
+import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, inventoryBatches, products, sales, saleItems } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -36,6 +36,25 @@ const customerCareProcedure = protectedProcedure.use(({ ctx, next }) => {
     throw new TRPCError({ code: "FORBIDDEN", message: "Customer care permission required" });
   }
   return next();
+});
+
+const customerCareDraftSchema = z.object({
+  fullName: z.string().min(2).max(220),
+  phone: z.string().min(7).max(40),
+  consentStatus: z.enum(["pending", "granted", "withdrawn"]).default("pending"),
+  chronicCareEnabled: z.boolean().default(false),
+  notes: z.string().max(4000).optional(),
+  branchId: z.number().int().positive().optional(),
+});
+
+const callCentreDraftSchema = z.object({
+  subject: z.string().min(2).max(220),
+  channel: z.enum(["phone", "whatsapp", "web", "in_person"]),
+  direction: z.enum(["inbound", "outbound"]),
+  priority: z.enum(["low", "normal", "high", "urgent"]).default("normal"),
+  customerId: z.number().int().positive().optional(),
+  branchId: z.number().int().positive().optional(),
+  callbackAt: z.coerce.date().optional(),
 });
 
 export const erpRouter = router({
@@ -252,6 +271,55 @@ export const erpRouter = router({
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         await db.update(callTickets).set(input).where(eq(callTickets.id, input.ticketId));
         return { success: true } as const;
+      }),
+  }),
+  offlineDrafts: router({
+    listMine: customerCareProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      return db.select().from(offlineDrafts).where(eq(offlineDrafts.createdByUserId, ctx.user.id)).orderBy(desc(offlineDrafts.updatedAt)).limit(50);
+    }),
+    enqueue: customerCareProcedure
+      .input(z.object({ idempotencyKey: z.string().min(8).max(120), module: z.enum(["customerCare", "callCentre"]), payload: z.unknown() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const payload = input.module === "customerCare" ? customerCareDraftSchema.parse(input.payload) : callCentreDraftSchema.parse(input.payload);
+        const existing = (await db.select().from(offlineDrafts).where(eq(offlineDrafts.idempotencyKey, input.idempotencyKey)).limit(1))[0];
+        if (existing) {
+          if (existing.createdByUserId !== ctx.user.id) throw new TRPCError({ code: "CONFLICT", message: "Idempotency key belongs to another user" });
+          return { draftId: existing.id, status: existing.status, duplicate: true };
+        }
+        const inserted = await db.insert(offlineDrafts).values({ idempotencyKey: input.idempotencyKey, module: input.module, payloadJson: JSON.stringify(payload), createdByUserId: ctx.user.id });
+        return { draftId: Number(inserted[0].insertId), status: "queued" as const, duplicate: false };
+      }),
+    replay: customerCareProcedure
+      .input(z.object({ draftId: z.number().int().positive() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const draft = (await db.select().from(offlineDrafts).where(and(eq(offlineDrafts.id, input.draftId), eq(offlineDrafts.createdByUserId, ctx.user.id))).limit(1))[0];
+        if (!draft) throw new TRPCError({ code: "NOT_FOUND", message: "Offline draft not found" });
+        if (draft.status === "replayed") return { draftId: draft.id, status: draft.status, entityId: draft.replayedEntityId, duplicate: true };
+        if (draft.status !== "queued") throw new TRPCError({ code: "CONFLICT", message: "Draft requires manual review before replay" });
+        const payload: unknown = JSON.parse(draft.payloadJson);
+        try {
+          if (draft.module === "customerCare") {
+            const parsed = customerCareDraftSchema.parse(payload);
+            const inserted = await db.insert(customerProfiles).values({ ...parsed, chronicCareEnabled: parsed.chronicCareEnabled ? 1 : 0, createdByUserId: ctx.user.id });
+            const entityId = Number(inserted[0].insertId);
+            await db.update(offlineDrafts).set({ status: "replayed", replayedEntityId: entityId, errorCode: null }).where(eq(offlineDrafts.id, draft.id));
+            return { draftId: draft.id, status: "replayed" as const, entityId, duplicate: false };
+          }
+          const parsed = callCentreDraftSchema.parse(payload);
+          const inserted = await db.insert(callTickets).values({ ...parsed, createdByUserId: ctx.user.id });
+          const entityId = Number(inserted[0].insertId);
+          await db.update(offlineDrafts).set({ status: "replayed", replayedEntityId: entityId, errorCode: null }).where(eq(offlineDrafts.id, draft.id));
+          return { draftId: draft.id, status: "replayed" as const, entityId, duplicate: false };
+        } catch (error) {
+          await db.update(offlineDrafts).set({ status: "failed", errorCode: "REPLAY_VALIDATION_FAILED" }).where(eq(offlineDrafts.id, draft.id));
+          throw new TRPCError({ code: "BAD_REQUEST", message: String(error) });
+        }
       }),
   }),
   catalog: router({
