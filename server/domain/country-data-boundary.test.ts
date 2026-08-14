@@ -14,4 +14,11 @@ describe("country data boundary", () => {
     expect(() => assertCountryRecordContext(record, { jurisdictionId: 2, organizationId: 4 })).toThrow("Cross-country");
     expect(() => assertCountryRecordContext(record, { jurisdictionId: 1, organizationId: 9 })).toThrow("Cross-organization");
   });
+
+  it.each(["medicine", "cosmetic", "medicalSupply", "authority", "tax", "invoice", "price", "prescription", "insurance", "payroll", "label"] as const)("requires compound scope for %s", entityType => {
+    const record = { entityType, jurisdictionId: 3, organizationId: 8 };
+    expect(assertCountryRecordContext(record, { jurisdictionId: 3, organizationId: 8 })).toBe(true);
+    expect(() => assertCountryRecordContext(record, { jurisdictionId: 4, organizationId: 8 })).toThrow("Cross-country");
+    expect(() => assertCountryRecordContext(record, { jurisdictionId: 3, organizationId: 12 })).toThrow("Cross-organization");
+  });
 });

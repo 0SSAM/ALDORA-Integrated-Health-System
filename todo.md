@@ -341,3 +341,5 @@
 - [ ] Run the same protected-router lifecycle against TEST_DATABASE_URL with real persisted organizations and memberships; mocked contracts do not replace database integration.
 - [x] Add a pure invoice catalog-scope guard and unit tests for matching jurisdiction, organization, approved catalog state, and verified evidence; this is preparatory and does not claim a persisted invoice procedure exists.
 - [ ] Wire the invoice catalog-scope guard into a real invoice creation/persistence procedure once an invoice table and supported jurisdiction adapter are implemented.
+- [x] Add unit matrix coverage for catalog, pricing, tax, invoice, prescription, insurance, payroll, label, authority, medicine, cosmetic, and medical-supply compound-scope acceptance and cross-country/cross-organization denial.
+- [ ] Add persisted-record denial coverage for those regulated categories against a disposable database; policy matrix tests alone do not satisfy this item.
