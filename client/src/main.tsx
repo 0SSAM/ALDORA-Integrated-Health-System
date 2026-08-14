@@ -21,11 +21,21 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
   startLogin();
 };
 
+const logClientApiError = (label: string, error: unknown) => {
+  // Never emit API response bodies or user-provided messages in production logs.
+  if (!import.meta.env.DEV) return;
+  const trpcError = error instanceof TRPCClientError ? error : undefined;
+  console.error(label, {
+    code: trpcError?.data?.code ?? "UNKNOWN",
+    httpStatus: trpcError?.data?.httpStatus ?? undefined,
+  });
+};
+
 queryClient.getQueryCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.query.state.error;
     redirectToLoginIfUnauthorized(error);
-    console.error("[API Query Error]", error);
+    logClientApiError("[API Query Error]", error);
   }
 });
 
@@ -33,7 +43,7 @@ queryClient.getMutationCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.mutation.state.error;
     redirectToLoginIfUnauthorized(error);
-    console.error("[API Mutation Error]", error);
+    logClientApiError("[API Mutation Error]", error);
   }
 });
 

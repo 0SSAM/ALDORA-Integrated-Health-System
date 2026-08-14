@@ -548,28 +548,12 @@
           return response;
         }
 
-        // For text responses, clone and read body in background
-        var clonedResponse = response.clone();
+        // Privacy boundary: never capture response bodies in the browser debug buffer.
+        // Response payloads may contain session tokens, patient data, or regulated records.
+        entry.response.body = "[Response body omitted by privacy policy]";
+        store.networkRequests.push(entry);
+        pruneBuffer(store.networkRequests, CONFIG.bufferSize.network);
 
-        // Async: read body in background, don't block the response
-        clonedResponse
-          .text()
-          .then(function (text) {
-            if (text.length <= CONFIG.maxBodyLength) {
-              entry.response.body = sanitizeValue(tryParseJson(text));
-            } else {
-              entry.response.body = text.slice(0, CONFIG.maxBodyLength) + "...[truncated]";
-            }
-          })
-          .catch(function () {
-            entry.response.body = "[Unable to read body]";
-          })
-          .finally(function () {
-            store.networkRequests.push(entry);
-            pruneBuffer(store.networkRequests, CONFIG.bufferSize.network);
-          });
-
-        // Return response immediately, don't wait for body reading
         return response;
       })
       .catch(function (error) {

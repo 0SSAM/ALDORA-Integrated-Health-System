@@ -412,6 +412,11 @@ export const erpRouter = router({
           const parsed = callCentreDraftSchema.parse(payload);
           await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, parsed.branchId);
           const organizationId = await getBranchOrganizationId(db, parsed.branchId);
+          if (parsed.customerId !== undefined) {
+            const customer = (await db.select({ branchId: customerProfiles.branchId, organizationId: customerProfiles.organizationId }).from(customerProfiles).where(eq(customerProfiles.id, parsed.customerId)).limit(1))[0];
+            if (!customer) throw new TRPCError({ code: "NOT_FOUND", message: "Customer profile not found" });
+            assertCustomerTicketScope({ ticketOrganizationId: organizationId, ticketBranchId: parsed.branchId, customerOrganizationId: customer.organizationId, customerBranchId: customer.branchId });
+          }
           const inserted = await db.insert(callTickets).values({ ...parsed, organizationId, createdByUserId: ctx.user.id });
           const entityId = Number(inserted[0].insertId);
           await db.update(offlineDrafts).set({ status: "replayed", replayedEntityId: entityId, errorCode: null }).where(eq(offlineDrafts.id, draft.id));

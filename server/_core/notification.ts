@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { ENV } from "./env";
+import { safeErrorLabel, safeHttpErrorLabel } from "../domain/safe-error";
 
 export type NotificationPayload = {
   title: string;
@@ -97,18 +98,21 @@ export async function notifyOwner(
     });
 
     if (!response.ok) {
-      const detail = await response.text().catch(() => "");
       console.warn(
-        `[Notification] Failed to notify owner (${response.status} ${response.statusText})${
-          detail ? `: ${detail}` : ""
-        }`
+        `[Notification] Failed to notify owner (${safeHttpErrorLabel(
+          response.status,
+          response.statusText,
+        )})`,
       );
       return false;
     }
 
     return true;
   } catch (error) {
-    console.warn("[Notification] Error calling notification service:", error);
+    console.warn(
+      "[Notification] Error calling notification service:",
+      safeErrorLabel(error),
+    );
     return false;
   }
 }

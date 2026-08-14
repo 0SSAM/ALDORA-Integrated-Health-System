@@ -19,6 +19,10 @@ describe("customer and call-ticket scope policy", () => {
     expect(() => assertAssigneeScope({ ticketOrganizationId: 10, ticketBranchId: 3 })).toThrow(/required/);
   });
 
+  it("rejects an offline call-centre replay customer outside the ticket scope", () => {
+    expect(() => assertCustomerTicketScope({ ticketOrganizationId: 10, ticketBranchId: 3, customerOrganizationId: 11, customerBranchId: 4 })).toThrow();
+  });
+
   it("builds an update payload from persisted ticket fields only", () => {
     expect(buildCallTicketUpdate({ status: "resolved", disposition: "completed", assignedUserId: 7 })).toEqual({ status: "resolved", disposition: "completed", assignedUserId: 7 });
     expect(buildCallTicketUpdate({ status: "pending" })).toEqual({ status: "pending" });

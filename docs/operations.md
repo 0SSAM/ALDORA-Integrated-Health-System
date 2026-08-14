@@ -42,4 +42,8 @@ The current release provides persisted, non-networked eligibility/preauthorizati
 
 ## Validation note
 
-With the current injected environment, `pnpm test` reports 119 passing tests and 4 optional database tests skipped because no valid MySQL `TEST_DATABASE_URL` is configured. TypeScript and the production build pass. A real database lifecycle remains a release prerequisite and must be run only against a disposable isolated test database.
+With the current injected environment, `pnpm test` reports 126 passing tests and 4 optional database tests skipped because no valid MySQL `TEST_DATABASE_URL` is configured. TypeScript and the production build pass. A real database lifecycle remains a release prerequisite and must be run only against a disposable isolated test database.
+
+## Diagnostic logging boundary
+
+Integration failures are logged with bounded status and stable error metadata only. Storage and notification response bodies, raw exception messages, tokens, and patient or customer payloads must not be written to server logs. Development browser/network diagnostics may contain request metadata or response bodies depending on the local debug collector; they are not an audit trail and must be disabled or access-restricted in any production-like environment. Operational investigations should use scoped audit records and redacted deployment logs instead.

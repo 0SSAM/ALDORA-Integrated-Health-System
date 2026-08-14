@@ -6,6 +6,7 @@ import { getDb } from "../db";
 import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { ARAB_COUNTRY_REGISTRY, normalizeCountryCode } from "../domain/regional-engine";
 import { assertPackApprovalReady, transitionPackStatus } from "../domain/compliance-lifecycle";
+import { canAccessJurisdiction } from "../domain/jurisdiction-access";
 
 const profileInput = z.object({
   countryCode: z.string().length(2),
@@ -20,8 +21,16 @@ const profileInput = z.object({
   numberSystem: z.string().min(2).max(16).default("latn"),
 });
 
+async function getUserJurisdictionAssignments(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number) {
+  return db
+    .select({ jurisdictionId: branchJurisdictions.jurisdictionId, active: branchUsers.active })
+    .from(branchJurisdictions)
+    .innerJoin(branchUsers, eq(branchUsers.branchId, branchJurisdictions.branchId))
+    .where(and(eq(branchUsers.userId, userId), eq(branchUsers.active, 1)));
+}
+
 export const regionalRouter = router({
-  registry: protectedProcedure.query(async () => {
+  registry: protectedProcedure.query(async ({ ctx }) => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
     const profiles = await db.select().from(jurisdictionProfiles).orderBy(jurisdictionProfiles.countryCode);
@@ -29,7 +38,7 @@ export const regionalRouter = router({
     const evidence = await db.select().from(complianceEvidence);
     const profileByCode = new Map(profiles.map(profile => [profile.countryCode, profile]));
     const now = new Date();
-    return ARAB_COUNTRY_REGISTRY.map(country => {
+    const registry = ARAB_COUNTRY_REGISTRY.map(country => {
       const profile = profileByCode.get(country.countryCode) ?? null;
       const pack = profile ? packs.find(candidate => candidate.jurisdictionId === profile.id && candidate.status === "approved") ?? null : null;
       let evidenceReady = false;
@@ -41,6 +50,8 @@ export const regionalRouter = router({
       const packReady = Boolean(pack && pack.effectiveFrom.getTime() <= now.getTime() && (!pack.reviewDueAt || pack.reviewDueAt.getTime() >= now.getTime()) && evidenceReady);
       return { ...country, status: profile?.active && packReady ? "configured" : profile ? "pending_approval" : "not_configured", profile, packReady };
     });
+    if (ctx.user.role === "admin") return registry;
+    return registry.map(country => ({ ...country, profile: null }));
   }),
 
   myBranchJurisdictions: protectedProcedure.query(async ({ ctx }) => {
@@ -128,15 +139,25 @@ export const regionalRouter = router({
     return { packId: pack.id, status: "rolled_back" as const, alreadyRolledBack: false };
   }),
 
-  listPacks: protectedProcedure.input(z.object({ jurisdictionId: z.number().int().positive() })).query(async ({ input }) => {
+  listPacks: protectedProcedure.input(z.object({ jurisdictionId: z.number().int().positive() })).query(async ({ ctx, input }) => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    const assignments = await getUserJurisdictionAssignments(db, ctx.user.id);
+    if (!canAccessJurisdiction(ctx.user.role, assignments, input.jurisdictionId)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Jurisdiction access denied" });
+    }
     return db.select().from(compliancePacks).where(eq(compliancePacks.jurisdictionId, input.jurisdictionId)).orderBy(desc(compliancePacks.createdAt));
   }),
 
-  listEvidence: protectedProcedure.input(z.object({ packId: z.number().int().positive() })).query(async ({ input }) => {
+  listEvidence: protectedProcedure.input(z.object({ packId: z.number().int().positive() })).query(async ({ ctx, input }) => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    const pack = (await db.select({ jurisdictionId: compliancePacks.jurisdictionId }).from(compliancePacks).where(eq(compliancePacks.id, input.packId)).limit(1))[0];
+    if (!pack) throw new TRPCError({ code: "NOT_FOUND", message: "Compliance pack not found" });
+    const assignments = await getUserJurisdictionAssignments(db, ctx.user.id);
+    if (!canAccessJurisdiction(ctx.user.role, assignments, pack.jurisdictionId)) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Jurisdiction access denied" });
+    }
     return db.select().from(complianceEvidence).where(eq(complianceEvidence.packId, input.packId)).orderBy(desc(complianceEvidence.createdAt));
   }),
 

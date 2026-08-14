@@ -404,3 +404,30 @@
 - [x] Add regression coverage for cross-branch notification visibility and mark-read denial.
 - [x] Apply audience-role authorization consistently to listForOrganization and markRead, not only the general notification list.
 - [x] Add regression coverage for role-targeted notification read and mark-read denial.
+
+# Comprehensive Quality, Security, and Product Audit
+
+- [ ] Audit server routers and domain policies for authorization, organization/jurisdiction scope, input validation, error handling, idempotency, and unsafe data exposure.
+- [ ] Audit database schema, migrations, indexes, nullable legacy fields, and query predicates for integrity and tenant isolation risks.
+- [ ] Audit scheduled callbacks, offline replay, notifications, uploads, and sensitive-data paths for lifecycle and abuse cases.
+- [ ] Audit frontend routes, loading/error/empty states, RTL/mobile behavior, accessibility, and dead-end navigation.
+- [ ] Run static checks, tests, production build, and focused browser verification; inspect runtime logs for actionable issues.
+- [ ] Fix every reproducible defect found in scope and add regression coverage before marking it complete.
+- [ ] Add only suitable improvements that are justified by the audit and do not fabricate regulatory, payer, government, or customer data.
+- [ ] Update the capability-gap and operations documentation with findings, fixes, remaining limitations, and validation evidence.
+- [x] Reduce client-side diagnostic logging to bounded, non-sensitive error metadata and remove showcase input logging from shipped code paths.
+- [x] Document that development network logs may contain response bodies and ensure production behavior does not expose debug payloads.
+- [x] Restrict regional compliance pack and evidence reads to the user’s assigned active branch jurisdictions, with administrator-only full registry details.
+- [x] Add regression coverage for cross-jurisdiction regional read denial and sanitized non-admin registry output.
+- [x] Bound server integration error logs to status and stable error metadata; never print storage/notification response bodies or raw exception objects.
+- [x] Add regression coverage for bounded integration error formatting where the helper can be tested without external calls.
+- [x] Sanitize remaining raw OAuth/session/database error logs using the shared safe-error classifier.
+- [x] Add regression coverage for auth/database log classification where feasible without exposing secrets.
+- [x] Revalidate optional customerId organization/branch scope during offline Call Centre replay, matching the online create path.
+- [x] Add regression coverage for replay rejection when the customer belongs to another branch or organization.
+- [x] Harden browser debug collector privacy boundary by omitting all response bodies from network logs
+- [x] Re-run full validation after debug collector privacy hardening (128 passed, 4 skipped; type check and production build passed)
+- [ ] Continue production audit for remaining security, UX, and integration gaps
+
+# Audit Notes
+- The development network log showed analytics response bodies being retained by the browser debug collector. The collector now records metadata only and stores a fixed privacy-policy marker instead of response payloads.
