@@ -583,7 +583,7 @@
 
 - [x] Expand Device-Trust policy tests to cover each individual missing trust signal and confirm all failures remain blocked; 7 focused tests and TypeScript passed.
 
-- [x] Run full regression and production build after the latest readiness changes; 68 test files passed with 215 tests passing and 5 optional database tests skipped because TEST_DATABASE_URL is unavailable, and the production build completed successfully.
+- [x] Run full regression and production build after the latest readiness changes; latest run passed 69 test files with 218 tests passing and 5 optional database tests skipped because an isolated TEST_DATABASE_URL is unavailable, and the production build completed successfully.
 
 - [x] Align the offline replay UI with server Device-Trust gating: show the blocked state and reason when no trusted client attestation is available instead of presenting a misleading actionable replay button; TypeScript and 7 focused tests passed.
 
