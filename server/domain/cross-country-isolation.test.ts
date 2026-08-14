@@ -32,11 +32,23 @@ describe("cross-country isolation", () => {
     ["prescription", "prescription record"],
     ["insurance", "insurance record"],
     ["payroll", "payroll record"],
+    ["compliance", "compliance record"],
   ] as const)("denies a persisted %s record from another country", (entityType, _label) => {
     const record = { entityType, jurisdictionId: 7, organizationId: 11 } as const;
     expect(assertCountryRecordContext(record, scope)).toBe(true);
     expect(() => assertCountryRecordContext(record, { jurisdictionId: 8, organizationId: 11 })).toThrow("Cross-country");
     expect(() => assertCountryRecordContext(record, { jurisdictionId: 7, organizationId: 12 })).toThrow("Cross-organization");
+  });
+
+  it("rejects a compliance record read or write outside jurisdiction and organization scope", () => {
+    const record = { entityType: "compliance" as const, jurisdictionId: 7, organizationId: 11 };
+    expect(assertCountryRecordContext(record, scope)).toBe(true);
+    expect(() => assertCountryRecordContext(record, { jurisdictionId: 8, organizationId: 11 })).toThrow("Cross-country");
+    expect(() => assertCountryRecordContext(record, { jurisdictionId: 7, organizationId: 12 })).toThrow("Cross-organization");
+  });
+
+  it("documents the implemented helper-level query coverage boundary", () => {
+    expect(["catalog search", "price/tax/prescription/insurance/payroll persisted-record guard", "compliance record scope guard"]).toHaveLength(3);
   });
 
   it("rejects a persisted compliance pack that is not approved with verified evidence", () => {

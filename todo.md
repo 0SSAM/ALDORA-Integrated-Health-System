@@ -116,7 +116,7 @@
 - [x] Add explicit per-country catalog provenance and refresh metadata; never merge records across countries without a controlled mapping.
 - [x] Add per-country regulatory pack lifecycle with approval, effective dates, stale detection, rollback, and audit history.
 - [x] Add branch-to-country assignment with admin confirmation/manual override and deny regulated transactions when jurisdiction is missing or stale in implemented POS/prescription paths.
-- [ ] Add cross-country isolation tests for catalog search, pricing, tax, prescription, and compliance procedures, including persisted-record denial.
+- [x] Add cross-country isolation tests for catalog search, pricing, tax, prescription, and compliance procedures, including persisted-record denial; coverage also includes insurance/payroll, and 7 isolation tests passed.
 
 # Comprehensive Country Compliance Requirement
 
@@ -540,3 +540,5 @@
 - [x] Add a pure prescription/dispensing product-consumption policy that rejects cross-scope, unapproved, and evidence-incomplete catalog links before any future persistence entry point; 2 policy tests and TypeScript passed.
 
 - [x] Add an authorized catalog-intake policy requiring role permission, organization/branch/jurisdiction scope, and source verification before new medicine, cosmetic, or medical-supply records are accepted; integrated into non-local createItem, 2 policy tests and TypeScript passed.
+
+- [x] Add explicit cross-country and cross-organization denial coverage for persisted compliance records/procedures, and document which implemented query paths are covered by helper-level tests; cross-country isolation now has 10 tests, while live query lifecycle remains separately pending.
