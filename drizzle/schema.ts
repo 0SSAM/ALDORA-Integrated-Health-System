@@ -41,6 +41,7 @@ export const products = mysqlTable("products", {
 
 export const inventoryBatches = mysqlTable("inventory_batches", {
   id: int("id").autoincrement().primaryKey(),
+  jurisdictionId: int("jurisdictionId"),
   branchId: int("branchId").notNull(),
   productId: int("productId").notNull(),
   batchNumber: varchar("batchNumber", { length: 80 }).notNull(),
@@ -52,6 +53,7 @@ export const inventoryBatches = mysqlTable("inventory_batches", {
 
 export const sales = mysqlTable("sales", {
   id: int("id").autoincrement().primaryKey(),
+  jurisdictionId: int("jurisdictionId"),
   branchId: int("branchId").notNull(),
   cashierId: int("cashierId").notNull(),
   invoiceNumber: varchar("invoiceNumber", { length: 80 }).notNull(),

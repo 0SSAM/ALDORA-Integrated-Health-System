@@ -147,3 +147,9 @@
 - [x] Require the same branch-bound pack before prescription extraction and dispensing; reject legacy or unbound intake records.
 - [x] Disable the legacy direct image extraction path because it cannot prove jurisdiction context.
 - [ ] Apply equivalent gates to any future invoice, insurance, payroll, reporting, and inventory mutation procedures as those entry points are wired to the database.
+
+# Core Operational Data Boundary
+
+- [x] Add nullable jurisdictionId to inventory_batches and sales schema; apply non-destructive migration 0010 for inventory batches.
+- [ ] Populate jurisdictionId from the confirmed branch assignment in every inventory and sale write path before allowing regulated persistence.
+- [ ] Add database/query tests proving products, batches, sales, prescriptions, and catalog records cannot cross jurisdiction boundaries.
