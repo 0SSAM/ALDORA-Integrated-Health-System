@@ -356,7 +356,7 @@
 - [x] Identify authoritative public clinical-trial registries and official Egyptian sources, then collect Egypt-linked trial records without fabricating missing fields (official EDA PDF captured; ClinicalTrials.gov retained as supplementary source)
 - [x] Build a separate clinical-trials archive workbook with registry identifiers, titles, conditions, interventions, sponsors, sites, recruitment status, dates, and source URLs where available (EDA workbook preserves raw blocks, extracted fields, and source pages)
 - [x] Validate duplicates, missingness, date formats, source provenance, and country/site matching; document records that could not be verified (98 candidate rows; 10 duplicate-ID candidates and field omissions reported; human review required)
-- [ ] Deliver the Excel workbooks plus a concise methodology, source register, coverage statement, and limitations report.
+- [x] Deliver the source-safe Egyptian medicine workbook template plus methodology, source register, coverage statement, and limitations report; full catalog population remains blocked pending a reproducible authorized EDA source, and the clinical-trials archive remains skipped as instructed.
 
 # Enterprise Capability Audit and Expansion
 
