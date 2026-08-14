@@ -37,3 +37,12 @@ export function transitionPackStatus(current: CompliancePackLifecycleStatus, tar
   if (current === "rolled_back") return "rolled_back" as const;
   return "rolled_back" as const;
 }
+
+
+export type ComplianceAuditAction = "created" | "approved" | "activated" | "expired" | "rolled_back";
+
+export function buildComplianceAuditEvent(input: { packId: number; action: ComplianceAuditAction; actorUserId: number; reason?: string | null }) {
+  if (!Number.isInteger(input.packId) || input.packId <= 0) throw new Error("Pack id is required");
+  if (!Number.isInteger(input.actorUserId) || input.actorUserId <= 0) throw new Error("Actor id is required");
+  return { packId: input.packId, action: input.action, actorUserId: input.actorUserId, reason: input.reason ?? null };
+}

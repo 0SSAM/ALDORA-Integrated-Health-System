@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertPackApprovalReady, missingVerifiedRules, transitionPackStatus } from "./compliance-lifecycle";
+import { assertPackApprovalReady, buildComplianceAuditEvent, missingVerifiedRules, transitionPackStatus } from "./compliance-lifecycle";
 
 describe("compliance pack lifecycle", () => {
   const now = new Date("2026-08-14T00:00:00.000Z");
@@ -20,5 +20,18 @@ describe("compliance pack lifecycle", () => {
 
   it("makes rollback idempotent", () => {
     expect(transitionPackStatus("rolled_back", "rolled_back")).toBe("rolled_back");
+  });
+
+  it("covers the approval lifecycle and exposes an auditable transition contract", () => {
+    const evidence = [
+      { ruleKey: "tax", verificationStatus: "verified" as const },
+      { ruleKey: "prescription", verificationStatus: "verified" as const },
+    ];
+    expect(missingVerifiedRules({ tax: true, prescription: true }, evidence)).toEqual([]);
+    expect(assertPackApprovalReady({ status: "review", rules: { tax: true, prescription: true }, evidence, effectiveFrom: new Date("2026-08-01"), reviewDueAt: new Date("2026-09-01"), now })).toBe(true);
+    expect(transitionPackStatus("review", "approved")).toBe("approved");
+    expect(transitionPackStatus("approved", "rolled_back")).toBe("rolled_back");
+    expect(buildComplianceAuditEvent({ packId: 8, action: "approved", actorUserId: 21, reason: "Evidence reviewed" })).toEqual({ packId: 8, action: "approved", actorUserId: 21, reason: "Evidence reviewed" });
+    expect(() => buildComplianceAuditEvent({ packId: 0, action: "approved", actorUserId: 21 })).toThrow(/Pack id/);
   });
 });
