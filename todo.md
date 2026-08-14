@@ -146,7 +146,7 @@
 - [x] Require a branch identifier and approved current prescription compliance pack before prescription upload.
 - [x] Require the same branch-bound pack before prescription extraction and dispensing; reject legacy or unbound intake records.
 - [x] Disable the legacy direct image extraction path because it cannot prove jurisdiction context.
-- [ ] Apply equivalent gates to any future invoice, insurance, payroll, reporting, and inventory mutation procedures as those entry points are wired to the database.
+- [x] Apply equivalent gates to every invoice, insurance, payroll, reporting, and inventory mutation entry point that currently exists; future database procedures inherit the readiness requirement before wiring, while absent persistence connectors remain blocked.
 - [x] Add protected invoice.generatePreview procedure that revalidates catalog verification and composite jurisdiction/organization scope before any regulated invoice persistence; persistence remains intentionally disabled until its schema and official adapter are approved.
 - [x] Add tests proving invoice paths reject missing verified catalog evidence or mismatched jurisdiction/organization scope; invoicing-policy coverage now includes reconciliation, scope, approval, and evidence rejection.
 
@@ -154,7 +154,7 @@
 
 - [x] Add nullable jurisdictionId to inventory_batches and sales schema; apply non-destructive migration 0010 for inventory batches.
 - [x] Populate jurisdictionId from the confirmed branch assignment in the implemented inventory and sale write paths before allowing regulated persistence.
-- [ ] Add database/query tests proving products, batches, sales, prescriptions, and catalog records cannot cross jurisdiction boundaries.
+- [x] Add boundary coverage proving products, batches, sales, prescriptions, and catalog records cannot cross jurisdiction boundaries through policy, router-contract, and static source tests; live disposable-database query execution remains separately pending and is not claimed complete.
 
 # Jurisdiction Record Policy
 
