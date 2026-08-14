@@ -378,3 +378,5 @@
 - [x] Update capability-gap and operations documentation with precise implemented, policy-only, and integration-gated statuses.
 - [ ] Save a checkpoint only after all completed items are marked [x].
 - [x] Make optional database integration tests skip safely when TEST_DATABASE_URL is an injected placeholder rather than a valid MySQL URL.
+- [x] Enforce customer-to-organization/branch scope when creating call-centre tickets and restrict update fields to persisted ticket columns.
+- [x] Add regression tests for call-centre customer scope and update-field safety.

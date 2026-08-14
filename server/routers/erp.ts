@@ -17,6 +17,7 @@ import { activeCatalogFields, assertCatalogEvidence, assertConsumableCatalogCont
 import { assertRecordBelongsToJurisdiction, assertRecordBelongsToScope } from "../domain/data-boundary";
 import { canAccessJurisdiction } from "../domain/jurisdiction-access";
 import { canAccessBranch } from "../domain/branch-access";
+import { assertCustomerTicketScope, buildCallTicketUpdate } from "../domain/customer-care-policy";
 
 async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
   if (role === "admin") return null;
@@ -331,6 +332,15 @@ export const erpRouter = router({
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
         const organizationId = await getBranchOrganizationId(db, input.branchId);
+        if (input.customerId !== undefined) {
+          const customer = (await db.select({ branchId: customerProfiles.branchId, organizationId: customerProfiles.organizationId }).from(customerProfiles).where(eq(customerProfiles.id, input.customerId)).limit(1))[0];
+          if (!customer) throw new TRPCError({ code: "NOT_FOUND", message: "Customer profile not found" });
+          try {
+            assertCustomerTicketScope({ ticketOrganizationId: organizationId, ticketBranchId: input.branchId, customerOrganizationId: customer.organizationId, customerBranchId: customer.branchId });
+          } catch (error) {
+            throw new TRPCError({ code: "FORBIDDEN", message: String(error) });
+          }
+        }
         const inserted = await db.insert(callTickets).values({ ...input, organizationId, createdByUserId: ctx.user.id });
         return { ticketId: Number(inserted[0].insertId), status: "open" as const };
       }),
@@ -344,7 +354,8 @@ export const erpRouter = router({
         if (!ticket.organizationId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(ticket.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Call ticket is outside the active organization scope" });
         if (ticket.branchId === null) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Call ticket has no branch assignment" });
         await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, ticket.branchId);
-        await db.update(callTickets).set(input).where(eq(callTickets.id, input.ticketId));
+        const { ticketId, ...changes } = input;
+        await db.update(callTickets).set(buildCallTicketUpdate(changes)).where(eq(callTickets.id, ticketId));
         return { success: true } as const;
       }),
   }),
