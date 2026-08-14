@@ -120,6 +120,13 @@
       "when": 1786726546232,
       "tag": "0016_bitter_steel_serpent",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1786727152175,
+      "tag": "0017_exotic_prodigy",
+      "breakpoints": true
     }
   ]
 }
