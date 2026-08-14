@@ -600,3 +600,5 @@
 - [x] Align every DB-touching integration test with the isolation guard, including organization-scope and TEST_DATABASE_URL smoke checks, so no test opens a MySQL connection without TEST_DATABASE_ISOLATED=true and a non-production URL; 5 focused tests passed, 5 optional schema tests skipped safely, and TypeScript passed.
 
 - [x] Update the open-prerequisites audit index after DB harness hardening to record that all current connection-opening tests are fail-closed behind the isolation guard.
+
+- [x] Make the database smoke test assert its safe-skip state explicitly when no isolated test database is configured, while preserving the guarded connection check when one is available; 4 focused tests and TypeScript passed.

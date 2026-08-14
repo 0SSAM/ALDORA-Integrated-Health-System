@@ -3,9 +3,11 @@ import mysql from "mysql2/promise";
 import { isIsolatedTestDatabaseUrl } from "./test-database-safety";
 
 describe("TEST_DATABASE_URL secret", () => {
-  it("connects to the isolated test database and closes cleanly", async () => {
+  it("connects to the isolated test database and closes cleanly when configured", async () => {
     const url = process.env.TEST_DATABASE_URL;
-    if (!isIsolatedTestDatabaseUrl(url, process.env.TEST_DATABASE_ISOLATED)) {
+    const isConfigured = isIsolatedTestDatabaseUrl(url, process.env.TEST_DATABASE_ISOLATED);
+    if (!isConfigured) {
+      expect(isConfigured).toBe(false);
       return;
     }
 
