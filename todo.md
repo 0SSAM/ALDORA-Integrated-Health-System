@@ -453,3 +453,5 @@
 - [x] Skip clinical-trials archive generation and delivery per user instruction; retain existing source notes without treating the trial archive as a required deliverable.
 - [x] Fix promotion usage reservation to require exactly one affected row from the Drizzle MySQL ResultSetHeader, preventing silent limit-bypass on concurrent or stale reservations; TypeScript and 15 focused tests pass.
 - [x] Re-run full Vitest, TypeScript, and production build after atomic promotion reservation fix: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
+- [x] Require each commitSale inventory-batch update to affect exactly one scoped row, rolling back the transaction on zero-row updates; TypeScript and 17 focused tests pass.
+- [x] Re-run full Vitest, TypeScript, and production build after exact-one-row inventory update enforcement: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
