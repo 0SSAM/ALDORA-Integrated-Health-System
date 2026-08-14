@@ -346,7 +346,7 @@
 - [x] Document a source-neutral organization-type evidence matrix covering government, pharmacy, distributor, hospital, laboratory, radiology, insurer, and rehabilitation deployments; this is an activation checklist, not proof of licensing or compliance.
 - [ ] Add explicit catalog-evidence revalidation inside prescription and dispensing product-consumption procedures once product matching is implemented; the reusable server guard now exists, but no such persistence entry point currently exists.
 - [ ] Add router/database acceptance and rejection tests for prescription/dispensing consumption of approved, unapproved, cross-scope, and evidence-incomplete catalog-linked products; current tests cover the reusable guard only.
-- [ ] Keep standalone invoice-generation enforcement pending until a real invoice persistence/submission entry point exists.
+- [x] Keep standalone invoice-generation enforcement pending until a real invoice persistence/submission entry point exists; current catalog-scope guard is preparatory and no standalone invoice path is exposed.
 - [x] Add and test a reusable server-side prescription/dispensing catalog-consumption guard covering approved evidence, product linkage, jurisdiction match, and rejection cases; actual router/database product matching remains pending because current prescription intake stores extracted text only.
 
 # Egyptian Medicines and Clinical-Trials Research
