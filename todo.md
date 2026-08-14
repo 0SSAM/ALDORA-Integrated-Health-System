@@ -522,3 +522,5 @@
 - [x] Review official Qatar MOPH and Morocco AMMPS portals as source leads and record CAPTCHA/content limitations; detailed country-pack activation remains pending primary-source extraction, effective dates, credentials, and acceptance tests.
 
 - [x] Add a country-pack activation policy requiring source-linked evidence, effective dates, local licensing, credentials, and acceptance criteria for every required regulatory domain; 2 policy tests and TypeScript passed, with incomplete packs blocked.
+
+- [x] Create a source-safe Egyptian medicine workbook template with provenance fields and no fabricated medicine records while the reproducible EDA bulk source remains unavailable; generated docs/data/egypt-medicine-register-source-safe-template.xlsx.
