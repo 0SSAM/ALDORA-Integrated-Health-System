@@ -1,0 +1,27 @@
+# Official source research notes — 2026-08-14
+
+## Jordan Food and Drug Administration (JFDA)
+
+Source: https://www.jfda.jo/Default/Ar
+
+The official JFDA homepage identifies the institution and exposes a dedicated Directorate of Medicines, a Directorate of Medical Devices and Supplies, electronic services, legislation, regulations, instructions, guides, policies, and service directories. The page also links to official services for drug registration, public drug-price search, public drug information and leaflets, and information on drugs submitted for registration. These are discovery and activation-gate sources; they do not by themselves establish that ALDO is compliant or licensed.
+
+Official linked service URLs visible on the page:
+- Drug registration workflow: https://workflow.jfda.jo/user/login
+- Public drug price search: https://drugapplication.jfda.jo/PRep/publicDrugSearch
+- Public drug information and leaflets: https://drugapplication.jfda.jo/PRep/publicDrugSearchWithLeaflets
+- Drugs submitted for registration: https://services.jfda.jo/JFDA/registration/newdrugssearch.aspx
+
+Implementation implication: a Jordan country pack should require a verified JFDA authority source, the applicable registration/licensing evidence, effective/review dates, and credentials/acceptance testing before enabling regulated catalog or dispensing workflows. The pack must keep prices, product registration, medical devices/supplies, and facility licensing as separate evidence domains.
+
+## Evidence limitation
+
+This note records only what was visible on the official page. It is not legal advice, does not verify current licensing requirements for a specific organization, and does not authorize production integrations.
+
+## Qatar Ministry of Public Health (MoPH)
+
+Source attempted: https://www.moph.gov.qa/english/OurServices/advancedsearch/Pages/servicesdetails.aspx?serviceId=228
+
+The official page presented a human-verification challenge in the current browsing session, so its detailed service content was not independently verified. Search discovery identified the page as a Ministry of Public Health service concerning final assessment for pharmaceutical-facility licensing and registration/renewal of pharmaceutical-facility licences, but this discovery is not treated as sufficient legal evidence.
+
+Implementation implication: keep Qatar licensing and facility-service activation disabled until the official service content, applicable requirements, current forms, credentials, and acceptance process are verified through an accessible official channel. Do not infer requirements from the blocked page or from third-party summaries.

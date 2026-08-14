@@ -331,3 +331,5 @@
 - [ ] Extend composite query assertions to every remaining regulated read/write path and add persisted cross-tenant denial coverage.
 - [x] Add an opt-in transaction/rollback probe proving a persisted jurisdiction-plus-organization predicate excludes a second organization and leaves no temporary data behind.
 - [ ] Execute the actual protected tRPC router lifecycle against a disposable database with authenticated organization memberships, cross-tenant denial, and cleanup assertions.
+- [x] Add source-triage notes for Jordan's official JFDA portal and Qatar's official MoPH pharmaceutical-facility service; keep Qatar pending where the official page could not be independently read.
+- [ ] Verify detailed Jordan and Qatar country-pack requirements with current primary sources, effective dates, local licences, privacy rules, and test credentials before activation.

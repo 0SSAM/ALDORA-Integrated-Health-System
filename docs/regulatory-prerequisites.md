@@ -31,3 +31,13 @@ A deployment must also record whether the organization is a pharmacy, chain, dis
 ALDO may provide configuration, evidence tracking, authorization gates, audit records, and adapter interfaces. It must not claim that the platform itself guarantees compliance with every Arab country. No adapter should be enabled with production credentials until the competent authority's current technical specification, credential process, test environment, acceptance criteria, and data-processing requirements have been reviewed and recorded in the country pack.
 
 **Review metadata:** prepared 14 August 2026; links must be revalidated before each production activation and whenever a jurisdiction pack reaches its review date.
+
+
+## Additional source status — Jordan and Qatar
+
+| Jurisdiction | Source status | Safe implementation interpretation |
+|---|---|---|
+| Jordan | [Jordan Food and Drug Administration](https://www.jfda.jo/Default/Ar) is an official authority portal exposing medicine registration, medicine-price search, medicine information/leaflets, medical-device and supplies directorates, electronic services, and legislation areas. | Use the JFDA authority and linked services as discovery and evidence sources. Do not activate a Jordan pack until product registration, facility and professional licensing, controlled medicines, tax/e-invoicing, privacy, retention, and integration credentials are separately verified. |
+| Qatar | The official MoPH service URL was opened but presented a human-verification challenge in this session: [pharmaceutical-facility service](https://www.moph.gov.qa/english/OurServices/advancedsearch/Pages/servicesdetails.aspx?serviceId=228). | Qatar remains `PENDING_REVIEW`; no detailed requirement is inferred from the blocked page or third-party summaries. Obtain and verify the current official service details, licences, privacy/hosting requirements, fiscal interfaces, and acceptance credentials before activation. |
+
+These entries expand source discovery only. They do not represent legal advice, licensing approval, or a claim that ALDO is compliant in Jordan or Qatar.
