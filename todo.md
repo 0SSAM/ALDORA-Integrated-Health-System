@@ -566,3 +566,5 @@
 - [x] Add a patient-identity matching readiness policy requiring trusted internal identifier, minimum demographic confirmation, ambiguity blocking, and manual review for unresolved matches; 2 policy tests and TypeScript passed.
 
 - [x] Add a data-export readiness policy requiring subject verification, organization/branch/jurisdiction scope, legal basis, field minimization/redaction, and audit metadata before export; 2 policy tests and TypeScript passed.
+
+- [x] Add an offline-sync mutation readiness policy requiring idempotency key, scoped actor/device, conflict resolution, retry safety, and audit metadata before synchronization; 2 policy tests and TypeScript passed.
