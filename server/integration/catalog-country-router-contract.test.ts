@@ -19,9 +19,9 @@ const user: TestUser = {
   lastSignedIn: new Date(0),
 };
 
-function contextFor(): TrpcContext {
+function contextFor(overrides: Partial<TestUser> = {}): TrpcContext {
   return {
-    user,
+    user: { ...user, ...overrides },
     req: { protocol: "https", headers: {} } as TrpcContext["req"],
     res: {} as TrpcContext["res"],
   };
@@ -58,5 +58,26 @@ describe("catalog country router contracts", () => {
     const caller = appRouter.createCaller(contextFor());
     await expect(caller.erp.catalog.search({ jurisdictionId: 99, query: "دواء" })).rejects.toMatchObject({ code: "FORBIDDEN" });
     expect(db.select).toHaveBeenCalledTimes(3);
+  });
+
+  it("rejects catalog creation outside the user's assigned jurisdiction before organization lookup or insert", async () => {
+    const db = queuedDb([
+      [{ id: 99, countryCode: "SA", active: 1, legalAuthorityProfile: "Saudi authority", language: "ar", defaultLocale: "ar-SA", currencyCode: "SAR", timezone: "Asia/Riyadh", taxProfile: "VAT", dateFormat: "DD/MM/YYYY", numberSystem: "arabic-indic" }],
+      [{ branchId: 9 }],
+      [],
+    ]);
+    getDbMock.mockResolvedValue(db);
+
+    const caller = appRouter.createCaller(contextFor({ role: "pharmacist" }));
+    await expect(caller.erp.catalog.createItem({
+      jurisdictionId: 99,
+      organizationId: 7,
+      category: "medicine",
+      sku: "SA-TEST-001",
+      nameAr: "عنصر اختبار",
+      sourceAuthority: "EDA",
+    })).rejects.toMatchObject({ code: "FORBIDDEN" });
+    expect(db.select).toHaveBeenCalledTimes(3);
+    expect(db.insert).toBeUndefined();
   });
 });

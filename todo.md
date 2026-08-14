@@ -443,3 +443,5 @@
 - [x] Remove raw XMLHttpRequest request bodies from development network logs; the collector now retains transport metadata and fixed privacy markers only, with regression and TypeScript checks passing.
 - [x] Generate and save a static server-boundary inventory under docs/audits/static-boundary-audit.json; it is a review aid only and does not replace code review or disposable-database lifecycle tests.
 - [x] Validate the static-audit addition with the full suite, TypeScript, and production build: 135 tests passed, 4 optional database tests skipped, TypeScript passed, and the production build passed with only the existing chunk-size warning.
+- [x] Add a router-contract test proving catalog.create rejects an unassigned jurisdiction before organization lookup or insert; focused catalog, POS, and report isolation tests pass.
+- [x] Re-run full Vitest and TypeScript after catalog.create isolation coverage: 136 tests passed, 4 optional database tests skipped, and TypeScript passed.
