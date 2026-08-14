@@ -552,3 +552,5 @@
 - [x] Add an inventory-mutation readiness policy requiring scoped branch/jurisdiction, approved current compliance pack, valid batch evidence, FEFO selection, and non-negative stock before activation; 2 policy tests and TypeScript passed.
 
 - [x] Add a jurisdiction-aware tax-calculation readiness policy requiring effective source evidence, rates, rounding rules, exemption handling, and audit metadata before activation; 2 policy tests and TypeScript passed.
+
+- [x] Add an invoice-numbering readiness policy requiring jurisdiction-bound sequence, fiscal-period validity, uniqueness, gap handling, and audit metadata before invoice persistence is enabled; 2 policy tests and TypeScript passed.
