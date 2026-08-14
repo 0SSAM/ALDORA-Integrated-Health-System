@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
 import { Activity, AlertTriangle, ArrowLeftRight, BarChart3, Bell, Boxes, BrainCircuit, Building2, ChevronLeft, ClipboardCheck, FileText, FlaskConical, HeartPulse, LayoutDashboard, LockKeyhole, Menu, PackageSearch, Receipt, Search, ShieldCheck, ShoppingCart, Stethoscope, Users, WalletCards, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -80,5 +81,48 @@ function ModulePanel({ active }: { active: string }) {
     people: { title: "الموظفون والفروع", description: "أدوار مرتبطة بالفروع مع أساس حساب ورديات ورواتب مصرية.", items: ["أدوار وصلاحيات", "وردية ورمضان", "إجازات ورواتب"] },
   };
   const panel = panels[active] ?? panels.overview;
+  if (active === "prescriptions") return <PrescriptionWorkspace />;
   return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardContent className="p-0"><div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div><div className="mb-2 flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-cyan-500" /><span className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700">مساحة عمل</span></div><h2 className="text-xl font-bold tracking-tight">{panel.title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{panel.description}</p></div><div className="grid grid-cols-1 gap-2 sm:min-w-[300px] sm:grid-cols-3">{panel.items.map(item => <div key={item} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-xs font-medium text-slate-600">{item}</div>)}</div></div></CardContent></Card>;
 }
+
+function PrescriptionWorkspace() {
+  const [intakeId, setIntakeId] = useState<number | null>(null);
+  const [status, setStatus] = useState("لم تُرفع صورة بعد");
+  const [resultText, setResultText] = useState("");
+  const upload = trpc.erp.prescription.upload.useMutation();
+  const extract = trpc.erp.prescription.extractFromIntake.useMutation();
+
+  const handleFile = (file: File) => {
+    if (!file.type.startsWith("image/")) { setStatus("الملف يجب أن يكون صورة"); return; }
+    if (file.size > 8 * 1024 * 1024) { setStatus("الحد الأقصى للصورة 8MB"); return; }
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = String(reader.result);
+      setStatus("جارٍ رفع الصورة بأمان…");
+      try {
+        const uploaded = await upload.mutateAsync({ fileName: file.name, mimeType: file.type as "image/jpeg" | "image/png" | "image/webp", dataUrl });
+        setIntakeId(uploaded.intakeId);
+        setStatus("تم الرفع. يمكنك بدء الاستخراج الآن.");
+      } catch (error) { setStatus(error instanceof Error ? error.message : "تعذر رفع الصورة"); }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const runExtraction = async () => {
+    if (!intakeId) return;
+    setStatus("جارٍ تحليل الوصفة بالرؤية المدمجة…");
+    try {
+      const response = await extract.mutateAsync({ intakeId });
+      setResultText(JSON.stringify(response.extraction, null, 2));
+      setStatus("اكتمل الاستخراج، وتبقى مراجعة الصيدلي إلزامية قبل الصرف.");
+    } catch (error) { setStatus(error instanceof Error ? error.message : "تعذر تحليل الوصفة"); }
+  };
+
+  return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardHeader><CardTitle className="flex items-center gap-2"><BrainCircuit className="h-5 w-5 text-cyan-600" />استقبال الوصفة الذكية</CardTitle><p className="text-sm text-slate-500">ارفع صورة واضحة؛ النتيجة تظل قيد مراجعة صيدلي ولا تنشئ بيعاً تلقائياً.</p></CardHeader><CardContent className="space-y-4">
+    <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cyan-200 bg-cyan-50/50 px-6 py-10 text-center hover:bg-cyan-50"><UploadIcon /><span className="mt-3 font-semibold text-slate-700">اختر صورة الوصفة</span><span className="mt-1 text-xs text-slate-500">JPG أو PNG أو WEBP، بحد أقصى 8MB</span><input className="hidden" type="file" accept="image/jpeg,image/png,image/webp" onChange={event => { const file = event.target.files?.[0]; if (file) handleFile(file); }} /></label>
+    <div className="flex flex-wrap items-center gap-3"><Badge variant="outline">{status}</Badge>{intakeId && <Button onClick={runExtraction} disabled={extract.isPending}>{extract.isPending ? "جارٍ التحليل…" : "تحليل الوصفة"}</Button>}</div>
+    {resultText && <pre className="max-h-72 overflow-auto rounded-xl bg-slate-950 p-4 text-left text-xs text-cyan-100" dir="ltr">{resultText}</pre>}
+  </CardContent></Card>;
+}
+
+function UploadIcon() { return <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-cyan-600 shadow-sm"><FileText className="h-6 w-6" /></div>; }

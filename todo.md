@@ -6,7 +6,7 @@
 - [ ] Enforce role permissions in server procedures and UI navigation without relying only on client-side checks.
 - [ ] Implement POS sales workflow with fractional unit dispensing.
 - [ ] Implement FEFO inventory deduction consistently for POS, returns, transfers, damaged goods, compounding, and insurance dispensing.
-- [ ] Implement MOH pricing validation with an immutable 7% maximum discount cap and server-side tests.
+- [x] Implement MOH pricing validation with an immutable 7% maximum discount cap and server-side tests.
 - [ ] Implement ETA fiscal receipt and e-invoicing data workflow with auditable statuses.
 - [ ] Implement inventory management with batches, expiry dates, reorder points, multi-branch stock, transfers, returns, damaged goods, and expiry alerts.
 - [ ] Implement cold-chain monitoring data model and dashboard indicators.
@@ -16,17 +16,17 @@
 - [ ] Implement HR employee management, labor-law shift calculations, Ramadan hours, overtime, leave management, and payroll processing.
 - [ ] Implement finance ledger, tax validation, cash-flow monitoring, financial reports, and payment gateway integration boundaries for InstaPay and Meeza.
 - [ ] Implement multi-branch dashboard with sales, inventory, insurance KPIs, BI charts, smart alerts, and tamper-evident audit hash records.
-- [ ] Implement prescription image upload and server-side built-in LLM vision extraction for drug names, dosages, quantities, and confidence/verification state.
-- [ ] Ensure prescription AI results require pharmacist confirmation before dispensing and never silently create a sale.
+- [x] Implement prescription image upload and server-side built-in LLM vision extraction for drug names, dosages, quantities, and confidence/verification state.
+- [x] Ensure prescription AI results require pharmacist confirmation before dispensing and never silently create a sale.
 - [ ] Implement customer/patient records and chronic-care tracking with access control and auditability.
 - [ ] Implement daily scheduled inventory and expiry scan using platform-managed Heartbeat at a documented UTC schedule.
 - [ ] Scope scheduled push notifications to branch managers only and make the scheduled handler idempotent.
-- [ ] Add schema migrations and database verification for all business entities.
+- [ ] Add schema migrations and database verification for implemented core business entities; remaining modules require additional migrations.
 - [ ] Add unit and integration tests for authentication, role guards, discount cap, FEFO, claims, payroll, AI extraction validation, audit logging, and scheduled handler authorization.
-- [ ] Run type checks, build checks, Vitest, and browser flow verification.
-- [ ] Verify responsive behavior for desktop Windows and mobile viewport layouts.
-- [ ] Review security controls, error handling, sensitive-data exposure, upload validation, and audit trails.
-- [ ] Document setup, roles, operational workflows, regulatory assumptions, deployment, backups, and known integration prerequisites.
+- [x] Run type checks, build checks, Vitest, and browser flow verification for the implemented vertical slice.
+- [x] Verify responsive behavior for desktop Windows and mobile viewport layouts.
+- [x] Review security controls, error handling, sensitive-data exposure, upload validation, and audit trails for the implemented vertical slice.
+- [x] Document setup, roles, operational workflows, regulatory assumptions, deployment, backups, and known integration prerequisites.
 - [ ] Prepare the final checkpoint and user-facing delivery summary.
 
 - [x] Create a verifiable source-analysis document covering the HTML references, SPASS payload, APK metadata, archive, and source-quality limitations.
@@ -46,3 +46,11 @@
 - [x] Document operational setup, scheduled callback behavior, release gates, and integration prerequisites.
 - [x] Add contextual workspace panels for POS, inventory, prescriptions, insurance, compliance, compounding, finance, and people modules.
 - [x] Re-run TypeScript and Vitest successfully after the workspace UI change.
+- [x] Add a protected schedule mutation that creates or reuses the daily inventory Heartbeat task and persists its task UID.
+- [x] Re-run TypeScript and Vitest successfully after adding schedule creation.
+- [x] Implement a real prescription upload experience with client file selection, server validation, storage upload, intake persistence, and built-in vision extraction wiring.
+- [x] Add a server-enforced dispensing guard requiring CONFIRMED pharmacist status before the dispensing workflow can proceed.
+- [x] Verify the prescription workspace interactively in the browser and confirm the file input accepts only JPEG/PNG/WEBP.
+- [x] Add a security review report covering auth, roles, uploads, errors, sensitive data, auditability, and production release blockers.
+- [x] Add explicit unit coverage for prescription confirmation and invalid upload MIME/size cases.
+- [x] Re-run TypeScript, Vitest, and production build successfully after the security fixes.

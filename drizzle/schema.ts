@@ -106,3 +106,14 @@ export const branchAlerts = mysqlTable("branch_alerts", {
   alertDate: timestamp("alertDate").notNull(),
   status: mysqlEnum("status", ["queued", "sent", "read"]).default("queued").notNull(),
 }, table => ({ dedupeIdx: uniqueIndex("branch_alerts_dedupe_idx").on(table.managerUserId, table.inventoryBatchId, table.alertType, table.alertDate) }));
+
+export const prescriptionIntakes = mysqlTable("prescription_intakes", {
+  id: int("id").autoincrement().primaryKey(),
+  createdByUserId: int("createdByUserId").notNull(),
+  imageKey: varchar("imageKey", { length: 255 }).notNull(),
+  imageMimeType: varchar("imageMimeType", { length: 80 }).notNull(),
+  status: mysqlEnum("status", ["UPLOADED", "PENDING_REVIEW", "CONFIRMED", "REJECTED"]).default("UPLOADED").notNull(),
+  extractionJson: text("extractionJson"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});

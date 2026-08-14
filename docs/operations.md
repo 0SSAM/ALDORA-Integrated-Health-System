@@ -17,3 +17,9 @@ Sales, inventory deduction, insurance submission, fiscal submission, payroll app
 ## Release gate
 
 Before production use, configure official integrations, verify certificates and provider contracts, test with each branch, run `pnpm check`, `pnpm test`, and `pnpm build`, verify browser flows on Windows and mobile Safari/Chrome, and review audit records for every critical mutation. Regulatory approval and payment success must be verified from the relevant external system, not inferred from a local status.
+
+## Backup and restore
+
+قاعدة البيانات هي مصدر السجل التشغيلي، بينما تخزن الصور والملفات في التخزين الكائني المدمج. قبل أي ترقية يجب أخذ نسخة قاعدة بيانات مشفرة عبر أدوات مزود المنصة، وتسجيل رقم النسخة ووقت UTC ومالك العملية في سجل التغيير. لا ينفذ النظام استعادة مدمرة تلقائياً؛ تتم الاستعادة في بيئة منفصلة أولاً، ثم تُراجع الجداول الحساسة مثل المبيعات والمخزون والتدقيق، وبعد موافقة مسؤول النظام تُعاد الخدمة إلى النسخة المستعادة. يجب اختبار الاستعادة دورياً على نسخة غير إنتاجية، والتحقق من صلاحيات الوصول، وسلامة ملفات الوصفات، وتسلسل hashes في audit_logs.
+
+لا تحفظ أسرار التكامل أو مفاتيح الدفع داخل المستودع. تُدار القيم عبر Secrets في بيئة المشروع، وتظل تكاملات EDA وETA وUHIA وTPA وInstaPay وMeeza في وضع غير متصل حتى يزوّد مالك النظام ببيانات اعتماد الإنتاج وموافقات الجهات المعنية.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateEgyptianPayroll, classifyInsuranceClaim, createAuditHash, EGYPTIAN_TPA_PROVIDER_CODES, validateEtaInvoice } from "./erp";
+import { assertPrescriptionConfirmed, calculateEgyptianPayroll, classifyInsuranceClaim, createAuditHash, EGYPTIAN_TPA_PROVIDER_CODES, validateEtaInvoice, validatePrescriptionUpload } from "./erp";
 
 describe("ERP domain services", () => {
   it("calculates overtime and Ramadan/night shift metrics", () => {
@@ -18,6 +18,17 @@ describe("ERP domain services", () => {
     expect(classifyInsuranceClaim({ submittedAmount: 100, approvedAmount: 80 }).status).toBe("PARTIALLY_APPROVED");
     expect(classifyInsuranceClaim({ submittedAmount: 100, rejectionCode: "R1" }).status).toBe("REJECTED");
     expect(EGYPTIAN_TPA_PROVIDER_CODES).toHaveLength(25);
+  });
+
+  it("blocks dispensing before pharmacist confirmation", () => {
+    expect(() => assertPrescriptionConfirmed("PENDING_REVIEW")).toThrow(/confirmation is required/);
+    expect(assertPrescriptionConfirmed("CONFIRMED")).toBe(true);
+  });
+
+  it("rejects invalid prescription uploads", () => {
+    expect(() => validatePrescriptionUpload({ mimeType: "application/pdf", byteLength: 100 })).toThrow(/Unsupported/);
+    expect(() => validatePrescriptionUpload({ mimeType: "image/png", byteLength: 8 * 1024 * 1024 + 1 })).toThrow(/8MB/);
+    expect(validatePrescriptionUpload({ mimeType: "image/png", byteLength: 128 })).toBe(true);
   });
 
   it("creates deterministic tamper-evident hashes", () => {

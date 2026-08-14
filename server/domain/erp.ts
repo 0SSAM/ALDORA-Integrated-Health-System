@@ -34,3 +34,15 @@ export function createAuditHash(input: { previousHash: string | null; actorId: n
 export const EGYPTIAN_TPA_PROVIDER_CODES = [
   "AXA", "MEDRIGHT", "MASHOUR", "GLORY", "NEXUS", "MISRPOLICY", "ALLIANZ", "METLIFE", "BUPA", "CIGNA", "MUSALLA", "MEDNET", "SAUDI_GERMAN", "ECARE", "HEALTH_INSURANCE_ORG", "UHIA", "NILE_BADR", "WATANIYA", "MISRA_LIFE", "GIG", "PHARMA_CARE", "TPA_23", "TPA_24", "TPA_25", "TPA_26",
 ] as const;
+
+export function assertPrescriptionConfirmed(status: "UPLOADED" | "PENDING_REVIEW" | "CONFIRMED" | "REJECTED") {
+  if (status !== "CONFIRMED") throw new Error("Pharmacist confirmation is required before dispensing");
+  return true as const;
+}
+
+export function validatePrescriptionUpload(input: { mimeType: string; byteLength: number }) {
+  const allowed = new Set(["image/jpeg", "image/png", "image/webp"]);
+  if (!allowed.has(input.mimeType)) throw new Error("Unsupported prescription image type");
+  if (input.byteLength > 8 * 1024 * 1024) throw new Error("Prescription image must be 8MB or smaller");
+  return true as const;
+}
