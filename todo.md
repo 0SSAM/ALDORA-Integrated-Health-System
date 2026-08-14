@@ -271,3 +271,8 @@
 
 - [x] Require active authenticated branch membership for prescription upload, extraction, confirmation, and dispensing paths.
 - [ ] Add equivalent membership and pack gates to invoice, insurance, payroll, and reporting persistence paths when implemented.
+
+# Customer Care and Call Centre Branch Isolation
+
+- [x] Scope customer-care and call-centre reads and writes to active branches assigned to the authenticated user; reject new unbound records for non-admin users.
+- [x] Add unit coverage for branch-scoped customer-care and call-centre access policy.

@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
-import { and, desc, eq, like } from "drizzle-orm";
+import { and, desc, eq, inArray, like } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
 import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, sales, saleItems } from "../../drizzle/schema";
 import { getDb } from "../db";
@@ -16,6 +16,19 @@ import { storageGetSignedUrl, storagePut } from "../storage";
 import { activeCatalogFields, assertCatalogEvidence, assertConsumableCatalogContext } from "../domain/catalog-policy";
 import { assertRecordBelongsToJurisdiction } from "../domain/data-boundary";
 import { canAccessJurisdiction } from "../domain/jurisdiction-access";
+import { canAccessBranch } from "../domain/branch-access";
+
+async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
+  if (role === "admin") return null;
+  const memberships = await db.select({ branchId: branchUsers.branchId }).from(branchUsers).where(and(eq(branchUsers.userId, userId), eq(branchUsers.active, 1)));
+  return memberships.map(({ branchId }) => branchId);
+}
+
+async function assertUserBranchAccess(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string, branchId: number) {
+  const branchIds = await getUserBranchIds(db, userId, role);
+  if (branchIds !== null && canAccessBranch(role, branchIds, branchId) || branchIds === null) return;
+  throw new TRPCError({ code: "FORBIDDEN", message: "User is not assigned to this branch" });
+}
 
 async function assertUserJurisdictionAccess(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string, jurisdictionId: number) {
   if (role === "admin") return;
@@ -254,16 +267,19 @@ export const erpRouter = router({
       }),
   }),
   customerCare: router({
-    list: customerCareProcedure.query(async () => {
+    list: customerCareProcedure.query(async ({ ctx }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
-      return db.select().from(customerProfiles).orderBy(desc(customerProfiles.updatedAt)).limit(100);
+      const branchIds = await getUserBranchIds(db, ctx.user.id, ctx.user.role);
+      const scope = branchIds === null ? undefined : branchIds.length ? inArray(customerProfiles.branchId, branchIds) : eq(customerProfiles.id, -1);
+      return db.select().from(customerProfiles).where(scope).orderBy(desc(customerProfiles.updatedAt)).limit(100);
     }),
     create: customerCareProcedure
-      .input(z.object({ fullName: z.string().min(2).max(220), phone: z.string().min(7).max(40), consentStatus: z.enum(["pending", "granted", "withdrawn"]).default("pending"), chronicCareEnabled: z.boolean().default(false), notes: z.string().max(4000).optional(), branchId: z.number().int().positive().optional() }))
+      .input(z.object({ fullName: z.string().min(2).max(220), phone: z.string().min(7).max(40), consentStatus: z.enum(["pending", "granted", "withdrawn"]).default("pending"), chronicCareEnabled: z.boolean().default(false), notes: z.string().max(4000).optional(), branchId: z.number().int().positive() }))
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
         const inserted = await db.insert(customerProfiles).values({ ...input, chronicCareEnabled: input.chronicCareEnabled ? 1 : 0, createdByUserId: ctx.user.id });
         return { customerId: Number(inserted[0].insertId) };
       }),
@@ -272,29 +288,40 @@ export const erpRouter = router({
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const customer = (await db.select({ branchId: customerProfiles.branchId }).from(customerProfiles).where(eq(customerProfiles.id, input.customerId)).limit(1))[0];
+        if (!customer) throw new TRPCError({ code: "NOT_FOUND", message: "Customer profile not found" });
+        if (customer.branchId === null) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Customer profile has no branch assignment" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, customer.branchId);
         const inserted = await db.insert(careInteractions).values({ ...input, userId: ctx.user.id });
         return { interactionId: Number(inserted[0].insertId) };
       }),
   }),
   callCentre: router({
-    list: customerCareProcedure.query(async () => {
+    list: customerCareProcedure.query(async ({ ctx }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
-      return db.select().from(callTickets).orderBy(desc(callTickets.updatedAt)).limit(100);
+      const branchIds = await getUserBranchIds(db, ctx.user.id, ctx.user.role);
+      const scope = branchIds === null ? undefined : branchIds.length ? inArray(callTickets.branchId, branchIds) : eq(callTickets.id, -1);
+      return db.select().from(callTickets).where(scope).orderBy(desc(callTickets.updatedAt)).limit(100);
     }),
     create: customerCareProcedure
-      .input(z.object({ subject: z.string().min(2).max(220), channel: z.enum(["phone", "whatsapp", "web", "in_person"]), direction: z.enum(["inbound", "outbound"]), priority: z.enum(["low", "normal", "high", "urgent"]).default("normal"), customerId: z.number().int().positive().optional(), branchId: z.number().int().positive().optional(), callbackAt: z.coerce.date().optional() }))
+      .input(z.object({ subject: z.string().min(2).max(220), channel: z.enum(["phone", "whatsapp", "web", "in_person"]), direction: z.enum(["inbound", "outbound"]), priority: z.enum(["low", "normal", "high", "urgent"]).default("normal"), customerId: z.number().int().positive().optional(), branchId: z.number().int().positive(), callbackAt: z.coerce.date().optional() }))
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
         const inserted = await db.insert(callTickets).values({ ...input, createdByUserId: ctx.user.id });
         return { ticketId: Number(inserted[0].insertId), status: "open" as const };
       }),
     updateStatus: customerCareProcedure
       .input(z.object({ ticketId: z.number().int().positive(), status: z.enum(["open", "pending", "resolved", "closed"]), disposition: z.string().max(120).optional(), assignedUserId: z.number().int().positive().optional() }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const ticket = (await db.select({ branchId: callTickets.branchId }).from(callTickets).where(eq(callTickets.id, input.ticketId)).limit(1))[0];
+        if (!ticket) throw new TRPCError({ code: "NOT_FOUND", message: "Call ticket not found" });
+        if (ticket.branchId === null) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Call ticket has no branch assignment" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, ticket.branchId);
         await db.update(callTickets).set(input).where(eq(callTickets.id, input.ticketId));
         return { success: true } as const;
       }),
