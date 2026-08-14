@@ -532,3 +532,5 @@
 - [x] Create an implementation-readiness note that maps remaining blocked items to the exact prerequisite needed, without treating blockers as completed features; created docs/audits/implementation-readiness-2026-08-15.md.
 
 - [x] Add a machine-readable country-pack source manifest for Egypt, Jordan, Qatar, and Morocco with review status and explicit activation blockers only; 1 manifest test and TypeScript passed.
+
+- [x] Add a country-aware payroll statutory readiness policy that blocks payroll activation until tax, social-insurance, employment, currency, effective-date, and employer-registration evidence is complete; 2 policy tests and TypeScript passed, with no payroll calculations activated.
