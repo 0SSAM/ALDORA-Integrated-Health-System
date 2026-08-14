@@ -389,3 +389,5 @@
 - [x] Harden report scheduling against malformed cron expressions, null jurisdiction scope, and stale compliance-pack approval before creating a Heartbeat task.
 - [x] Restrict insurance lifecycle transitions to authorized organization roles and reject external references on non-submission states; retain the production credential gate for SUBMITTED.
 - [x] Add regression coverage for insurance transition authorization and external-reference rules.
+- [x] Harden report Heartbeat execution against inactive, legacy-unscoped, or unsupported persisted definitions before querying regulated data.
+- [x] Add regression coverage for report callback lifecycle guards and idempotent duplicate behavior.

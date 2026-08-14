@@ -4,6 +4,15 @@ import { branchJurisdictions, inventoryBatches, reportDefinitions, reportRuns, s
 import { getDb } from "../db";
 import { sdk } from "../_core/sdk";
 
+export type ReportExecutionDefinition = { id: number; status: string; jurisdictionId: number | null; queryKey: string };
+
+export function reportExecutionSkipReason(definition: ReportExecutionDefinition): "inactive" | "missing_scope" | "unsupported_query" | undefined {
+  if (definition.status !== "active") return "inactive";
+  if (definition.jurisdictionId === null) return "missing_scope";
+  if (!new Set(["inventory.alerts.v1", "sales.daily.v1", "compliance.expiry.v1", "operations.summary.v1"]).has(definition.queryKey)) return "unsupported_query";
+  return undefined;
+}
+
 async function executeAllowlistedQuery(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, definition: typeof reportDefinitions.$inferSelect, periodStart: Date, periodEnd: Date) {
   const scopedBatches = await db.select({ id: inventoryBatches.id, quantityOnHand: inventoryBatches.quantityOnHand, reorderPoint: inventoryBatches.reorderPoint, expiryDate: inventoryBatches.expiryDate }).from(inventoryBatches).innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, inventoryBatches.branchId)).where(and(eq(inventoryBatches.organizationId, definition.organizationId), eq(branchJurisdictions.jurisdictionId, definition.jurisdictionId ?? -1)));
   const scopedSales = await db.select({ id: sales.id, totalAmount: sales.totalAmount }).from(sales).innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, sales.branchId)).where(and(eq(sales.organizationId, definition.organizationId), eq(branchJurisdictions.jurisdictionId, definition.jurisdictionId ?? -1), gte(sales.createdAt, periodStart), lte(sales.createdAt, periodEnd)));
@@ -26,6 +35,8 @@ export async function reportExecutionHandler(req: Request, res: Response) {
 
     const definition = (await db.select().from(reportDefinitions).where(eq(reportDefinitions.scheduleCronTaskUid, taskUid)).limit(1))[0];
     if (!definition) return res.json({ ok: true, skipped: "orphan" });
+    const skipReason = reportExecutionSkipReason(definition);
+    if (skipReason) return res.json({ ok: true, skipped: skipReason, definitionId: definition.id });
 
     const periodEnd = new Date();
     const periodStart = new Date(periodEnd.getTime() - 24 * 60 * 60 * 1000);
