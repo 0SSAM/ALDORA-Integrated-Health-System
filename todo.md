@@ -102,7 +102,7 @@
 - [x] Implement branch geolocation capture with explicit admin confirmation and a manual override; never infer legal jurisdiction from IP alone.
 - [x] Separate shared ERP rules from versioned country compliance packs with activation date, source URL, owner, status, and expiry/review date.
 - [x] Add country-aware tax, invoicing, pricing, prescription, controlled-medicine, labeling, insurance, payroll, and reporting rule interfaces.
-- [ ] Add Arabic localization architecture with RTL, country-specific terminology, currencies, calendars, numerals, and fallback translations.
+- [x] Add Arabic localization architecture with RTL, country-specific terminology, currencies, calendars, numerals, and fallback translations.
 - [ ] Add country-aware offline policy, sync conflict rules, and safeguards against using stale regulatory rules.
 - [ ] Add admin workflow for legal-pack review, approval, rollback, and audit history.
 - [x] Research and document authoritative regulatory sources for the initial Arabic-country coverage; do not fabricate legal rules or claim legal certification.
@@ -190,3 +190,10 @@
 - [x] Add a country-neutral invoicing policy that requires an approved pack rule, official endpoint, country-matched adapter, and reconciled invoice document.
 - [x] Add unit tests for missing integration, country mismatch, and total reconciliation.
 - [ ] Register and integrate a real adapter per country only after official technical specifications, credentials, and acceptance testing are supplied.
+
+# Frontend Localization Integration
+
+- [x] Wrap the application in LocalizationProvider and apply document language/direction and data-country.
+- [x] Apply dynamic direction and country/currency display in the main Home workspace.
+- [x] Avoid defaulting the UI to Egypt; use an unset country until a verified branch jurisdiction is selected.
+- [ ] Drive the provider from the authenticated branch jurisdiction registry instead of localStorage once branch selection UI is connected.
