@@ -68,3 +68,7 @@ The offline policy rejects regulated inventory, sale, prescription, and invoice 
 ## Production-audit cycle conclusion
 
 This audit cycle covered the implemented server authorization and scope paths, the migration/schema source baseline, scheduled and offline lifecycle policies, sensitive-data handling, and the inspected RTL workspace UI. A reproducible scheduled-report error disclosure was fixed and regression-tested. Remaining gaps are not silently classified as defects: they require a valid disposable database, current primary regulatory sources, official integration credentials/certificates, or broader assistive-technology and persistence coverage.
+
+## Egyptian medicine-register source check
+
+A current source check was attempted against the EDA public portal and its official medicine-search path. The portal returned a request-rejected response in the current environment, and no downloadable public register was available in the project workspace. Therefore no new medicine rows or completeness claims were created. The Egyptian medicine workbook remains source-gated until an accessible official export or an authorized, reproducible extraction path is supplied.
