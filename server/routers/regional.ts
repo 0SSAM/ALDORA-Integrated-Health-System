@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { branchJurisdictions, branches, complianceEvidence, compliancePacks, complianceRuleAudits, jurisdictionProfiles } from "../../drizzle/schema";
+import { branchJurisdictions, branchUsers, branches, complianceEvidence, compliancePacks, complianceRuleAudits, jurisdictionProfiles } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { ARAB_COUNTRY_REGISTRY, normalizeCountryCode } from "../domain/regional-engine";
@@ -41,6 +41,20 @@ export const regionalRouter = router({
       const packReady = Boolean(pack && pack.effectiveFrom.getTime() <= now.getTime() && (!pack.reviewDueAt || pack.reviewDueAt.getTime() >= now.getTime()) && evidenceReady);
       return { ...country, status: profile?.active && packReady ? "configured" : profile ? "pending_approval" : "not_configured", profile, packReady };
     });
+  }),
+
+  myBranchJurisdictions: protectedProcedure.query(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    const memberships = await db.select().from(branchUsers).where(and(eq(branchUsers.userId, ctx.user.id), eq(branchUsers.active, 1)));
+    const result = [];
+    for (const membership of memberships) {
+      const branch = (await db.select().from(branches).where(and(eq(branches.id, membership.branchId), eq(branches.active, 1))).limit(1))[0];
+      const assignment = branch ? (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, branch.id)).limit(1))[0] : undefined;
+      const profile = assignment ? (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0] : undefined;
+      result.push({ branch, assignment: assignment ?? null, profile: profile ?? null });
+    }
+    return result;
   }),
 
   assignBranchJurisdiction: adminProcedure.input(z.object({ branchId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), latitude: z.number().min(-90).max(90).nullable().optional(), longitude: z.number().min(-180).max(180).nullable().optional(), locationSource: z.enum(["admin_confirmed", "manual_override"]) })).mutation(async ({ ctx, input }) => {
@@ -118,6 +132,12 @@ export const regionalRouter = router({
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
     return db.select().from(compliancePacks).where(eq(compliancePacks.jurisdictionId, input.jurisdictionId)).orderBy(desc(compliancePacks.createdAt));
+  }),
+
+  listEvidence: protectedProcedure.input(z.object({ packId: z.number().int().positive() })).query(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    return db.select().from(complianceEvidence).where(eq(complianceEvidence.packId, input.packId)).orderBy(desc(complianceEvidence.createdAt));
   }),
 
   listPackAudits: adminProcedure.input(z.object({ packId: z.number().int().positive() })).query(async ({ input }) => {

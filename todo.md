@@ -196,7 +196,7 @@
 - [x] Wrap the application in LocalizationProvider and apply document language/direction and data-country.
 - [x] Apply dynamic direction and country/currency display in the main Home workspace.
 - [x] Avoid defaulting the UI to Egypt; use an unset country until a verified branch jurisdiction is selected.
-- [ ] Drive the provider from the authenticated branch jurisdiction registry instead of localStorage once branch selection UI is connected.
+- [x] Drive the provider from the authenticated branch jurisdiction registry instead of localStorage; keep UNSET until an active assigned branch profile is returned by the server.
 
 # Offline Safety Foundation
 
@@ -245,3 +245,9 @@
 - [x] Add and apply product-to-catalog evidence policy at regulated sale consumption.
 - [x] Add unit coverage for linked verified products, rejected/unverified catalog records, jurisdiction mismatch, and legacy unlinked products.
 - [x] Re-run TypeScript, 49 Vitest tests, and production build successfully.
+
+# Regional Administration UI
+
+- [x] Add an admin-only regional administration panel for profile status, pack versions, evidence status, approve/rollback, and audit history.
+- [x] Ensure non-admin users see read-only readiness and legal-prerequisite status without mutation controls.
+- [x] Verify the panel compiles and renders its safe unauthenticated loading state; authenticated admin/non-admin browser-flow coverage remains a release follow-up.

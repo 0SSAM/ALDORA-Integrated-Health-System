@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 
 type ClientLocalization = {
   countryCode: string;
@@ -11,6 +13,8 @@ type ClientLocalization = {
   t: (key: string) => string;
   formatCurrency: (amount: number) => string;
   setCountry: (countryCode: string) => void;
+  branchId: number | null;
+  jurisdictionId: number | null;
 };
 
 const dictionaries: Record<string, Record<string, string>> = {
@@ -33,7 +37,10 @@ const countryDefaults: Record<string, { locale: string; currencyCode: string }> 
 const LocalizationContext = createContext<ClientLocalization | null>(null);
 
 export function LocalizationProvider({ children }: { children: ReactNode }) {
-  const [countryCode, setCountryCode] = useState(() => localStorage.getItem("bdf-country") ?? "UNSET");
+  const { user } = useAuth();
+  const branchRegistry = trpc.regional.myBranchJurisdictions.useQuery(undefined, { enabled: Boolean(user), retry: false, refetchOnWindowFocus: false });
+  const confirmedBranch = branchRegistry.data?.find(item => item.assignment?.jurisdictionId && item.profile?.active === 1) ?? null;
+  const countryCode = confirmedBranch?.profile?.countryCode ?? "UNSET";
   const defaults = countryDefaults[countryCode] ?? { locale: "ar", currencyCode: "XXX" };
   const language = defaults.locale.split("-")[0] ?? "ar";
   const dictionary = dictionaries[language] ?? dictionaries.ar;
@@ -47,12 +54,13 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
     numberingSystem: "latn",
     t: (key) => dictionary[key] ?? dictionaries.ar[key] ?? key,
     formatCurrency: (amount) => new Intl.NumberFormat(`${defaults.locale}-u-ca-gregory-nu-latn`, { style: "currency", currency: defaults.currencyCode }).format(amount),
-    setCountry: (next) => {
-      const normalized = next.trim().toUpperCase();
-      localStorage.setItem("bdf-country", normalized);
-      setCountryCode(normalized);
+    setCountry: () => {
+      // Legal jurisdiction is controlled by the authenticated branch registry;
+      // a client-side country toggle must never change regulated behavior.
     },
-  }), [countryCode, defaults.currencyCode, defaults.locale, dictionary, language]);
+    branchId: confirmedBranch?.branch?.id ?? null,
+    jurisdictionId: confirmedBranch?.assignment?.jurisdictionId ?? null,
+  }), [countryCode, defaults.currencyCode, defaults.locale, dictionary, language, confirmedBranch]);
 
   useEffect(() => {
     document.documentElement.lang = value.language;
