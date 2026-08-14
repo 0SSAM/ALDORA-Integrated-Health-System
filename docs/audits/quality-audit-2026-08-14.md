@@ -48,3 +48,7 @@ First, provision a disposable database test connection and run the protected rou
 ## Static-audit tooling improvement
 
 The static boundary inventory now emits a bounded summary in addition to per-file counts: files scanned, files containing protected procedures, organization/jurisdiction scope markers, raw-error-string markers, and body/payload tokens. A regression test verifies the summary, scope signals, and non-certification disclaimer. This is a reporting improvement only; it does not replace semantic review or disposable-database lifecycle testing.
+
+## Frontend audit slice
+
+The reviewed workspace routes use the shared dashboard shell and expose loading, error, or empty states for the inspected data panels. The current Arabic-first UI maintains RTL layout, labeled inputs, visible status text, responsive grid behavior, and an escape path through the persistent navigation. The desktop preview was checked after the ALDO branding update. This is a focused implementation audit, not a substitute for a full assistive-technology test matrix.

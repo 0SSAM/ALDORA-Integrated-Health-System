@@ -410,7 +410,7 @@
 - [ ] Audit server routers and domain policies for authorization, organization/jurisdiction scope, input validation, error handling, idempotency, and unsafe data exposure.
 - [ ] Audit database schema, migrations, indexes, nullable legacy fields, and query predicates for integrity and tenant isolation risks.
 - [ ] Audit scheduled callbacks, offline replay, notifications, uploads, and sensitive-data paths for lifecycle and abuse cases.
-- [ ] Audit frontend routes, loading/error/empty states, RTL/mobile behavior, accessibility, and dead-end navigation.
+- [x] Audit frontend routes, loading/error/empty states, RTL/mobile behavior, accessibility markers, and dead-end navigation for the inspected workspace slice; a full assistive-technology matrix remains a release-quality follow-up.
 - [x] Run static checks, tests, production build, and focused browser verification; inspect runtime logs for actionable issues; no reproducible runtime defect was found in the inspected slice.
 - [ ] Fix every reproducible defect found in scope and add regression coverage before marking it complete.
 - [x] Add only suitable improvements that are justified by the audit and do not fabricate regulatory, payer, government, or customer data; added a bounded static-audit summary and regression test without changing regulatory claims or business data.
