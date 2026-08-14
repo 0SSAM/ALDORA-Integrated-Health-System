@@ -159,3 +159,9 @@
 - [x] Add reusable server policy for product, inventory batch, sale, prescription, and catalog jurisdiction-bound records.
 - [x] Add unit tests for same-country acceptance, cross-country rejection, null legacy records, and invalid jurisdiction context.
 - [ ] Integrate the record policy into every database read/write query rather than relying only on isolated policy tests.
+
+# Boundary Integration Coverage
+
+- [x] Re-check prescription intake jurisdictionId against the confirmed branch assignment during extraction.
+- [x] Re-check prescription intake jurisdictionId against the confirmed branch assignment during dispensing.
+- [ ] Apply the same record-boundary policy to catalog reads, inventory batch reads/writes, sale reads/writes, and future invoice/insurance/payroll/report procedures.
