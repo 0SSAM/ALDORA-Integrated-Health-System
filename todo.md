@@ -409,10 +409,10 @@
 
 - [x] Audit server routers and domain policies for authorization, organization/jurisdiction scope, input validation, error handling, idempotency, and unsafe data exposure on the implemented slice; persisted lifecycle and future-entry-point review remain explicitly open.
 - [x] Audit database schema, migrations, indexes, nullable legacy fields, and query predicates on the inspected source slice; 22 SQL files match 22 journal entries and live-database constraint/query-plan verification remains explicitly open.
-- [ ] Audit scheduled callbacks, offline replay, notifications, uploads, and sensitive-data paths for lifecycle and abuse cases.
+- [x] Audit scheduled callbacks, offline replay, notifications, uploads, and sensitive-data paths on the inspected slice; regulated offline mutations require online validation, reports are allowlisted/idempotent/in-app, and external channels remain disabled by default.
 - [x] Audit frontend routes, loading/error/empty states, RTL/mobile behavior, accessibility markers, and dead-end navigation for the inspected workspace slice; a full assistive-technology matrix remains a release-quality follow-up.
 - [x] Run static checks, tests, production build, and focused browser verification; inspect runtime logs for actionable issues; no reproducible runtime defect was found in the inspected slice.
-- [ ] Fix every reproducible defect found in scope and add regression coverage before marking it complete.
+- [x] Fix every reproducible defect found in scope and add regression coverage before marking it complete; fixed scheduled-report outer-catch leakage of raw error, URL, and task UID, with a regression assertion.
 - [x] Add only suitable improvements that are justified by the audit and do not fabricate regulatory, payer, government, or customer data; added a bounded static-audit summary and regression test without changing regulatory claims or business data.
 - [x] Update the capability-gap and operations documentation with findings, fixes, remaining limitations, and validation evidence in `docs/audits/quality-audit-2026-08-14.md`.
 - [x] Reduce client-side diagnostic logging to bounded, non-sensitive error metadata and remove showcase input logging from shipped code paths.

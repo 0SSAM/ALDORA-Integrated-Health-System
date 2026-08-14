@@ -10,6 +10,10 @@ export function boundedReportErrorCode(_error: unknown): "REPORT_QUERY_FAILED" {
   return "REPORT_QUERY_FAILED";
 }
 
+export function safeReportTransportError(_error: unknown): { error: "report-execution-failed" } {
+  return { error: "report-execution-failed" };
+}
+
 export function reportExecutionSkipReason(definition: ReportExecutionDefinition): "inactive" | "missing_scope" | "unsupported_query" | undefined {
   if (definition.status !== "active") return "inactive";
   if (definition.jurisdictionId === null) return "missing_scope";
@@ -105,6 +109,6 @@ export async function reportExecutionHandler(req: Request, res: Response) {
     const delivery = await recordInAppDelivery(db, definition, runId);
     return res.json({ ok: true, runId, status: "succeeded", output, delivery });
   } catch (error) {
-    return res.status(500).json({ error: String(error), context: { url: req.originalUrl, taskUid }, timestamp: new Date().toISOString() });
+    return res.status(500).json(safeReportTransportError(error));
   }
 }

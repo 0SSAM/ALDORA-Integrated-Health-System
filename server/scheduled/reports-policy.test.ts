@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boundedReportErrorCode, reportExecutionSkipReason } from "./reports";
+import { boundedReportErrorCode, reportExecutionSkipReason, safeReportTransportError } from "./reports";
 
 describe("report execution lifecycle policy", () => {
   const base = { id: 7, status: "active", jurisdictionId: 3, queryKey: "sales.daily.v1" };
@@ -19,5 +19,12 @@ describe("report execution lifecycle policy", () => {
 
   it("bounds execution failures without exposing raw database errors", () => {
     expect(boundedReportErrorCode(new Error("password=secret; ER_ACCESS_DENIED"))).toBe("REPORT_QUERY_FAILED");
+  });
+
+  it("returns a fixed transport error without URL, task, or raw error details", () => {
+    const response = safeReportTransportError(new Error("password=secret /taskUid=private"));
+    expect(response).toEqual({ error: "report-execution-failed" });
+    expect(JSON.stringify(response)).not.toContain("password");
+    expect(JSON.stringify(response)).not.toContain("taskUid");
   });
 });

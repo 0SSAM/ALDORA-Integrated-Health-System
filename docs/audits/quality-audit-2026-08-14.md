@@ -60,3 +60,7 @@ The implemented server slice was reviewed through the static inventory and prote
 ## Schema and migration audit slice
 
 The schema review found 22 SQL migration files and 22 journal entries, so the migration baseline is internally aligned. The current schema contains 30 declared index or unique-index definitions and 19 explicit non-null organization/jurisdiction scope declarations in the inspected source. Scope-sensitive tables use organization, branch, and/or jurisdiction predicates in the reviewed router paths. A live database constraint and query-plan review is still required before claiming complete persisted tenant isolation, because the currently supplied test connection is not a valid disposable database.
+
+## Scheduled, offline, notification, and sensitive-data audit slice
+
+The offline policy rejects regulated inventory, sale, prescription, and invoice operations when jurisdiction confirmation, a current compliance pack, or online validation is missing; non-regulated offline work remains draft-only and conflict resolution requires manual review. Scheduled reports use cron authentication, allowlisted query keys, scoped organization/jurisdiction predicates, idempotency keys, in-app delivery, and bounded query errors. During review, the outer report handler was found to expose raw error text, request URL, and task UID; this was corrected to a fixed transport error and covered by regression tests. External report channels remain disabled by default.
