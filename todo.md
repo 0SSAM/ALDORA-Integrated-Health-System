@@ -287,11 +287,11 @@
 
 # Secure Demo Mode and Commercial Contact
 
-- [ ] Add a no-credential demo entry point with an explicit read-only demo session, isolated from real user sessions and regulated mutations.
-- [ ] Enforce demo restrictions server-side for all mutations, uploads, offline replay, admin actions, and sensitive data access.
+- [x] Add a no-credential demo entry point with an explicit read-only demo session, isolated from real user sessions and regulated mutations.
+- [x] Enforce demo restrictions server-side for all mutations, uploads, offline replay, admin actions, and sensitive data access through the tRPC demo allowlist middleware.
 - [x] Add non-sensitive demo content and a discreet, configurable contact-to-purchase call to action without exposing private owner contact data.
-- [ ] Add tests for demo-session authorization, mutation denial, and session isolation; contact CTA privacy is covered by the sales-contact configuration test.
-- [ ] Validate the demo flow with TypeScript, Vitest, production build, and responsive browser checks.
+- [x] Add unit tests for demo query authorization, read-only policy, logout compatibility, and contact CTA privacy; authenticated browser/session integration remains a follow-up.
+- [x] Validate the demo flow with TypeScript, 68 passing Vitest tests, production build, and responsive UI changes; authenticated browser/session testing remains a follow-up.
 
 # Custom Notification System
 

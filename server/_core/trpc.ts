@@ -2,6 +2,7 @@ import { NOT_ADMIN_ERR_MSG, UNAUTHED_ERR_MSG } from '@shared/const';
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { TrpcContext } from "./context";
+import { isDemoQueryAllowed } from "../domain/demo-access";
 
 const t = initTRPC.context<TrpcContext>().create({
   transformer: superjson,
@@ -16,7 +17,7 @@ const requireUser = t.middleware(async opts => {
   if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
   }
-  if (ctx.isDemo && opts.type === "mutation") {
+  if (ctx.isDemo && (opts.type !== "query" || !isDemoQueryAllowed(opts.path))) {
     throw new TRPCError({ code: "FORBIDDEN", message: "وضع العرض التجريبي للقراءة فقط. تواصل معنا لطلب نسخة تشغيلية." });
   }
 
