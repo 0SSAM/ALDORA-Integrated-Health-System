@@ -46,3 +46,21 @@ These entries expand source discovery only. They do not represent legal advice, 
 | Morocco | [Ministry of Health and Social Protection — health-product regulations](https://www.sante.gov.ma/Reglementation/Pages/REGLEMENTATION-APPLICABLE-AU-PRODUITS-DE-SANTE.aspx) | Official page listing primary laws and decrees for medicines/pharmacy, in-vitro diagnostic reagents, medical devices, poisonous substances, generic bioequivalence, and human-medicine marketing authorization. | The page is not a complete facility-licensing, privacy, tax/e-invoicing, insurance, payroll, or integration-credential specification and does not authorize an ALDO production activation. |
 
 Morocco remains `PENDING_REVIEW` until the applicable authority, effective legal versions, organization-specific licences, product evidence, privacy/hosting requirements, fiscal interfaces, and acceptance credentials are independently recorded in a country pack.
+
+
+## Organization-type evidence matrix
+
+The following matrix is an activation checklist, not a statement that any licence has been obtained. Each enabled country pack must attach the current authority, legal source, effective date, responsible reviewer, retention period, privacy/hosting decision, interoperability specification, and acceptance credentials for the applicable row.
+
+| Organization type | Minimum evidence categories before activation | Current ALDO status |
+|---|---|---|
+| Government entity | Public-sector authority, procurement/hosting approval, data classification, retention, audit, incident response, and inter-agency exchange requirements | Configuration and evidence tracking only; country-specific approval pending |
+| Independent pharmacy or pharmacy chain | Facility and professional licences, product registration, controlled-medicine rules, dispensing/prescription rules, pricing/tax/e-invoice, recalls, and branch jurisdiction | Core branch and jurisdiction gates exist; local licences and adapters pending |
+| Distributor | Wholesale/distribution licence, warehouse and cold-chain controls, batch/recall/track-and-trace rules, transport permissions, tax/e-invoice, and supplier/customer identifiers | Inventory and FEFO foundations exist; distributor-specific country evidence pending |
+| Hospital | Facility licence, clinical-data access roles, prescribing/dispensing boundaries, laboratory/imaging interoperability, retention, consent, incident response, and payer exchange | Sensitive-data policy exists; hospital credentials and interoperability tests pending |
+| Laboratory | Laboratory accreditation, test catalogue, specimen/diagnostic retention, result privacy, referral and interoperability rules, and professional access evidence | Diagnostic category is modeled; laboratory pack and integrations pending |
+| Radiology center | Facility and modality permissions, imaging retention/hosting, report/signature controls, access logging, referral exchange, and radiation-safety evidence | Imaging category is modeled; radiology pack and integrations pending |
+| Insurer | Payer licence, claims/benefit rules, member identifiers, consent and minimum-necessary access, retention, fraud/audit, and clearinghouse credentials | Insurance policy foundations exist; payer-specific evidence and adapters pending |
+| Rehabilitation/physiotherapy center | Facility/professional permissions, treatment records, consent, referral, retention, payer rules, and safeguarding requirements | Organization type is modeled; country-specific evidence pending |
+
+No row may be marked production-ready solely because the corresponding software workspace exists. The activation decision belongs to the designated local reviewer and must remain auditable in the regulatory-pack lifecycle.

@@ -313,7 +313,7 @@
 - [ ] Add database/query tests proving persisted regulated records cannot be created or accessed without matching jurisdiction and organization scope.
 - [x] Add organization-specific workspace navigation and safe empty states without implying unsupported regulatory certification.
 - [x] Add a reusable sensitive-data policy for patient, prescription, diagnostic, imaging, insurance, and audit categories with least-privilege role checks, organization scope, demo denial, and export denial; persistence-route integration remains tracked separately.
-- [ ] Add integration-contract tests for protected organization routers and database-backed cross-tenant denial; unit coverage now includes the role matrix, sensitive-data access, demo denial, export denial, and cross-organization policy checks.
+- [x] Add mocked integration-contract coverage for protected organization routers; database-backed cross-tenant denial remains a separate pending item, while unit coverage includes the role matrix, sensitive-data access, demo denial, export denial, and cross-organization policy checks.
 - [ ] Document official regulatory, interoperability, retention, and credential prerequisites per country and organization type.
 
 # Notification Organization Scope Bug
@@ -343,3 +343,4 @@
 - [ ] Wire the invoice catalog-scope guard into a real invoice creation/persistence procedure once an invoice table and supported jurisdiction adapter are implemented.
 - [x] Add unit matrix coverage for catalog, pricing, tax, invoice, prescription, insurance, payroll, label, authority, medicine, cosmetic, and medical-supply compound-scope acceptance and cross-country/cross-organization denial.
 - [ ] Add persisted-record denial coverage for those regulated categories against a disposable database; policy matrix tests alone do not satisfy this item.
+- [x] Document a source-neutral organization-type evidence matrix covering government, pharmacy, distributor, hospital, laboratory, radiology, insurer, and rehabilitation deployments; this is an activation checklist, not proof of licensing or compliance.
