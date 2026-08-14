@@ -42,6 +42,12 @@ describe("catalog evidence policy", () => {
     })).toBe(true);
   });
 
+  it("rejects consumption when an active optional field lacks verified evidence", () => {
+    const item = { nameAr: "مستلزم", category: "medical_supply", sku: "SKU-2", manufacturer: "مصنع موثق" };
+    const evidence = ["nameAr", "category", "sku"].map(catalogField => ({ catalogField, verificationStatus: "verified" as const }));
+    expect(() => assertConsumableCatalogContext({ productCatalogItemId: 12, catalogItemId: 12, productJurisdictionId: 2, catalogJurisdictionId: 2, catalogStatus: "approved", category: "medical_supply", item, evidence })).toThrow("manufacturer");
+  });
+
   it("rejects unlinked, unapproved, and cross-jurisdiction catalog consumption", () => {
     const base = {
       productCatalogItemId: 11,

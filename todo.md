@@ -115,7 +115,7 @@
 - [ ] Create a country data-boundary model so every medicine, cosmetic, medical-supply, authority, tax, invoice, price, prescription, insurance, payroll, and label record belongs to a jurisdiction profile.
 - [x] Add explicit per-country catalog provenance and refresh metadata; never merge records across countries without a controlled mapping.
 - [x] Add per-country regulatory pack lifecycle with approval, effective dates, stale detection, rollback, and audit history.
-- [ ] Add branch-to-country assignment with admin confirmation/manual override and deny transactions when jurisdiction is missing or stale.
+- [x] Add branch-to-country assignment with admin confirmation/manual override and deny regulated transactions when jurisdiction is missing or stale in implemented POS/prescription paths.
 - [ ] Add cross-country isolation tests for catalog search, pricing, tax, prescription, and compliance procedures.
 
 # Comprehensive Country Compliance Requirement
@@ -129,7 +129,7 @@
 
 - [x] Add explicit language and legal-authority-profile fields to jurisdiction configuration and enforce them in Regional Engine validation.
 - [x] Update regional registry readiness so a country is only configured with an approved, non-stale pack and verified evidence for enabled rule keys.
-- [ ] Enforce evidence linkage for every active catalog field before catalog approval and regulated use.
+- [x] Enforce evidence linkage for every active catalog field before catalog approval and regulated sale use; other regulated consumers remain tracked separately.
 - [x] Add unit coverage for country code normalization, profile completeness, approval, stale-pack blocking, missing evidence, and cross-country access denial.
 - [x] Block stale or unapproved packs in the Regional Engine before regulated operations.
 
@@ -151,7 +151,7 @@
 # Core Operational Data Boundary
 
 - [x] Add nullable jurisdictionId to inventory_batches and sales schema; apply non-destructive migration 0010 for inventory batches.
-- [ ] Populate jurisdictionId from the confirmed branch assignment in every inventory and sale write path before allowing regulated persistence.
+- [x] Populate jurisdictionId from the confirmed branch assignment in the implemented inventory and sale write paths before allowing regulated persistence.
 - [ ] Add database/query tests proving products, batches, sales, prescriptions, and catalog records cannot cross jurisdiction boundaries.
 
 # Jurisdiction Record Policy
@@ -202,7 +202,7 @@
 
 - [x] Add a country-aware offline decision policy that allows only non-regulated drafts offline and blocks sale, inventory mutation, prescription, and invoice operations.
 - [x] Add conflict resolution policy requiring manual review instead of silent overwrite.
-- [ ] Wire the offline policy into the PWA queue/service worker and visible sync-status UI.
+- [x] Wire the offline policy into the PWA queue/service worker and visible sync-status UI; regulated requests remain blocked offline.
 
 # PWA Offline Integration
 
@@ -251,3 +251,8 @@
 - [x] Add an admin-only regional administration panel for profile status, pack versions, evidence status, approve/rollback, and audit history.
 - [x] Ensure non-admin users see read-only readiness and legal-prerequisite status without mutation controls.
 - [x] Verify the panel compiles and renders its safe unauthenticated loading state; authenticated admin/non-admin browser-flow coverage remains a release follow-up.
+
+# Catalog Consumption Evidence Hardening
+
+- [x] Apply assertConsumableCatalogContext in commitSale so every active catalog field requires verified evidence at regulated sale use.
+- [x] Add regression coverage for a sale rejected when a non-empty active catalog field lacks verified evidence.

@@ -1,6 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 
 type ClientLocalization = {
   countryCode: string;
@@ -15,6 +15,8 @@ type ClientLocalization = {
   setCountry: (countryCode: string) => void;
   branchId: number | null;
   jurisdictionId: number | null;
+  branches: Array<{ id: number; nameAr: string; countryCode: string }>;
+  setBranchId: (branchId: number) => void;
 };
 
 const dictionaries: Record<string, Record<string, string>> = {
@@ -39,7 +41,9 @@ const LocalizationContext = createContext<ClientLocalization | null>(null);
 export function LocalizationProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const branchRegistry = trpc.regional.myBranchJurisdictions.useQuery(undefined, { enabled: Boolean(user), retry: false, refetchOnWindowFocus: false });
-  const confirmedBranch = branchRegistry.data?.find(item => item.assignment?.jurisdictionId && item.profile?.active === 1) ?? null;
+  const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
+  const branches = useMemo(() => (branchRegistry.data ?? []).filter(item => item.branch && item.profile).map(item => ({ id: item.branch!.id, nameAr: item.branch!.nameAr, countryCode: item.profile!.countryCode })), [branchRegistry.data]);
+  const confirmedBranch = branches.length ? (branchRegistry.data?.find(item => item.branch?.id === selectedBranchId && item.assignment?.jurisdictionId && item.profile?.active === 1) ?? branchRegistry.data?.find(item => item.assignment?.jurisdictionId && item.profile?.active === 1) ?? null) : null;
   const countryCode = confirmedBranch?.profile?.countryCode ?? "UNSET";
   const defaults = countryDefaults[countryCode] ?? { locale: "ar", currencyCode: "XXX" };
   const language = defaults.locale.split("-")[0] ?? "ar";
@@ -60,7 +64,11 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
     },
     branchId: confirmedBranch?.branch?.id ?? null,
     jurisdictionId: confirmedBranch?.assignment?.jurisdictionId ?? null,
-  }), [countryCode, defaults.currencyCode, defaults.locale, dictionary, language, confirmedBranch]);
+    branches,
+    setBranchId: (branchId) => {
+      if (branches.some(branch => branch.id === branchId)) setSelectedBranchId(branchId);
+    },
+  }), [countryCode, defaults.currencyCode, defaults.locale, dictionary, language, confirmedBranch, branches]);
 
   useEffect(() => {
     document.documentElement.lang = value.language;

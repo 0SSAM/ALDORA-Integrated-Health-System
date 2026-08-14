@@ -13,7 +13,7 @@ import { assertPrescriptionConfirmed, preparePosSale, validatePrescriptionUpload
 import { assertCompliancePackUsable, assertJurisdictionProfileReady } from "../domain/regional-engine";
 import { assertBranchAssignmentReady } from "../domain/branch-compliance";
 import { storageGetSignedUrl, storagePut } from "../storage";
-import { activeCatalogFields, assertCatalogEvidence } from "../domain/catalog-policy";
+import { activeCatalogFields, assertCatalogEvidence, assertConsumableCatalogContext } from "../domain/catalog-policy";
 import { assertRecordBelongsToJurisdiction } from "../domain/data-boundary";
 
 const pharmacistProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -109,7 +109,7 @@ export const erpRouter = router({
           const catalogItem = (await db.select().from(catalogItems).where(and(eq(catalogItems.id, product.catalogItemId), eq(catalogItems.jurisdictionId, assignment.jurisdictionId))).limit(1))[0];
           if (!catalogItem || catalogItem.verificationStatus !== "VERIFIED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog record is not verified for this jurisdiction" });
           const catalogEvidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.jurisdictionId, assignment.jurisdictionId), eq(complianceEvidence.operation, "catalog"), eq(complianceEvidence.verificationStatus, "verified")));
-          try { assertCatalogEvidence(catalogItem.category, catalogEvidence, []); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+          try { assertConsumableCatalogContext({ productCatalogItemId: product.catalogItemId, catalogItemId: catalogItem.id, productJurisdictionId: product.jurisdictionId, catalogJurisdictionId: catalogItem.jurisdictionId!, catalogStatus: catalogItem.verificationStatus === "VERIFIED" ? "approved" : catalogItem.verificationStatus === "REJECTED" ? "rejected" : "pending", category: catalogItem.category, item: catalogItem, evidence: catalogEvidence }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
           const remaining = Number(batch.quantityOnHand);
           if (!Number.isFinite(remaining) || remaining < item.quantity) throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient stock" });
           checkedItems.push({ ...item, remaining });
