@@ -24,8 +24,10 @@ describe("ALDO visible branding privacy", () => {
 
   it("keeps the application-owned service worker branded as ALDO", async () => {
     const source = await readFile(new URL("../client/public/sw.js", import.meta.url), "utf8");
-    expect(source).not.toMatch(/bdf-pharma|X-BDF|BDF_SYNC_STATUS/i);
+    expect(source).not.toMatch(/X-BDF|BDF_SYNC_STATUS/i);
     expect(source).toContain("aldo-health-care-shell-v3");
+    expect(source).toContain('LEGACY_CACHE_NAMES = ["bdf-pharma-shell-v2"]');
+    expect(source).toContain("caches.delete(name)");
     expect(source).toContain("X-ALDO-Regulated-Operation");
     expect(source).toContain("ALDO_SYNC_STATUS");
   });

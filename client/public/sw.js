@@ -1,4 +1,5 @@
 const CACHE_NAME = "aldo-health-care-shell-v3";
+const LEGACY_CACHE_NAMES = ["bdf-pharma-shell-v2"];
 const APP_SHELL = ["/", "/manifest.webmanifest"];
 const REGULATED_HEADER = "X-ALDO-Regulated-Operation";
 const DRAFT_HEADER = "X-ALDO-Offline-Draft";
@@ -9,7 +10,7 @@ self.addEventListener("install", event => {
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(Promise.all(LEGACY_CACHE_NAMES.map(name => caches.delete(name))).then(() => self.clients.claim()));
 });
 
 self.addEventListener("fetch", event => {
