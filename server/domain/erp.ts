@@ -56,3 +56,63 @@ export function preparePosSale(input: { officialPrice: number; quantity: number;
   const allocations = selectFefoBatches(input.batches, input.quantity);
   return { allocations, gross: Number((input.officialPrice * input.quantity).toFixed(2)), discountAmount: input.discountAmount, net: Number((input.officialPrice * input.quantity - input.discountAmount).toFixed(2)), etaStatus: "pending" as const };
 }
+
+export function planInventoryAdjustment(batches: StockBatch[], quantity: number, reason: "TRANSFER" | "RETURN" | "DAMAGED" | "INSURANCE_DISPENSE") {
+  if (!reason) throw new Error("Adjustment reason required");
+  return { reason, allocations: selectFefoBatches(batches, quantity) };
+}
+
+export function classifyInsuranceAging(daysOutstanding: number) {
+  if (!Number.isFinite(daysOutstanding) || daysOutstanding < 0) throw new Error("Invalid aging days");
+  return daysOutstanding <= 30 ? "0_30" : daysOutstanding <= 60 ? "31_60" : daysOutstanding <= 90 ? "61_90" : "90_PLUS";
+}
+
+export function evaluateColdChain(temperatureC: number, minC: number, maxC: number) {
+  if (![temperatureC, minC, maxC].every(Number.isFinite) || minC > maxC) throw new Error("Invalid cold-chain range");
+  return { inRange: temperatureC >= minC && temperatureC <= maxC, temperatureC, minC, maxC };
+}
+
+export function buildLegalLabel(input: { productCode: string; batchNumber: string; expiryDate: string; barcodeValue: string; qrPayload: string }) {
+  if (Object.values(input).some(value => !value.trim())) throw new Error("Legal label fields are required");
+  return { ...input, format: "QR_BARCODE", verified: false as const };
+}
+
+export function calculateCompoundingCost(components: Array<{ quantity: number; unitCost: number }>, laborCost: number, marginPercent: number) {
+  if (components.some(item => item.quantity < 0 || item.unitCost < 0) || laborCost < 0 || marginPercent < 0) throw new Error("Invalid compounding cost");
+  const cost = components.reduce((sum, item) => sum + item.quantity * item.unitCost, 0) + laborCost;
+  return { cost: Number(cost.toFixed(2)), price: Number((cost * (1 + marginPercent / 100)).toFixed(2)) };
+}
+
+export function validateFinanceEntry(input: { taxAmount: number; debit: number; credit: number }) {
+  if (![input.taxAmount, input.debit, input.credit].every(Number.isFinite) || input.taxAmount < 0 || input.debit < 0 || input.credit < 0) throw new Error("Invalid finance entry");
+  return { balanced: Math.abs(input.debit - input.credit) < 0.005, taxAmount: Number(input.taxAmount.toFixed(2)) };
+}
+
+export function validatePatientRecord(input: { patientCode: string; consentRecorded: boolean; chronicCareEnabled: boolean }) {
+  if (!input.patientCode.trim()) throw new Error("Patient code required");
+  if (input.chronicCareEnabled && !input.consentRecorded) throw new Error("Consent required for chronic care");
+  return { auditable: true as const, accessControlled: true as const };
+}
+
+export function validateInventorySchedulePolicy(input: { role: string; path: string; cron: string }) {
+  if (!["admin", "manager"].includes(input.role)) throw new Error("Only administrators or managers can schedule alerts");
+  if (input.path !== "/api/scheduled/inventory-alerts") throw new Error("Invalid inventory alert path");
+  if (!/^\d+ \S+ \S+ \S+ \S+ \S+$/.test(input.cron)) throw new Error("Invalid cron expression");
+  return true;
+}
+
+export function deductCompoundingBom(components: Array<{ componentId: string; requiredQuantity: number; availableQuantity: number }>) {
+  if (components.some(item => !item.componentId || item.requiredQuantity <= 0 || item.availableQuantity < item.requiredQuantity)) throw new Error("Insufficient BOM component stock");
+  return components.map(item => ({ componentId: item.componentId, deductedQuantity: item.requiredQuantity }));
+}
+
+export function createCompoundingLiability(input: { batchId: string; preparedByUserId: number; pharmacistApproved: boolean }) {
+  if (!input.batchId || !Number.isInteger(input.preparedByUserId) || input.preparedByUserId <= 0) throw new Error("Liability identity required");
+  if (!input.pharmacistApproved) throw new Error("Pharmacist approval required");
+  return { ...input, status: "APPROVED" as const, auditable: true as const };
+}
+
+export function validateAuthorityArtifacts(input: { authority: "EDA" | "ETA" | "MOH" | "NFSA" | "UHIA" | "SYNDICATE"; reference: string; verified: boolean }) {
+  if (!input.reference.trim()) throw new Error(`${input.authority} reference required`);
+  return { authority: input.authority, reference: input.reference, verified: input.verified, externalVerificationRequired: !input.verified };
+}

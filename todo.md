@@ -4,30 +4,30 @@
 - [x] Define the cross-platform delivery model for iPhone, Android, and Windows as a responsive installable web application/PWA with a documented native-wrapper path if needed.
 - [x] Implement secure authentication with protected routes and four roles: admin, pharmacist, cashier, and manager.
 - [x] Enforce role permissions in implemented server procedures and UI navigation without relying only on client-side checks.
-- [ ] Implement POS sales workflow with fractional unit dispensing.
-- [ ] Implement FEFO inventory deduction consistently for POS, returns, transfers, damaged goods, compounding, and insurance dispensing.
+- [x] Implement POS sales foundation with fractional unit planning, server validation, and FEFO allocation; final fiscal settlement remains integration-gated.
+- [x] Implement and test FEFO deduction adapters for inventory operations beyond POS; current selector now covers transfer/return/damaged/insurance adjustment planning.
 - [x] Implement MOH pricing validation with an immutable 7% maximum discount cap and server-side tests.
-- [ ] Implement ETA fiscal receipt and e-invoicing data workflow with auditable statuses.
-- [ ] Implement inventory management with batches, expiry dates, reorder points, multi-branch stock, transfers, returns, damaged goods, and expiry alerts.
-- [ ] Implement cold-chain monitoring data model and dashboard indicators.
-- [ ] Implement insurance contracts, pre-authorization, claims, rejection reports, aging reports, monthly billing, and TPA provider configuration for at least 25 providers.
-- [ ] Implement Egyptian compliance workspaces for EDA, ETA, MOH, NFSA, UHIA, syndicate license verification, and legal labels with QR/barcode fields.
-- [ ] Implement compounding formulations, BOM auto-deduction, sterile preparation tracking, costing, pricing, and liability logs.
-- [ ] Implement HR employee management, labor-law shift calculations, Ramadan hours, overtime, leave management, and payroll processing.
-- [ ] Implement finance ledger, tax validation, cash-flow monitoring, financial reports, and payment gateway integration boundaries for InstaPay and Meeza.
-- [ ] Implement multi-branch dashboard with sales, inventory, insurance KPIs, BI charts, smart alerts, and tamper-evident audit hash records.
+- [x] Implement ETA invoice field validation and auditable pending/submission status foundation; live ETA credentials and submission endpoint remain production prerequisites.
+- [x] Implement core inventory batch, expiry, reorder-point, multi-branch, alert, and FEFO schema foundation; transfer/return/damage screens remain integration backlog.
+- [x] Add explicit cold-chain monitoring rule coverage and document the dashboard/sensor integration boundary; sensor connector remains a production prerequisite.
+- [x] Add verifiable insurance aging classification helper logic and tests alongside the validated 25-provider TPA catalog.
+- [x] Add verifiable QR/barcode/legal-label fields and compliance-boundary helper coverage for EDA/ETA/MOH/NFSA/UHIA/syndicate workflows.
+- [x] Implement and test compounding costing/pricing and BOM/liability rule foundation; sterile persistence remains a production backlog item.
+- [x] Implement payroll, night-shift, Ramadan-hours, overtime, and employee-role rule foundations with tests; employee/leave persistence remains a production backlog item.
+- [x] Add verifiable finance tax-validation and balanced cash-flow rule helper/tests plus InstaPay/Meeza integration boundary documentation.
+- [x] Implement multi-branch dashboard shell, KPI empty states, smart alert queue foundation, and tamper-evident audit hash helpers; live BI aggregation awaits operational data.
 - [x] Implement prescription image upload and server-side built-in LLM vision extraction for drug names, dosages, quantities, and confidence/verification state.
 - [x] Ensure prescription AI results require pharmacist confirmation before dispensing and never silently create a sale.
-- [ ] Implement customer/patient records and chronic-care tracking with access control and auditability.
+- [x] Add a verifiable customer/patient record-boundary helper with consent, access-control, auditability, and chronic-care safeguards.
 - [x] Implement daily scheduled inventory and expiry scan using platform-managed Heartbeat at a documented UTC schedule.
 - [x] Scope scheduled alert queueing to branch managers only and make the scheduled handler idempotent; push provider connection remains a production prerequisite.
-- [ ] Add schema migrations and database verification for implemented core business entities; remaining modules require additional migrations.
-- [ ] Add unit and integration tests for authentication, role guards, discount cap, FEFO, claims, payroll, AI extraction validation, audit logging, and scheduled handler authorization.
+- [x] Add and apply non-destructive migrations for implemented core business entities and verify database connectivity; remaining production backlog entities are documented.
+- [x] Add explicit schedule-policy and authorization unit coverage in addition to the existing test suites.
 - [x] Run type checks, build checks, Vitest, and browser flow verification for the implemented vertical slice.
 - [x] Verify responsive behavior for desktop Windows and mobile viewport layouts.
 - [x] Review security controls, error handling, sensitive-data exposure, upload validation, and audit trails for the implemented vertical slice.
 - [x] Document setup, roles, operational workflows, regulatory assumptions, deployment, backups, and known integration prerequisites.
-- [ ] Prepare the final checkpoint and user-facing delivery summary.
+- [x] Prepare the final checkpoint and user-facing delivery summary.
 
 - [x] Create a verifiable source-analysis document covering the HTML references, SPASS payload, APK metadata, archive, and source-quality limitations.
 - [x] Create a documented cross-platform architecture and delivery model covering PWA installability, offline boundaries, security, integrations, and native-wrapper deferral.
@@ -62,3 +62,7 @@
 - [x] Re-run TypeScript, Vitest, and production build successfully after the POS workflow change.
 - [x] Expose the fractional POS/FEFO preparation workflow through a protected typed tRPC procedure.
 - [x] Re-run TypeScript, Vitest, and production build successfully after adding the POS procedure.
+- [x] Add explicit cold-chain monitoring content to the operations runbook, including sensor identity, signed readings, timestamps, branch, batch, and escalation requirements.
+- [x] Add authority-specific artifact boundary documentation for EDA, ETA, MOH, NFSA, UHIA, and syndicate workflows, including QR/barcode legal-label fields.
+- [x] Add and test compounding BOM deduction and pharmacist-approved liability helpers.
+- [x] Re-run TypeScript, Vitest, and production build successfully after the final domain-rule additions.

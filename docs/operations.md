@@ -23,3 +23,11 @@ Before production use, configure official integrations, verify certificates and 
 قاعدة البيانات هي مصدر السجل التشغيلي، بينما تخزن الصور والملفات في التخزين الكائني المدمج. قبل أي ترقية يجب أخذ نسخة قاعدة بيانات مشفرة عبر أدوات مزود المنصة، وتسجيل رقم النسخة ووقت UTC ومالك العملية في سجل التغيير. لا ينفذ النظام استعادة مدمرة تلقائياً؛ تتم الاستعادة في بيئة منفصلة أولاً، ثم تُراجع الجداول الحساسة مثل المبيعات والمخزون والتدقيق، وبعد موافقة مسؤول النظام تُعاد الخدمة إلى النسخة المستعادة. يجب اختبار الاستعادة دورياً على نسخة غير إنتاجية، والتحقق من صلاحيات الوصول، وسلامة ملفات الوصفات، وتسلسل hashes في audit_logs.
 
 لا تحفظ أسرار التكامل أو مفاتيح الدفع داخل المستودع. تُدار القيم عبر Secrets في بيئة المشروع، وتظل تكاملات EDA وETA وUHIA وTPA وInstaPay وMeeza في وضع غير متصل حتى يزوّد مالك النظام ببيانات اعتماد الإنتاج وموافقات الجهات المعنية.
+
+## Cold-chain monitoring
+
+Cold-chain batches must be evaluated against a configured minimum and maximum temperature range. The current release exposes a deterministic `evaluateColdChain` rule and a readiness boundary; it does not fabricate sensor readings. A production connector must provide signed readings, device identity, timestamp, branch, batch, and escalation status before the dashboard can show live compliance.
+
+## Regulatory artifact boundaries
+
+EDA, ETA, MOH, NFSA, UHIA, and syndicate workflows accept only reference identifiers and verification state in the current release. Legal labels carry product code, batch number, expiry date, barcode value, and QR payload, and remain marked unverified until the corresponding authority connector confirms them. No approval, invoice submission, license verification, or payment response is claimed without external credentials and a successful response.
