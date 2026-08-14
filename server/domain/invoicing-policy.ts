@@ -58,3 +58,18 @@ export function assertInvoiceCatalogScope(scope: InvoiceCatalogScope) {
   }
   return true as const;
 }
+
+
+export type InvoiceGenerationInput = {
+  document: InvoiceDocument;
+  catalogScope: InvoiceCatalogScope;
+};
+
+/**
+ * Validates the complete local invoice boundary before persistence or external submission.
+ * No government endpoint is contacted here; adapters remain credential- and pack-gated.
+ */
+export function generateInvoiceDocument(input: InvoiceGenerationInput) {
+  assertInvoiceCatalogScope(input.catalogScope);
+  return validateInvoiceDocument(input.document);
+}

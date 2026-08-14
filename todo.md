@@ -500,3 +500,5 @@
 - [x] Remove the legacy BDF shell cache during Service Worker activation and cover the cleanup contract; 4 branding tests and TypeScript passed, with the legacy cache name retained only as an explicit deletion target.
 
 - [x] Add focused cross-country isolation coverage for catalog search results, pricing/tax records, prescription records, compliance records, and persisted-record scope denial; 7 tests and TypeScript passed.
+
+- [x] Add a pure invoice-generation boundary that validates document reconciliation and catalog jurisdiction/evidence before any future persistence or official submission adapter; 6 invoice-policy tests and TypeScript passed.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertInvoiceCatalogScope, requireInvoiceIntegration, validateInvoiceDocument, type InvoiceAdapter } from "./invoicing-policy";
+import { assertInvoiceCatalogScope, generateInvoiceDocument, requireInvoiceIntegration, validateInvoiceDocument, type InvoiceAdapter } from "./invoicing-policy";
 
 const adapter: InvoiceAdapter = { countryCode: "SA", submit: async () => ({ externalId: "x", status: "submitted" }) };
 const rules = { invoicing: { integration: true, endpoint: "https://official.example/invoice" } } as const;
@@ -29,5 +29,16 @@ describe("invoicing policy", () => {
 
   it("rejects invoice catalog scope without tenant or jurisdiction", () => {
     expect(() => assertInvoiceCatalogScope({ jurisdictionId: null, organizationId: 7, catalogJurisdictionId: null, catalogOrganizationId: 7, catalogVerificationStatus: "approved", verifiedEvidenceCount: 1 })).toThrow(/scope/);
+  });
+
+  it("generates only a reconciled invoice with approved same-scope catalog evidence", () => {
+    const input = {
+      document: { invoiceNumber: "INV-2", currencyCode: "EGP", subtotal: 250, discountAmount: 10, totalAmount: 240, items: [{ sku: "EG-1", quantity: 2, unitPrice: 125 }] },
+      catalogScope: { jurisdictionId: 4, organizationId: 12, catalogJurisdictionId: 4, catalogOrganizationId: 12, catalogVerificationStatus: "approved" as const, verifiedEvidenceCount: 3 },
+    };
+    expect(generateInvoiceDocument(input).invoiceNumber).toBe("INV-2");
+    expect(() => generateInvoiceDocument({ ...input, catalogScope: { ...input.catalogScope, catalogJurisdictionId: 5 } })).toThrow(/outside/);
+    expect(() => generateInvoiceDocument({ ...input, catalogScope: { ...input.catalogScope, verifiedEvidenceCount: 0 } })).toThrow(/evidence/);
+    expect(() => generateInvoiceDocument({ ...input, document: { ...input.document, totalAmount: 241 } })).toThrow(/reconcile/);
   });
 });
