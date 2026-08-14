@@ -165,3 +165,10 @@
 - [x] Re-check prescription intake jurisdictionId against the confirmed branch assignment during extraction.
 - [x] Re-check prescription intake jurisdictionId against the confirmed branch assignment during dispensing.
 - [ ] Apply the same record-boundary policy to catalog reads, inventory batch reads/writes, sale reads/writes, and future invoice/insurance/payroll/report procedures.
+
+# Catalog Query Boundary
+
+- [x] Require an active complete jurisdiction profile for catalog search.
+- [x] Require an active complete jurisdiction profile for catalog creation.
+- [x] Require an active complete jurisdiction profile plus current approved pack and verified evidence for catalog approval.
+- [ ] Re-check catalog jurisdiction and evidence when a catalog item is consumed by sale, prescription, dispensing, or invoice workflows.
