@@ -520,3 +520,5 @@
 - [x] Record a primary-source review for EDA Egypt and JFDA Jordan with source URLs and explicit limitations; no unverified regulatory rows or automatic submission were enabled.
 
 - [x] Review official Qatar MOPH and Morocco AMMPS portals as source leads and record CAPTCHA/content limitations; detailed country-pack activation remains pending primary-source extraction, effective dates, credentials, and acceptance tests.
+
+- [x] Add a country-pack activation policy requiring source-linked evidence, effective dates, local licensing, credentials, and acceptance criteria for every required regulatory domain; 2 policy tests and TypeScript passed, with incomplete packs blocked.
