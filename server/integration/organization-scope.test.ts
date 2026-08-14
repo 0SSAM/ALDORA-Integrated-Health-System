@@ -1,8 +1,9 @@
 import { createConnection, type Connection } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { isIsolatedTestDatabaseUrl } from "./test-database-safety";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
-const hasValidTestDatabase = /^(mysql|mysql2|mariadb):\/\//.test(testDatabaseUrl ?? "");
+const hasValidTestDatabase = isIsolatedTestDatabaseUrl(testDatabaseUrl, process.env.TEST_DATABASE_ISOLATED);
 
 describe.skipIf(!hasValidTestDatabase)("persisted organization boundary contract", () => {
   let connection: Connection;
