@@ -526,3 +526,5 @@
 - [x] Create a source-safe Egyptian medicine workbook template with provenance fields and no fabricated medicine records while the reproducible EDA bulk source remains unavailable; generated docs/data/egypt-medicine-register-source-safe-template.xlsx.
 
 - [x] Package the source-safe workbook with a concise methodology, source register, coverage statement, and limitations note for review; created docs/data/egypt-medicine-register-delivery.md.
+
+- [x] Run regression validation after country-pack and source-safe workbook work; 172 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing non-blocking chunk-size warning.
