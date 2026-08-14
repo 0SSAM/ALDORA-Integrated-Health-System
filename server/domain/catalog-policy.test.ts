@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeCatalogFields, assertCatalogEvidence, assertConsumableCatalogContext, canApproveCatalogItem, missingCatalogEvidence } from "./catalog-policy";
+import { activeCatalogFields, assertCatalogEvidence, assertConsumableCatalogContext, assertPrescriptionCatalogConsumption, canApproveCatalogItem, missingCatalogEvidence } from "./catalog-policy";
 
 describe("catalog evidence policy", () => {
   it("requires registration evidence for medicines", () => {
@@ -62,5 +62,22 @@ describe("catalog evidence policy", () => {
     expect(() => assertConsumableCatalogContext({ ...base, productCatalogItemId: null })).toThrow("not linked");
     expect(() => assertConsumableCatalogContext({ ...base, catalogStatus: "pending" })).toThrow("not approved");
     expect(() => assertConsumableCatalogContext({ ...base, catalogJurisdictionId: 3 })).toThrow("jurisdiction mismatch");
+  });
+
+  it("revalidates prescription and dispensing consumption through the dedicated guard", () => {
+    const context = {
+      productCatalogItemId: 21,
+      catalogItemId: 21,
+      productJurisdictionId: 4,
+      catalogJurisdictionId: 4,
+      catalogStatus: "approved" as const,
+      category: "medicine" as const,
+      item: { nameAr: "دواء", category: "medicine", sku: "RX-1", registrationNumber: "REG-1" },
+      evidence: ["nameAr", "category", "sku", "registrationNumber"].map(catalogField => ({ catalogField, verificationStatus: "verified" as const })),
+    };
+    expect(assertPrescriptionCatalogConsumption(context)).toBe(true);
+    expect(() => assertPrescriptionCatalogConsumption({ ...context, catalogStatus: "rejected" })).toThrow("not approved");
+    expect(() => assertPrescriptionCatalogConsumption({ ...context, productJurisdictionId: 9 })).toThrow("jurisdiction mismatch");
+    expect(() => assertPrescriptionCatalogConsumption({ ...context, evidence: context.evidence.filter(item => item.catalogField !== "registrationNumber") })).toThrow("registrationNumber");
   });
 });

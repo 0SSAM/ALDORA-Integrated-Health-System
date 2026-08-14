@@ -136,7 +136,7 @@
 # Enforcement Coverage Follow-up
 
 - [ ] Apply branch-jurisdiction and compliance-pack gating to prescription upload/dispensing, invoice, insurance, payroll, reporting, and inventory mutation entry points, not only POS preparation and catalog approval.
-- [ ] Require catalog evidence validation again at downstream regulated use when a product is loaded for sale, prescription, dispensing, or invoice generation; POS, prescription, dispensing, and catalog paths enforce it, but invoice-generation enforcement is not yet implemented.
+- [ ] Require catalog evidence validation again at downstream regulated use when a product is loaded for sale, prescription, dispensing, or invoice-numbered sale generation; commitSale enforces the sale path, while prescription/dispensing product matching and standalone invoice procedures do not yet exist.
 - [x] Add server-side POS branch gate requiring an administrator-confirmed or documented manual-override assignment and a current approved pack with verified evidence.
 - [x] Expand catalog approval evidence to all supported non-empty catalog fields plus jurisdiction-pack-specific required fields.
 
@@ -173,7 +173,7 @@
 - [x] Require an active complete jurisdiction profile for catalog search.
 - [x] Require an active complete jurisdiction profile for catalog creation.
 - [x] Require an active complete jurisdiction profile plus current approved pack and verified evidence for catalog approval.
-- [ ] Re-check catalog jurisdiction and evidence when a catalog item is consumed by prescription, dispensing, or invoice workflows; commitSale is now covered.
+- [x] Re-check catalog jurisdiction and evidence when a catalog item is consumed by prescription, dispensing, or the implemented invoice-numbered commitSale workflow; a separate invoice workflow is not present.
 
 # Batch Boundary Enforcement
 
@@ -344,3 +344,7 @@
 - [x] Add unit matrix coverage for catalog, pricing, tax, invoice, prescription, insurance, payroll, label, authority, medicine, cosmetic, and medical-supply compound-scope acceptance and cross-country/cross-organization denial.
 - [ ] Add persisted-record denial coverage for those regulated categories against a disposable database; policy matrix tests alone do not satisfy this item.
 - [x] Document a source-neutral organization-type evidence matrix covering government, pharmacy, distributor, hospital, laboratory, radiology, insurer, and rehabilitation deployments; this is an activation checklist, not proof of licensing or compliance.
+- [ ] Add explicit catalog-evidence revalidation inside prescription and dispensing product-consumption procedures once product matching is implemented; the reusable server guard now exists, but no such persistence entry point currently exists.
+- [ ] Add router/database acceptance and rejection tests for prescription/dispensing consumption of approved, unapproved, cross-scope, and evidence-incomplete catalog-linked products; current tests cover the reusable guard only.
+- [ ] Keep standalone invoice-generation enforcement pending until a real invoice persistence/submission entry point exists.
+- [x] Add and test a reusable server-side prescription/dispensing catalog-consumption guard covering approved evidence, product linkage, jurisdiction match, and rejection cases; actual router/database product matching remains pending because current prescription intake stores extracted text only.

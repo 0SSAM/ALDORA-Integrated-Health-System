@@ -56,3 +56,12 @@ export function assertConsumableCatalogContext(context: ConsumableCatalogContext
   ]);
   return true as const;
 }
+
+/**
+ * Guard for a future prescription/dispensing product-consumption entry point.
+ * The current prescription workflow stores extracted text only; it must call
+ * this guard when a product is actually matched before regulated consumption.
+ */
+export function assertPrescriptionCatalogConsumption(context: ConsumableCatalogContext) {
+  return assertConsumableCatalogContext(context);
+}
