@@ -50,6 +50,14 @@ export type CompliancePackContext = {
   evidenceCount: number;
 };
 
+export type VersionedCompliancePack = CompliancePackContext & { createdAt: Date };
+
+export function selectCurrentCompliancePack(packs: VersionedCompliancePack[], now = new Date()) {
+  return packs
+    .filter(pack => pack.status === "approved" && pack.effectiveFrom.getTime() <= now.getTime() && (!pack.reviewDueAt || pack.reviewDueAt.getTime() >= now.getTime()))
+    .sort((a, b) => b.effectiveFrom.getTime() - a.effectiveFrom.getTime() || b.createdAt.getTime() - a.createdAt.getTime())[0] ?? null;
+}
+
 export function isArabCountryCode(value: string): value is CountryCode {
   return ARAB_COUNTRY_REGISTRY.some(country => country.countryCode === value);
 }

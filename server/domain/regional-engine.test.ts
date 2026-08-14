@@ -5,6 +5,7 @@ import {
   assertJurisdictionProfileReady,
   assertSameJurisdiction,
   normalizeCountryCode,
+  selectCurrentCompliancePack,
 } from "./regional-engine";
 
 const profile = {
@@ -50,6 +51,15 @@ describe("regional engine", () => {
     expect(() => assertCompliancePackUsable(profile, { ...approvedPack, reviewDueAt: new Date("2026-01-01") }, "sale", new Date("2026-06-01"))).toThrow("stale");
     expect(() => assertCompliancePackUsable(profile, { ...approvedPack, evidenceCount: 0 }, "sale")).toThrow("source evidence");
     expect(() => assertCompliancePackUsable(profile, approvedPack, "insurance")).toThrow("not enabled");
+  });
+
+  it("selects the newest effective approved rule version and excludes stale or rolled-back versions", () => {
+    const current = selectCurrentCompliancePack([
+      { ...approvedPack, packVersion: "EG-2025.4", effectiveFrom: new Date("2025-01-01"), reviewDueAt: new Date("2026-01-01"), createdAt: new Date("2025-01-02") },
+      { ...approvedPack, packVersion: "EG-2026.1", createdAt: new Date("2026-01-02") },
+      { ...approvedPack, packVersion: "EG-2026.2", status: "rolled_back", effectiveFrom: new Date("2026-05-01"), createdAt: new Date("2026-05-02") },
+    ], new Date("2026-06-01"));
+    expect(current?.packVersion).toBe("EG-2026.1");
   });
 
   it("blocks cross-country record access", () => {

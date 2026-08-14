@@ -99,16 +99,16 @@
 # Multi-country Arabic Expansion TODO
 
 - [x] Define supported-country configuration model with country code, legal authority profile, currency, tax profile, timezone, locale, language, date/number formats, and branch jurisdiction.
-- [ ] Implement branch geolocation capture with explicit admin confirmation and a manual override; never infer legal jurisdiction from IP alone.
+- [x] Implement branch geolocation capture with explicit admin confirmation and a manual override; never infer legal jurisdiction from IP alone.
 - [x] Separate shared ERP rules from versioned country compliance packs with activation date, source URL, owner, status, and expiry/review date.
 - [x] Add country-aware tax, invoicing, pricing, prescription, controlled-medicine, labeling, insurance, payroll, and reporting rule interfaces.
 - [ ] Add Arabic localization architecture with RTL, country-specific terminology, currencies, calendars, numerals, and fallback translations.
 - [ ] Add country-aware offline policy, sync conflict rules, and safeguards against using stale regulatory rules.
 - [ ] Add admin workflow for legal-pack review, approval, rollback, and audit history.
 - [x] Research and document authoritative regulatory sources for the initial Arabic-country coverage; do not fabricate legal rules or claim legal certification.
-- [ ] Add country, jurisdiction, rule-version, stale-rule, and geolocation override tests.
+- [x] Add country, jurisdiction, rule-version, stale-rule, and geolocation override tests.
 - [x] Run TypeScript, Vitest, and production build for the multi-country changes; responsive verification remains a final release check.
-- [ ] Save a multi-country checkpoint and report supported scope and legal prerequisites.
+- [x] Save a multi-country checkpoint and report supported scope and legal prerequisites.
 
 # Per-country Data Isolation Clarification
 
