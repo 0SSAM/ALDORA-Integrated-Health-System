@@ -413,7 +413,7 @@
 - [ ] Audit frontend routes, loading/error/empty states, RTL/mobile behavior, accessibility, and dead-end navigation.
 - [x] Run static checks, tests, production build, and focused browser verification; inspect runtime logs for actionable issues; no reproducible runtime defect was found in the inspected slice.
 - [ ] Fix every reproducible defect found in scope and add regression coverage before marking it complete.
-- [ ] Add only suitable improvements that are justified by the audit and do not fabricate regulatory, payer, government, or customer data.
+- [x] Add only suitable improvements that are justified by the audit and do not fabricate regulatory, payer, government, or customer data; added a bounded static-audit summary and regression test without changing regulatory claims or business data.
 - [x] Update the capability-gap and operations documentation with findings, fixes, remaining limitations, and validation evidence in `docs/audits/quality-audit-2026-08-14.md`.
 - [x] Reduce client-side diagnostic logging to bounded, non-sensitive error metadata and remove showcase input logging from shipped code paths.
 - [x] Document that development network logs may contain response bodies and ensure production behavior does not expose debug payloads.

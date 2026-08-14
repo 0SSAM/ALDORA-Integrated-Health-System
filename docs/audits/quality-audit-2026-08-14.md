@@ -44,3 +44,7 @@ The runtime logs inspected for this milestone showed successful `auth.me` reques
 First, provision a disposable database test connection and run the protected router lifecycle with real organizations, memberships, jurisdiction assignments, rollback, and cleanup. Second, extend the same persisted assertions to regulated categories that are already represented in schema and routers. Third, complete country-specific activation registers only from current primary sources and supplied credentials. Fourth, implement standalone invoice persistence only when its schema and jurisdiction adapter requirements are defined.
 
 > **Safety boundary:** No customer reviews, ratings, testimonials, medicine records, government approvals, payer responses, clinical results, or regulatory certifications were fabricated for this audit.
+
+## Static-audit tooling improvement
+
+The static boundary inventory now emits a bounded summary in addition to per-file counts: files scanned, files containing protected procedures, organization/jurisdiction scope markers, raw-error-string markers, and body/payload tokens. A regression test verifies the summary, scope signals, and non-certification disclaimer. This is a reporting improvement only; it does not replace semantic review or disposable-database lifecycle testing.

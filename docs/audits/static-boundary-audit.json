@@ -1,7 +1,15 @@
 {
-  "generatedAt": "2026-08-14T19:31:16.025Z",
+  "generatedAt": "2026-08-14T20:13:10.833Z",
   "scope": "server routers, domain policies, scheduled callbacks, and db helper files",
   "methodology": "Static inventory only; counts do not replace code review or disposable-database lifecycle tests.",
+  "summary": {
+    "filesScanned": 67,
+    "filesWithProtectedProcedures": 7,
+    "filesWithOrganizationScope": 22,
+    "filesWithJurisdictionScope": 22,
+    "filesWithRawErrorStrings": 0,
+    "filesWithBodyOrPayloadTokens": 6
+  },
   "files": [
     {
       "file": "db.ts",
@@ -521,7 +529,7 @@
       "lineCount": 1,
       "protected-procedure": 10,
       "organization-scope": 98,
-      "jurisdiction-scope": 100,
+      "jurisdiction-scope": 106,
       "raw-error-string": 0,
       "body-or-payload": 12
     },
@@ -529,8 +537,8 @@
       "file": "routers/insurance.ts",
       "lineCount": 1,
       "protected-procedure": 4,
-      "organization-scope": 20,
-      "jurisdiction-scope": 21,
+      "organization-scope": 22,
+      "jurisdiction-scope": 23,
       "raw-error-string": 0,
       "body-or-payload": 0
     },
@@ -609,8 +617,8 @@
   ],
   "totals": {
     "protected-procedure": 41,
-    "organization-scope": 343,
-    "jurisdiction-scope": 295,
+    "organization-scope": 345,
+    "jurisdiction-scope": 303,
     "raw-error-string": 0,
     "body-or-payload": 18
   }

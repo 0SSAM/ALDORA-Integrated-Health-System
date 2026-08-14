@@ -31,11 +31,21 @@ for (const file of files) {
   findings.push({ file: relative, lineCount, ...counts });
 }
 findings.sort((a, b) => a.file.localeCompare(b.file));
+const totals = Object.fromEntries(patterns.map(({ id }) => [id, findings.reduce((sum, row) => sum + row[id], 0)]));
+const summary = {
+  filesScanned: findings.length,
+  filesWithProtectedProcedures: findings.filter(row => row["protected-procedure"] > 0).length,
+  filesWithOrganizationScope: findings.filter(row => row["organization-scope"] > 0).length,
+  filesWithJurisdictionScope: findings.filter(row => row["jurisdiction-scope"] > 0).length,
+  filesWithRawErrorStrings: findings.filter(row => row["raw-error-string"] > 0).length,
+  filesWithBodyOrPayloadTokens: findings.filter(row => row["body-or-payload"] > 0).length,
+};
 const report = {
   generatedAt: new Date().toISOString(),
   scope: "server routers, domain policies, scheduled callbacks, and db helper files",
   methodology: "Static inventory only; counts do not replace code review or disposable-database lifecycle tests.",
+  summary,
   files: findings,
-  totals: Object.fromEntries(patterns.map(({ id }) => [id, findings.reduce((sum, row) => sum + row[id], 0)])),
+  totals,
 };
 console.log(JSON.stringify(report, null, 2));
