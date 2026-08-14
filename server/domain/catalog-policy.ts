@@ -28,3 +28,31 @@ export function assertCatalogEvidence(category: CatalogCategory, evidence: Catal
   if (missing.length) throw new Error(`Missing verified catalog evidence: ${missing.join(", ")}`);
   return true as const;
 }
+
+export type ConsumableCatalogContext = {
+  productCatalogItemId: number | null;
+  catalogItemId: number;
+  productJurisdictionId: number | null;
+  catalogJurisdictionId: number;
+  catalogStatus: "pending" | "approved" | "rejected";
+  category: CatalogCategory;
+  item: Record<string, unknown>;
+  evidence: CatalogEvidenceRecord[];
+  additionalRequiredFields?: string[];
+};
+
+export function assertConsumableCatalogContext(context: ConsumableCatalogContext) {
+  if (context.productCatalogItemId === null || context.productCatalogItemId !== context.catalogItemId) {
+    throw new Error("Product is not linked to the requested catalog record");
+  }
+  if (context.productJurisdictionId === null || context.productJurisdictionId !== context.catalogJurisdictionId) {
+    throw new Error("Product and catalog jurisdiction mismatch");
+  }
+  if (context.catalogStatus !== "approved") throw new Error("Catalog item is not approved");
+  const activeFields = activeCatalogFields(context.item, context.category);
+  assertCatalogEvidence(context.category, context.evidence, [
+    ...activeFields.filter(field => !requiredCatalogEvidenceFields(context.category, context.additionalRequiredFields).includes(field)),
+    ...(context.additionalRequiredFields ?? []),
+  ]);
+  return true as const;
+}

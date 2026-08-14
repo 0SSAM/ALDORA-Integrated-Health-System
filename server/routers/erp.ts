@@ -105,6 +105,11 @@ export const erpRouter = router({
           const product = (await db.select().from(products).where(eq(products.id, item.productId)).limit(1))[0];
           const batch = (await db.select().from(inventoryBatches).where(eq(inventoryBatches.id, item.batchId)).limit(1))[0];
           if (!product || !batch || batch.branchId !== input.branchId || batch.productId !== item.productId || batch.jurisdictionId !== assignment.jurisdictionId || product.jurisdictionId !== assignment.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Product or batch is outside the branch jurisdiction" });
+          if (!product.catalogItemId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Product requires a verified jurisdiction catalog record before regulated sale" });
+          const catalogItem = (await db.select().from(catalogItems).where(and(eq(catalogItems.id, product.catalogItemId), eq(catalogItems.jurisdictionId, assignment.jurisdictionId))).limit(1))[0];
+          if (!catalogItem || catalogItem.verificationStatus !== "VERIFIED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog record is not verified for this jurisdiction" });
+          const catalogEvidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.jurisdictionId, assignment.jurisdictionId), eq(complianceEvidence.operation, "catalog"), eq(complianceEvidence.verificationStatus, "verified")));
+          try { assertCatalogEvidence(catalogItem.category, catalogEvidence, []); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
           const remaining = Number(batch.quantityOnHand);
           if (!Number.isFinite(remaining) || remaining < item.quantity) throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient stock" });
           checkedItems.push({ ...item, remaining });

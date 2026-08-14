@@ -171,7 +171,7 @@
 - [x] Require an active complete jurisdiction profile for catalog search.
 - [x] Require an active complete jurisdiction profile for catalog creation.
 - [x] Require an active complete jurisdiction profile plus current approved pack and verified evidence for catalog approval.
-- [ ] Re-check catalog jurisdiction and evidence when a catalog item is consumed by sale, prescription, dispensing, or invoice workflows.
+- [ ] Re-check catalog jurisdiction and evidence when a catalog item is consumed by prescription, dispensing, or invoice workflows; commitSale is now covered.
 
 # Batch Boundary Enforcement
 
@@ -233,3 +233,15 @@
 - [x] Connect the tested compliance lifecycle policy to approvePack and rollbackPack router mutations.
 - [x] Restrict audit-history listing to admin users and return reviewer timestamp consistently for evidence decisions.
 - [ ] Add an integration test harness that exercises the actual protected router lifecycle against a test database.
+
+# Product-to-Catalog Evidence Link
+
+- [x] Add nullable catalogItemId to products with a non-destructive migration for legacy rows.
+- [x] Require an approved verified catalog item and current evidence when a linked product is consumed by commitSale.
+- [x] Add tests for linked verified products, rejected/unverified catalog records, and legacy unlinked product behavior.
+
+# Catalog Consumption Verification
+
+- [x] Add and apply product-to-catalog evidence policy at regulated sale consumption.
+- [x] Add unit coverage for linked verified products, rejected/unverified catalog records, jurisdiction mismatch, and legacy unlinked products.
+- [x] Re-run TypeScript, 49 Vitest tests, and production build successfully.

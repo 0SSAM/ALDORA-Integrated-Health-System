@@ -30,6 +30,7 @@ export const branchUsers = mysqlTable("branch_users", {
 export const products = mysqlTable("products", {
   id: int("id").autoincrement().primaryKey(),
   jurisdictionId: int("jurisdictionId"),
+  catalogItemId: int("catalogItemId"),
   sku: varchar("sku", { length: 64 }).notNull(),
   barcode: varchar("barcode", { length: 64 }),
   nameAr: varchar("nameAr", { length: 220 }).notNull(),
