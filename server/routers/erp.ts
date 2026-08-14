@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
 import { and, desc, eq, like } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions } from "../../drizzle/schema";
+import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, inventoryBatches, products, sales, saleItems } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -65,6 +65,41 @@ export const erpRouter = router({
           assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules, evidenceCount: evidence.length }, "sale");
         } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
         try { return { ...preparePosSale(input), jurisdictionId: assignment.jurisdictionId }; } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
+      }),
+    commitSale: protectedProcedure
+      .input(z.object({ branchId: z.number().int().positive(), invoiceNumber: z.string().min(3).max(80), paymentMethod: z.enum(["cash", "meeza", "instapay", "insurance"]), discountAmount: z.number().nonnegative(), items: z.array(z.object({ productId: z.number().int().positive(), batchId: z.number().int().positive(), quantity: z.number().positive(), unit: z.string().min(1).max(24), unitPrice: z.number().nonnegative() })).min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
+        try { assertBranchAssignmentReady(assignment); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
+        const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
+        const evidence = pack ? await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
+        if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current sale compliance pack required" });
+        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "sale"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        const subtotal = input.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+        const discount = enforceDiscount(subtotal, input.discountAmount);
+        if (!discount.allowed) throw new TRPCError({ code: "BAD_REQUEST", message: discount.reason });
+        const checkedItems: Array<{ productId: number; batchId: number; quantity: number; unit: string; unitPrice: number; remaining: number }> = [];
+        for (const item of input.items) {
+          const product = (await db.select().from(products).where(eq(products.id, item.productId)).limit(1))[0];
+          const batch = (await db.select().from(inventoryBatches).where(eq(inventoryBatches.id, item.batchId)).limit(1))[0];
+          if (!product || !batch || batch.branchId !== input.branchId || batch.productId !== item.productId || batch.jurisdictionId !== assignment.jurisdictionId || product.jurisdictionId !== assignment.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Product or batch is outside the branch jurisdiction" });
+          const remaining = Number(batch.quantityOnHand);
+          if (!Number.isFinite(remaining) || remaining < item.quantity) throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient stock" });
+          checkedItems.push({ ...item, remaining });
+        }
+        try {
+          const result = await db.transaction(async (tx) => {
+            const inserted = await tx.insert(sales).values({ branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, cashierId: ctx.user.id, invoiceNumber: input.invoiceNumber, subtotal: subtotal.toFixed(2), discountAmount: input.discountAmount.toFixed(2), totalAmount: (subtotal - input.discountAmount).toFixed(2), discountValidation: "MOH_7_PERCENT", paymentMethod: input.paymentMethod, etaStatus: "pending" });
+            const saleId = Number(inserted[0].insertId);
+            await tx.insert(saleItems).values(checkedItems.map((item) => ({ saleId, productId: item.productId, batchId: item.batchId, unit: item.unit, quantity: item.quantity.toFixed(3), unitPrice: item.unitPrice.toFixed(2) })));
+            for (const item of checkedItems) await tx.update(inventoryBatches).set({ quantityOnHand: (item.remaining - item.quantity).toFixed(3) }).where(eq(inventoryBatches.id, item.batchId));
+            return saleId;
+          });
+          return { saleId: result, jurisdictionId: assignment.jurisdictionId, status: "COMMITTED" as const };
+        } catch (error) { throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Sale commit failed: ${String(error)}` }); }
       }),
   }),
   schedule: router({

@@ -177,4 +177,10 @@
 
 - [x] Require jurisdictionId on FEFO batch inputs.
 - [x] Reject any POS batch whose jurisdiction differs from the confirmed branch jurisdiction.
-- [ ] Add and gate a persisted inventory/sale write transaction that stores the branch jurisdictionId rather than returning only a prepared sale preview.
+- [x] Add and gate a persisted inventory/sale write transaction that stores the branch jurisdictionId rather than returning only a prepared sale preview.
+
+# Persisted Sale Boundary
+
+- [x] Add protected commitSale transaction that validates branch assignment, approved sale pack, product jurisdiction, batch branch/jurisdiction, discount cap, stock, and persists sales/sale_items with jurisdictionId.
+- [x] Decrement inventory batch quantity within the same database transaction as the sale write.
+- [ ] Add country-specific e-invoicing submission/acknowledgement adapters only after each jurisdiction pack supplies verified technical requirements and credentials.
