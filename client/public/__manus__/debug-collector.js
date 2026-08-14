@@ -602,40 +602,9 @@
       xhr._manusData.requestBody = body ? sanitizeValue(tryParseJson(body)) : null;
 
       xhr.addEventListener("load", function () {
-        var contentType = (xhr.getResponseHeader("content-type") || "").toLowerCase();
-        var responseBody = null;
-
-        // Skip body capture for streaming responses
-        var isStreaming = contentType.indexOf("text/event-stream") !== -1 ||
-                          contentType.indexOf("application/stream") !== -1 ||
-                          contentType.indexOf("application/x-ndjson") !== -1;
-
-        // Skip body capture for binary content types
-        var isBinary = contentType.indexOf("image/") !== -1 ||
-                       contentType.indexOf("video/") !== -1 ||
-                       contentType.indexOf("audio/") !== -1 ||
-                       contentType.indexOf("application/octet-stream") !== -1 ||
-                       contentType.indexOf("application/pdf") !== -1 ||
-                       contentType.indexOf("application/zip") !== -1;
-
-        if (isStreaming) {
-          responseBody = "[Streaming response - not captured]";
-        } else if (isBinary) {
-          responseBody = "[Binary content: " + contentType + "]";
-        } else {
-          // Safe to read responseText for text responses
-          try {
-            var text = xhr.responseText || "";
-            if (text.length > CONFIG.maxBodyLength) {
-              responseBody = text.slice(0, CONFIG.maxBodyLength) + "...[truncated]";
-            } else {
-              responseBody = sanitizeValue(tryParseJson(text));
-            }
-          } catch (e) {
-            // responseText may throw for non-text responses
-            responseBody = "[Unable to read response: " + e.message + "]";
-          }
-        }
+        // Privacy boundary: never read or retain XMLHttpRequest response bodies.
+        // Status, timing, and transport metadata are sufficient for development diagnostics.
+        var responseBody = "[Response body omitted by privacy policy]";
 
         var entry = {
           timestamp: xhr._manusData.startTime,
