@@ -81,7 +81,7 @@ const customerCareDraftSchema = z.object({
   consentStatus: z.enum(["pending", "granted", "withdrawn"]).default("pending"),
   chronicCareEnabled: z.boolean().default(false),
   notes: z.string().max(4000).optional(),
-  branchId: z.number().int().positive().optional(),
+  branchId: z.number().int().positive(),
 });
 
 const callCentreDraftSchema = z.object({
@@ -90,7 +90,7 @@ const callCentreDraftSchema = z.object({
   direction: z.enum(["inbound", "outbound"]),
   priority: z.enum(["low", "normal", "high", "urgent"]).default("normal"),
   customerId: z.number().int().positive().optional(),
-  branchId: z.number().int().positive().optional(),
+  branchId: z.number().int().positive(),
   callbackAt: z.coerce.date().optional(),
 });
 
@@ -381,13 +381,17 @@ export const erpRouter = router({
         try {
           if (draft.module === "customerCare") {
             const parsed = customerCareDraftSchema.parse(payload);
-            const inserted = await db.insert(customerProfiles).values({ ...parsed, chronicCareEnabled: parsed.chronicCareEnabled ? 1 : 0, createdByUserId: ctx.user.id });
+            await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, parsed.branchId);
+            const organizationId = await getBranchOrganizationId(db, parsed.branchId);
+            const inserted = await db.insert(customerProfiles).values({ ...parsed, organizationId, chronicCareEnabled: parsed.chronicCareEnabled ? 1 : 0, createdByUserId: ctx.user.id });
             const entityId = Number(inserted[0].insertId);
             await db.update(offlineDrafts).set({ status: "replayed", replayedEntityId: entityId, errorCode: null }).where(eq(offlineDrafts.id, draft.id));
             return { draftId: draft.id, status: "replayed" as const, entityId, duplicate: false };
           }
           const parsed = callCentreDraftSchema.parse(payload);
-          const inserted = await db.insert(callTickets).values({ ...parsed, createdByUserId: ctx.user.id });
+          await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, parsed.branchId);
+          const organizationId = await getBranchOrganizationId(db, parsed.branchId);
+          const inserted = await db.insert(callTickets).values({ ...parsed, organizationId, createdByUserId: ctx.user.id });
           const entityId = Number(inserted[0].insertId);
           await db.update(offlineDrafts).set({ status: "replayed", replayedEntityId: entityId, errorCode: null }).where(eq(offlineDrafts.id, draft.id));
           return { draftId: draft.id, status: "replayed" as const, entityId, duplicate: false };
@@ -441,7 +445,8 @@ export const erpRouter = router({
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const item = (await db.select().from(catalogItems).where(eq(catalogItems.id, input.itemId)).limit(1))[0];
         if (!item) throw new TRPCError({ code: "NOT_FOUND", message: "Catalog item not found" });
-        if (!item.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog item has no jurisdiction" });
+        if (!item.jurisdictionId || !item.organizationId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog item has no complete organization/jurisdiction scope" });
+        if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(item.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item is outside the active organization scope" });
         try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, item.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: String(error) }); }
         if (input.approved) {
           if (!item.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog item has no jurisdiction" });

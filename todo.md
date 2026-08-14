@@ -318,3 +318,8 @@
 
 - [x] Resolve the stale COOKIE_NAME import error reported by the development server by restarting the stale HMR process; TypeScript, 72 tests, and production build are passing.
 - [x] Verify organization-scoped notifications are filtered by active membership and preserve global notifications for authorized users, including server-side mark-read authorization.
+- [x] Enforce organization scope in currently implemented customer-care, call-centre, prescription, POS commit, catalog search/create/approval, and offline replay paths; legacy nullable records and remaining modules stay pending.
+- [ ] Backfill organizationId for existing rows using verified branch-to-organization assignments, quarantine ambiguous rows, then make regulated scope columns non-null where safe.
+- [ ] Reconcile the deployed database migration baseline with the repository migration journal without recreating existing tables.
+
+على الرغم من نجاح اختبارات السياسة، يجب عدم اعتبار العزل الكامل مكتملاً قبل backfill والتحقق من قاعدة البيانات الفعلية.
