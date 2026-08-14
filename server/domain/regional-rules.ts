@@ -7,8 +7,8 @@ export function parseRegionalRuleSet(rulesJson: string): RegionalRuleSet {
     const parsed = JSON.parse(rulesJson) as unknown;
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Rules must be an object");
     return parsed as RegionalRuleSet;
-  } catch (error) {
-    throw new Error(`Invalid regional rules JSON: ${String(error)}`);
+  } catch {
+    throw new Error("Invalid regional rules JSON");
   }
 }
 

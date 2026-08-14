@@ -16,6 +16,11 @@ describe("regional rule interfaces", () => {
     expect(isRegionalOperationConfigured(rules, "payroll")).toBe(false);
   });
 
+  it("does not expose the raw JSON parser error", () => {
+    expect(() => parseRegionalRuleSet("{invalid")).toThrow("Invalid regional rules JSON");
+    expect(() => parseRegionalRuleSet("{invalid")).not.toThrow("Unexpected token");
+  });
+
   it("formats amounts using the jurisdiction locale and currency", () => {
     expect(formatRegionalAmount(1250, "EGP", "ar-EG")).toContain("١٬٢٥٠");
   });

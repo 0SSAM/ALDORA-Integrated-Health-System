@@ -490,3 +490,5 @@
 - [x] Remove provider-branded console labels from the shipped debug collector while preserving its internal runtime identifiers, and extend branding regression coverage; TypeScript, 3 branding tests, and production build passed.
 
 - [x] Create `docs/medicine-data-methodology-2026-08-14.md` documenting the required workbook fields, provenance checks, source limitations, and activation gate; medicine workbook delivery remains open because no verified source file is available.
+
+- [x] Replace the raw regional-rules JSON parser exception with a fixed message and extend `regional-rules.test.ts`; 4 focused tests and TypeScript passed.
