@@ -101,7 +101,7 @@
 - [x] Define supported-country configuration model with country code, legal authority profile, currency, tax profile, timezone, locale, language, date/number formats, and branch jurisdiction.
 - [ ] Implement branch geolocation capture with explicit admin confirmation and a manual override; never infer legal jurisdiction from IP alone.
 - [x] Separate shared ERP rules from versioned country compliance packs with activation date, source URL, owner, status, and expiry/review date.
-- [ ] Add country-aware tax, invoicing, pricing, prescription, controlled-medicine, labeling, insurance, payroll, and reporting rule interfaces.
+- [x] Add country-aware tax, invoicing, pricing, prescription, controlled-medicine, labeling, insurance, payroll, and reporting rule interfaces.
 - [ ] Add Arabic localization architecture with RTL, country-specific terminology, currencies, calendars, numerals, and fallback translations.
 - [ ] Add country-aware offline policy, sync conflict rules, and safeguards against using stale regulatory rules.
 - [ ] Add admin workflow for legal-pack review, approval, rollback, and audit history.
@@ -113,7 +113,7 @@
 # Per-country Data Isolation Clarification
 
 - [ ] Create a country data-boundary model so every medicine, cosmetic, medical-supply, authority, tax, invoice, price, prescription, insurance, payroll, and label record belongs to a jurisdiction profile.
-- [ ] Add explicit per-country catalog provenance and refresh metadata; never merge records across countries without a controlled mapping.
+- [x] Add explicit per-country catalog provenance and refresh metadata; never merge records across countries without a controlled mapping.
 - [ ] Add per-country regulatory pack lifecycle with approval, effective dates, stale detection, rollback, and audit history.
 - [ ] Add branch-to-country assignment with admin confirmation/manual override and deny transactions when jurisdiction is missing or stale.
 - [ ] Add cross-country isolation tests for catalog search, pricing, tax, prescription, and compliance procedures.
@@ -132,3 +132,10 @@
 - [ ] Enforce evidence linkage for every active catalog field before catalog approval and regulated use.
 - [x] Add unit coverage for country code normalization, profile completeness, approval, stale-pack blocking, missing evidence, and cross-country access denial.
 - [x] Block stale or unapproved packs in the Regional Engine before regulated operations.
+
+# Enforcement Coverage Follow-up
+
+- [ ] Apply branch-jurisdiction and compliance-pack gating to prescription upload/dispensing, invoice, insurance, payroll, reporting, and inventory mutation entry points, not only POS preparation and catalog approval.
+- [ ] Require catalog evidence validation again at downstream regulated use when a product is loaded for sale, prescription, dispensing, or invoice generation.
+- [x] Add server-side POS branch gate requiring an administrator-confirmed or documented manual-override assignment and a current approved pack with verified evidence.
+- [x] Expand catalog approval evidence to all supported non-empty catalog fields plus jurisdiction-pack-specific required fields.

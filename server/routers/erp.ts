@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
 import { and, desc, eq, like } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue } from "../../drizzle/schema";
+import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -10,7 +10,10 @@ import { invokeLLM } from "../_core/llm";
 import { protectedProcedure, router } from "../_core/trpc";
 import { enforceDiscount, selectFefoBatches, type AppRole } from "../domain/rules";
 import { assertPrescriptionConfirmed, preparePosSale, validatePrescriptionUpload } from "../domain/erp";
+import { assertCompliancePackUsable } from "../domain/regional-engine";
+import { assertBranchAssignmentReady } from "../domain/branch-compliance";
 import { storageGetSignedUrl, storagePut } from "../storage";
+import { activeCatalogFields, assertCatalogEvidence } from "../domain/catalog-policy";
 
 const pharmacistProcedure = protectedProcedure.use(({ ctx, next }) => {
   const role = ctx.user.role as AppRole;
@@ -45,9 +48,21 @@ export const erpRouter = router({
   }),
   pos: router({
     prepareSale: protectedProcedure
-      .input(z.object({ officialPrice: z.number().nonnegative(), quantity: z.number().positive(), discountAmount: z.number().nonnegative(), batches: z.array(z.object({ id: z.string(), expiryDate: z.coerce.date(), quantityOnHand: z.number().nonnegative() })) }))
-      .mutation(({ input }) => {
-        try { return preparePosSale(input); } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
+      .input(z.object({ branchId: z.number().int().positive(), officialPrice: z.number().nonnegative(), quantity: z.number().positive(), discountAmount: z.number().nonnegative(), batches: z.array(z.object({ id: z.string(), expiryDate: z.coerce.date(), quantityOnHand: z.number().nonnegative() })) }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
+        try { assertBranchAssignmentReady(assignment); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
+        const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
+        if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Branch jurisdiction or approved compliance pack is unavailable" });
+        const evidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified")));
+        const rules = JSON.parse(pack.rulesJson) as Record<string, boolean>;
+        try {
+          assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules, evidenceCount: evidence.length }, "sale");
+        } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { return { ...preparePosSale(input), jurisdictionId: assignment.jurisdictionId }; } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
       }),
   }),
   schedule: router({
@@ -205,20 +220,23 @@ export const erpRouter = router({
   }),
   catalog: router({
     search: protectedProcedure
-      .input(z.object({ query: z.string().max(120).default(""), category: z.enum(["medicine", "cosmetic", "medical_supply"]).optional() }))
+      .input(z.object({ jurisdictionId: z.number().int().positive(), query: z.string().max(120).default(""), category: z.enum(["medicine", "cosmetic", "medical_supply"]).optional() }))
       .query(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const filters = [];
         if (input.query) filters.push(like(catalogItems.nameAr, `%${input.query}%`));
+        filters.push(eq(catalogItems.jurisdictionId, input.jurisdictionId));
         if (input.category) filters.push(eq(catalogItems.category, input.category));
-        return db.select().from(catalogItems).where(filters.length ? and(...filters) : undefined).orderBy(desc(catalogItems.updatedAt)).limit(100);
+        return db.select().from(catalogItems).where(and(...filters)).orderBy(desc(catalogItems.updatedAt)).limit(100);
       }),
     createItem: catalogEditorProcedure
-      .input(z.object({ category: z.enum(["medicine", "cosmetic", "medical_supply"]), sku: z.string().min(2).max(80), barcode: z.string().max(80).optional(), nameAr: z.string().min(2).max(240), nameEn: z.string().max(240).optional(), genericName: z.string().max(240).optional(), manufacturer: z.string().max(220).optional(), registrationNumber: z.string().max(120).optional(), sourceAuthority: z.enum(["EDA", "NFSA", "LOCAL_PENDING_REVIEW"]), sourceRecordId: z.string().max(160).optional(), sourceUrl: z.string().url().max(500).optional() }))
+      .input(z.object({ jurisdictionId: z.number().int().positive(), category: z.enum(["medicine", "cosmetic", "medical_supply"]), sku: z.string().min(2).max(80), barcode: z.string().max(80).optional(), nameAr: z.string().min(2).max(240), nameEn: z.string().max(240).optional(), genericName: z.string().max(240).optional(), manufacturer: z.string().max(220).optional(), registrationNumber: z.string().max(120).optional(), sourceAuthority: z.string().min(2).max(40), sourceRecordId: z.string().max(160).optional(), sourceUrl: z.string().url().max(500).optional() }))
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, input.jurisdictionId)).limit(1))[0];
+        if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "Jurisdiction not found" });
         const inserted = await db.insert(catalogItems).values({ ...input, verificationStatus: input.sourceAuthority === "LOCAL_PENDING_REVIEW" ? "PENDING_REVIEW" : "UNVERIFIED", createdByUserId: ctx.user.id, sourceRetrievedAt: new Date() });
         const itemId = Number(inserted[0].insertId);
         await db.insert(catalogSyncQueue).values({ entityType: input.category, operation: "create", entityId: itemId, idempotencyKey: `catalog-create-${itemId}-${ctx.user.id}`, payloadJson: JSON.stringify(input), createdByUserId: ctx.user.id });
@@ -229,6 +247,18 @@ export const erpRouter = router({
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const item = (await db.select().from(catalogItems).where(eq(catalogItems.id, input.itemId)).limit(1))[0];
+        if (!item) throw new TRPCError({ code: "NOT_FOUND", message: "Catalog item not found" });
+        if (input.approved) {
+          if (!item.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog item has no jurisdiction" });
+          const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, item.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
+          if (!pack || pack.effectiveFrom > new Date() || (pack.reviewDueAt && pack.reviewDueAt < new Date())) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current compliance pack required" });
+          const verified = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified")));
+          const parsedRules = JSON.parse(pack.rulesJson) as Record<string, unknown>;
+          const packFields = Array.isArray(parsedRules.catalogRequiredFields) ? parsedRules.catalogRequiredFields.filter((field): field is string => typeof field === "string") : [];
+          const activeFields = activeCatalogFields(item, item.category);
+          try { assertCatalogEvidence(item.category, verified, [...activeFields, ...packFields]); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        }
         await db.update(catalogItems).set({ verificationStatus: input.approved ? "VERIFIED" : "REJECTED", approvedByUserId: ctx.user.id }).where(eq(catalogItems.id, input.itemId));
         return { itemId: input.itemId, status: input.approved ? "VERIFIED" as const : "REJECTED" as const };
       }),

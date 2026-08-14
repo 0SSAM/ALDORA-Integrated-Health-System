@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { complianceEvidence, compliancePacks, jurisdictionProfiles } from "../../drizzle/schema";
+import { branchJurisdictions, branches, complianceEvidence, compliancePacks, jurisdictionProfiles } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { ARAB_COUNTRY_REGISTRY, normalizeCountryCode } from "../domain/regional-engine";
@@ -40,6 +40,19 @@ export const regionalRouter = router({
       const packReady = Boolean(pack && pack.effectiveFrom.getTime() <= now.getTime() && (!pack.reviewDueAt || pack.reviewDueAt.getTime() >= now.getTime()) && evidenceReady);
       return { ...country, status: profile?.active && packReady ? "configured" : profile ? "pending_approval" : "not_configured", profile, packReady };
     });
+  }),
+
+  assignBranchJurisdiction: adminProcedure.input(z.object({ branchId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), latitude: z.number().min(-90).max(90).nullable().optional(), longitude: z.number().min(-180).max(180).nullable().optional(), locationSource: z.enum(["admin_confirmed", "manual_override"]) })).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    const branch = (await db.select().from(branches).where(eq(branches.id, input.branchId)).limit(1))[0];
+    const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, input.jurisdictionId)).limit(1))[0];
+    if (!branch || !profile) throw new TRPCError({ code: "NOT_FOUND", message: "Branch or jurisdiction not found" });
+    const existing = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
+    const values = { branchId: input.branchId, jurisdictionId: input.jurisdictionId, latitude: input.latitude === null || input.latitude === undefined ? null : String(input.latitude), longitude: input.longitude === null || input.longitude === undefined ? null : String(input.longitude), locationSource: input.locationSource, confirmedByUserId: ctx.user.id, confirmedAt: new Date() };
+    if (existing) await db.update(branchJurisdictions).set(values).where(eq(branchJurisdictions.id, existing.id));
+    else await db.insert(branchJurisdictions).values(values);
+    return { branchId: input.branchId, jurisdictionId: input.jurisdictionId, locationSource: input.locationSource, confirmedBy: ctx.user.id };
   }),
 
   saveProfile: adminProcedure.input(profileInput).mutation(async ({ ctx, input }) => {
