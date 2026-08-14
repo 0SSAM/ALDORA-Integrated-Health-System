@@ -37,3 +37,9 @@ Standalone invoice persistence/submission, product matching from prescription ex
 ## Integrity rule
 
 > No production URL, personal data, fabricated medicine records, guessed regulatory rule, bypassed anti-bot challenge, or placeholder credential may be used to close any item in this index.
+
+## Exact unchecked items after the database-test skip
+
+The remaining unchecked items are intentionally preserved as prerequisites rather than marked complete. They fall into four groups: country-specific e-invoicing adapters and acceptance credentials; future database-backed invoice, insurance, payroll, and reporting entry points that do not yet exist; live disposable-database isolation and persisted denial coverage; and verified country-pack source/legal evidence for Jordan, Qatar, Morocco, and the full Egypt medicine register. The remaining product-catalog acceptance tests are also dependent on a real prescription-to-product persistence path that has not been implemented. Finally, offline replay still requires a genuine trusted-device attestation provider and revocation signal; browser capabilities are not accepted as evidence.
+
+The user explicitly chose to skip supplying `TEST_DATABASE_URL`. Accordingly, all live database lifecycle items remain open, while the local harness, safe-skip behavior, isolation guard, runbook, policy tests, and static/router contracts remain complete and verified. No item in this section may be closed using guessed credentials, fabricated records, bypassed anti-bot controls, or an unverified regulatory source.

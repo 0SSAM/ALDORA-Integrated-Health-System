@@ -602,3 +602,5 @@
 - [x] Update the open-prerequisites audit index after DB harness hardening to record that all current connection-opening tests are fail-closed behind the isolation guard.
 
 - [x] Make the database smoke test assert its safe-skip state explicitly when no isolated test database is configured, while preserving the guarded connection check when one is available; 4 focused tests and TypeScript passed.
+
+- [x] Refresh the open-prerequisites index with the exact remaining unchecked items after the database-test skip, preserving each blocker and its required prerequisite.
