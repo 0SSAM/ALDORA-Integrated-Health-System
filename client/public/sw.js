@@ -1,7 +1,7 @@
-const CACHE_NAME = "bdf-pharma-shell-v2";
+const CACHE_NAME = "aldo-health-care-shell-v3";
 const APP_SHELL = ["/", "/manifest.webmanifest"];
-const REGULATED_HEADER = "X-BDF-Regulated-Operation";
-const DRAFT_HEADER = "X-BDF-Offline-Draft";
+const REGULATED_HEADER = "X-ALDO-Regulated-Operation";
+const DRAFT_HEADER = "X-ALDO-Offline-Draft";
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
@@ -27,7 +27,7 @@ self.addEventListener("fetch", event => {
 });
 
 self.addEventListener("message", event => {
-  if (event.data?.type === "BDF_SYNC_STATUS") {
-    event.source?.postMessage({ type: "BDF_SYNC_STATUS", online: self.navigator?.onLine ?? true });
+  if (event.data?.type === "ALDO_SYNC_STATUS") {
+    event.source?.postMessage({ type: "ALDO_SYNC_STATUS", online: self.navigator?.onLine ?? true });
   }
 });

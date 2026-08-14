@@ -494,3 +494,5 @@
 - [x] Replace the raw regional-rules JSON parser exception with a fixed message and extend `regional-rules.test.ts`; 4 focused tests and TypeScript passed.
 
 - [x] Run a focused scan for dynamic TRPC error messages after the router hardening; no remaining outward message template using raw error, input, URL, or task identifiers was found in the inspected server files.
+
+- [x] Replace remaining application-owned BDF Service Worker cache/header/message identifiers with ALDO names, update Home messaging, and extend branding regression coverage; 4 branding tests and TypeScript passed. Internal provider proxy paths and offline database migration identifiers remain unchanged for compatibility.

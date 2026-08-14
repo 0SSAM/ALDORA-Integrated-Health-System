@@ -21,4 +21,12 @@ describe("ALDO visible branding privacy", () => {
     expect(source).toContain("ALDO Debug Collector");
     expect(source).toContain("[ALDO]");
   });
+
+  it("keeps the application-owned service worker branded as ALDO", async () => {
+    const source = await readFile(new URL("../client/public/sw.js", import.meta.url), "utf8");
+    expect(source).not.toMatch(/bdf-pharma|X-BDF|BDF_SYNC_STATUS/i);
+    expect(source).toContain("aldo-health-care-shell-v3");
+    expect(source).toContain("X-ALDO-Regulated-Operation");
+    expect(source).toContain("ALDO_SYNC_STATUS");
+  });
 });

@@ -74,7 +74,7 @@ export default function Home() {
     const onOffline = () => setOnline(false);
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
-    navigator.serviceWorker?.controller?.postMessage({ type: "BDF_SYNC_STATUS" });
+    navigator.serviceWorker?.controller?.postMessage({ type: "ALDO_SYNC_STATUS" });
     void listDurableOfflineDrafts().then(setOfflineDrafts).catch(() => setOfflineDrafts([]));
     return () => { window.removeEventListener("online", onOnline); window.removeEventListener("offline", onOffline); };
   }, []);
