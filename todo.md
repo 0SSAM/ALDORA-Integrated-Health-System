@@ -38,3 +38,11 @@
 - [x] Add typed tRPC procedures for discount validation, FEFO planning, and built-in vision-model prescription extraction with pharmacist-review status.
 - [x] Add an authenticated Heartbeat callback endpoint for daily inventory/expiry alert queueing by branch manager.
 - [x] Run TypeScript checks and Vitest successfully after the implemented vertical slice.
+
+- [x] Add deterministic payroll, ETA-field validation, insurance claim classification, 25-provider TPA catalog, and tamper-evident audit hash helpers with tests.
+- [x] Verify desktop and mobile viewport rendering with preview screenshots.
+- [x] Document Egyptian regulatory integration boundaries and production prerequisites without fabricating approvals or payment responses.
+- [x] Run a successful production build for the current vertical slice.
+- [x] Document operational setup, scheduled callback behavior, release gates, and integration prerequisites.
+- [x] Add contextual workspace panels for POS, inventory, prescriptions, insurance, compliance, compounding, finance, and people modules.
+- [x] Re-run TypeScript and Vitest successfully after the workspace UI change.
