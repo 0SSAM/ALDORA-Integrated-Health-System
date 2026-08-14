@@ -528,3 +528,5 @@
 - [x] Package the source-safe workbook with a concise methodology, source register, coverage statement, and limitations note for review; created docs/data/egypt-medicine-register-delivery.md.
 
 - [x] Run regression validation after country-pack and source-safe workbook work; 172 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing non-blocking chunk-size warning.
+
+- [x] Create an implementation-readiness note that maps remaining blocked items to the exact prerequisite needed, without treating blockers as completed features; created docs/audits/implementation-readiness-2026-08-15.md.
