@@ -386,3 +386,4 @@
 - [x] Add a taskUid-authenticated Heartbeat callback for persisted reports with orphan handling, deterministic idempotency, explicit skipped status, and no external delivery claim.
 - [x] Refresh operations documentation for persisted reporting, insurance requests, compliance gates, and the current validation count.
 - [x] Implement reviewed allowlisted report execution for inventory alerts, daily sales, expiry review, and operations summary with organization/jurisdiction predicates and no user SQL.
+- [x] Harden report scheduling against malformed cron expressions, null jurisdiction scope, and stale compliance-pack approval before creating a Heartbeat task.

@@ -87,6 +87,8 @@ export const reportsRouter = router({
       const definition = (await db.select().from(reportDefinitions).where(eq(reportDefinitions.id, input.definitionId)).limit(1))[0];
       if (!definition) throw new TRPCError({ code: "NOT_FOUND", message: "Report definition not found" });
       await assertOrganizationAccess(db, ctx.user.id, ctx.user.role, definition.organizationId);
+      if (definition.jurisdictionId === null) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Report jurisdiction scope is required" });
+      await assertReportRegulatoryScope(db, definition.organizationId, definition.jurisdictionId);
       if (ctx.user.role !== "admin") {
         const manager = await db.select({ id: organizationMemberships.id }).from(organizationMemberships).where(and(eq(organizationMemberships.organizationId, definition.organizationId), eq(organizationMemberships.userId, ctx.user.id), eq(organizationMemberships.active, 1), inArray(organizationMemberships.organizationRole, ["owner", "org_admin", "compliance_officer", "operations_manager"]))).limit(1);
         if (!manager.length) throw new TRPCError({ code: "FORBIDDEN", message: "Report scheduling requires organization management access" });
