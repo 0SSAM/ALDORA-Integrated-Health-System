@@ -1,5 +1,7 @@
-const CACHE_NAME = "bdf-pharma-shell-v1";
+const CACHE_NAME = "bdf-pharma-shell-v2";
 const APP_SHELL = ["/", "/manifest.webmanifest"];
+const REGULATED_HEADER = "X-BDF-Regulated-Operation";
+const DRAFT_HEADER = "X-BDF-Offline-Draft";
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
@@ -11,6 +13,21 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") return;
-  event.respondWith(fetch(event.request).catch(() => caches.match(event.request).then(response => response || caches.match("/"))));
+  const request = event.request;
+  if (request.method !== "GET") {
+    const regulated = request.headers.get(REGULATED_HEADER) === "true";
+    const draft = request.headers.get(DRAFT_HEADER) === "true";
+    if (regulated || !draft) return;
+    if (!self.navigator?.onLine) {
+      event.respondWith(new Response(JSON.stringify({ error: "offline-draft-must-use-app-queue" }), { status: 409, headers: { "content-type": "application/json" } }));
+    }
+    return;
+  }
+  event.respondWith(fetch(request).catch(() => caches.match(request).then(response => response || caches.match("/"))));
+});
+
+self.addEventListener("message", event => {
+  if (event.data?.type === "BDF_SYNC_STATUS") {
+    event.source?.postMessage({ type: "BDF_SYNC_STATUS", online: self.navigator?.onLine ?? true });
+  }
 });

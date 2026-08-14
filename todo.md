@@ -203,3 +203,9 @@
 - [x] Add a country-aware offline decision policy that allows only non-regulated drafts offline and blocks sale, inventory mutation, prescription, and invoice operations.
 - [x] Add conflict resolution policy requiring manual review instead of silent overwrite.
 - [ ] Wire the offline policy into the PWA queue/service worker and visible sync-status UI.
+
+# PWA Offline Integration
+
+- [x] Update the Service Worker to reject regulated non-GET requests offline and preserve app-shell fallback.
+- [x] Add visible online/offline status to Home and request sync status from the Service Worker.
+- [ ] Implement a durable IndexedDB draft queue with idempotency keys and manual conflict review UI for non-regulated drafts.

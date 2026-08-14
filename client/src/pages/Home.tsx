@@ -10,7 +10,7 @@ import { trpc } from "@/lib/trpc";
 import { useLocalization } from "@/contexts/LocalizationContext";
 import { Activity, AlertTriangle, ArrowLeftRight, BarChart3, Bell, Boxes, BrainCircuit, Building2, ChevronLeft, ClipboardCheck, Database, FileText, FlaskConical, HeartPulse, LayoutDashboard, LockKeyhole, Menu, PackageSearch, PhoneCall, Plus, Receipt, Search, ShieldCheck, ShoppingCart, Stethoscope, Ticket, UserRound, Users, WalletCards, X } from "lucide-react";
 import { skipToken } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const modules = [
   { id: "overview", label: "نظرة عامة", icon: LayoutDashboard },
@@ -37,6 +37,7 @@ const metrics = [
 export default function Home() {
   const { user, loading } = useAuth();
   const localization = useLocalization();
+  const [online, setOnline] = useState(() => typeof navigator === "undefined" ? true : navigator.onLine);
   const [active, setActive] = useState("overview");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -48,6 +49,14 @@ export default function Home() {
   }, [role]);
   const activeModule = allowedModules.find(item => item.id === active) ?? allowedModules[0] ?? modules[0];
   const filteredModules = useMemo(() => allowedModules.filter(item => item.label.includes(query.trim())), [allowedModules, query]);
+  useEffect(() => {
+    const onOnline = () => setOnline(true);
+    const onOffline = () => setOnline(false);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    navigator.serviceWorker?.controller?.postMessage({ type: "BDF_SYNC_STATUS" });
+    return () => { window.removeEventListener("online", onOnline); window.removeEventListener("offline", onOffline); };
+  }, []);
 
   if (loading) return <div className="min-h-screen grid place-items-center bg-[#f4f7fb] text-slate-500">جارٍ التحقق من جلسة الدخول…</div>;
 
@@ -64,7 +73,7 @@ export default function Home() {
       {mobileOpen && <button aria-label="إغلاق القائمة" className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       <main className="lg:mr-[286px]">
-        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#f4f7fb]/90 px-4 py-4 backdrop-blur-xl sm:px-8"><div className="flex items-center gap-3"><Button variant="outline" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}><Menu className="h-5 w-5" /></Button><div className="min-w-0 flex-1"><p className="text-xs font-medium text-slate-500">الثلاثاء، ١٤ أغسطس ٢٠٢٦</p><h1 className="truncate text-xl font-bold tracking-tight sm:text-2xl">{activeModule.label}</h1></div><div className="hidden w-64 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 sm:flex"><Search className="h-4 w-4 text-slate-400" /><Input value={query} onChange={e => setQuery(e.target.value)} placeholder="ابحث في الوحدات" className="border-0 bg-transparent px-0 shadow-none focus-visible:ring-0" /></div><Badge variant="outline" className="hidden bg-white px-3 py-2 text-xs sm:flex">{localization.countryCode} · {localization.currencyCode}</Badge><Button variant="outline" size="icon" className="relative bg-white"><Bell className="h-4 w-4" /><span className="absolute -left-1 -top-1 h-2 w-2 rounded-full bg-rose-500" /></Button>{user ? <Badge variant="secondary" className="hidden gap-2 px-3 py-2 sm:flex"><span className="h-2 w-2 rounded-full bg-emerald-500" />{user.name || "مستخدم"}</Badge> : <Button onClick={() => startLogin()} className="hidden bg-[#0d1b2a] sm:flex">تسجيل الدخول</Button>}</div></header>
+        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-[#f4f7fb]/90 px-4 py-4 backdrop-blur-xl sm:px-8"><div className="flex items-center gap-3"><Button variant="outline" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}><Menu className="h-5 w-5" /></Button><div className="min-w-0 flex-1"><p className="text-xs font-medium text-slate-500">الثلاثاء، ١٤ أغسطس ٢٠٢٦</p><h1 className="truncate text-xl font-bold tracking-tight sm:text-2xl">{activeModule.label}</h1></div><div className="hidden w-64 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 sm:flex"><Search className="h-4 w-4 text-slate-400" /><Input value={query} onChange={e => setQuery(e.target.value)} placeholder="ابحث في الوحدات" className="border-0 bg-transparent px-0 shadow-none focus-visible:ring-0" /></div><Badge variant="outline" className="hidden bg-white px-3 py-2 text-xs sm:flex">{localization.countryCode} · {localization.currencyCode}</Badge><Badge variant="outline" className={cn("hidden px-3 py-2 text-xs sm:flex", online ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700")}>{online ? "متصل" : "مسودات محلية فقط"}</Badge><Button variant="outline" size="icon" className="relative bg-white"><Bell className="h-4 w-4" /><span className="absolute -left-1 -top-1 h-2 w-2 rounded-full bg-rose-500" /></Button>{user ? <Badge variant="secondary" className="hidden gap-2 px-3 py-2 sm:flex"><span className="h-2 w-2 rounded-full bg-emerald-500" />{user.name || "مستخدم"}</Badge> : <Button onClick={() => startLogin()} className="hidden bg-[#0d1b2a] sm:flex">تسجيل الدخول</Button>}</div></header>
         <div className="mx-auto max-w-[1500px] space-y-6 p-4 sm:p-8">
           {!user && <div className="flex items-center justify-between gap-4 rounded-2xl border border-cyan-200 bg-cyan-50 px-5 py-4"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 text-cyan-700" /><div><p className="font-semibold text-cyan-950">وضع العرض الآمن</p><p className="text-sm leading-6 text-cyan-800">سجّل الدخول للوصول إلى العمليات المحمية وقاعدة بيانات الفروع.</p></div></div><Button onClick={() => startLogin()} className="shrink-0 bg-cyan-700 hover:bg-cyan-800">دخول</Button></div>}
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{metrics.map(metric => { const Icon = metric.icon; return <Card key={metric.label} className="border-0 shadow-sm shadow-slate-200/60"><CardContent className="p-5"><div className="mb-5 flex items-start justify-between"><div className={cn("grid h-11 w-11 place-items-center rounded-2xl", metric.tone)}><Icon className="h-5 w-5" /></div><span className="text-xs font-medium text-slate-400">اليوم</span></div><p className="text-sm text-slate-500">{metric.label}</p><p className="mt-1 text-3xl font-bold tracking-tight">{metric.value}</p><p className="mt-2 text-xs text-slate-400">{metric.hint}</p></CardContent></Card>; })}</section>
