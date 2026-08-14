@@ -1,5 +1,25 @@
 import { decimal, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
+export const organizations = mysqlTable("organizations", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationType: mysqlEnum("organizationType", ["government", "pharmacy", "pharmacy_chain", "distributor", "insurer", "rehabilitation", "hospital", "laboratory", "radiology"]).notNull(),
+  legalName: varchar("legalName", { length: 240 }).notNull(),
+  displayName: varchar("displayName", { length: 240 }).notNull(),
+  countryCode: varchar("countryCode", { length: 3 }).notNull(),
+  status: mysqlEnum("status", ["pending", "active", "suspended", "archived"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ nameIdx: index("organizations_name_idx").on(table.displayName), countryIdx: index("organizations_country_idx").on(table.countryCode) }));
+
+export const organizationMemberships = mysqlTable("organization_memberships", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  userId: int("userId").notNull(),
+  organizationRole: mysqlEnum("organizationRole", ["owner", "org_admin", "compliance_officer", "clinical_lead", "operations_manager", "staff", "auditor"]).notNull(),
+  active: int("active").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ membershipIdx: uniqueIndex("organization_memberships_unique_idx").on(table.organizationId, table.userId), userIdx: index("organization_memberships_user_idx").on(table.userId, table.active) }));
+
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
   openId: varchar("openId", { length: 64 }).notNull().unique(),
@@ -14,6 +34,7 @@ export const users = mysqlTable("users", {
 
 export const branches = mysqlTable("branches", {
   id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId"),
   code: varchar("code", { length: 32 }).notNull(),
   nameAr: varchar("nameAr", { length: 160 }).notNull(),
   address: text("address"),
@@ -100,6 +121,10 @@ export const scheduledJobs = mysqlTable("scheduled_jobs", {
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+export type Organization = typeof organizations.$inferSelect;
+export type OrganizationMembership = typeof organizationMemberships.$inferSelect;
+export type OrganizationType = Organization["organizationType"];
+export type OrganizationRole = OrganizationMembership["organizationRole"];
 
 export const branchAlerts = mysqlTable("branch_alerts", {
   id: int("id").autoincrement().primaryKey(),

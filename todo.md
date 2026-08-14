@@ -284,3 +284,29 @@
 - [x] Add copyright and provenance metadata to the repository, generated app metadata, and project ownership documentation without weakening security or licensing clarity.
 - [x] Add a tamper-evident ownership manifest with a non-secret SHA-256 fingerprint and document the recovery/proof procedure.
 - [x] Add tests and production validation proving the new identity is present and sensitive CV contact data is absent from shipped UI assets.
+
+# Secure Demo Mode and Commercial Contact
+
+- [ ] Add a no-credential demo entry point with an explicit read-only demo session, isolated from real user sessions and regulated mutations.
+- [ ] Enforce demo restrictions server-side for all mutations, uploads, offline replay, admin actions, and sensitive data access.
+- [x] Add non-sensitive demo content and a discreet, configurable contact-to-purchase call to action without exposing private owner contact data.
+- [ ] Add tests for demo-session authorization, mutation denial, and session isolation; contact CTA privacy is covered by the sales-contact configuration test.
+- [ ] Validate the demo flow with TypeScript, Vitest, production build, and responsive browser checks.
+
+# Custom Notification System
+
+- [ ] Define custom notification types, severity, audience, read state, and expiry without exposing private data.
+- [ ] Add server-side notification delivery/list/read procedures with role and demo-session restrictions.
+- [ ] Add an in-app notification center and toast presentation consistent with the Arabic RTL UI.
+- [ ] Add tests for authorization, demo read-only behavior, unread counts, marking read, and safe content rendering.
+- [ ] Run TypeScript, Vitest, production build, and responsive browser checks for the notification experience.
+
+# Multi-Organization Healthcare Expansion
+
+- [x] Define organization types for government, independent pharmacy, pharmacy chain, distributor, insurer, rehabilitation/physiotherapy center, hospital, laboratory, and radiology center.
+- [ ] Add organization membership and scoped roles so each account sees only its organization, branches, facilities, and permitted modules.
+- [ ] Add server-side organization isolation to queries and mutations, including explicit denial of cross-organization access.
+- [x] Add organization-specific workspace navigation and safe empty states without implying unsupported regulatory certification.
+- [ ] Add privacy/security controls for patient, prescription, diagnostic, imaging, insurance, and audit data, including least privilege and demo restrictions.
+- [ ] Add unit and integration-contract tests for organization isolation, role matrix, sensitive-data access, and cross-tenant denial.
+- [ ] Document official regulatory, interoperability, retention, and credential prerequisites per country and organization type.
