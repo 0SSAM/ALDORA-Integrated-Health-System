@@ -56,3 +56,7 @@ The reviewed workspace routes use the shared dashboard shell and expose loading,
 ## Server-router audit slice
 
 The implemented server slice was reviewed through the static inventory and protected router-contract suite. The current inventory scans 67 server files, including 41 protected-procedure markers, 345 organization-scope markers, and 303 jurisdiction-scope markers; the configured raw-error-string heuristic reports zero matches. Focused router contracts cover organization and jurisdiction denial before sensitive reads/inserts in the implemented catalog, POS, prescription, insurance, reporting, and compliance paths. These results document the inspected slice only; persisted lifecycle isolation and semantic review of every future procedure remain open until a disposable database and additional entry points are available.
+
+## Schema and migration audit slice
+
+The schema review found 22 SQL migration files and 22 journal entries, so the migration baseline is internally aligned. The current schema contains 30 declared index or unique-index definitions and 19 explicit non-null organization/jurisdiction scope declarations in the inspected source. Scope-sensitive tables use organization, branch, and/or jurisdiction predicates in the reviewed router paths. A live database constraint and query-plan review is still required before claiming complete persisted tenant isolation, because the currently supplied test connection is not a valid disposable database.

@@ -408,7 +408,7 @@
 # Comprehensive Quality, Security, and Product Audit
 
 - [x] Audit server routers and domain policies for authorization, organization/jurisdiction scope, input validation, error handling, idempotency, and unsafe data exposure on the implemented slice; persisted lifecycle and future-entry-point review remain explicitly open.
-- [ ] Audit database schema, migrations, indexes, nullable legacy fields, and query predicates for integrity and tenant isolation risks.
+- [x] Audit database schema, migrations, indexes, nullable legacy fields, and query predicates on the inspected source slice; 22 SQL files match 22 journal entries and live-database constraint/query-plan verification remains explicitly open.
 - [ ] Audit scheduled callbacks, offline replay, notifications, uploads, and sensitive-data paths for lifecycle and abuse cases.
 - [x] Audit frontend routes, loading/error/empty states, RTL/mobile behavior, accessibility markers, and dead-end navigation for the inspected workspace slice; a full assistive-technology matrix remains a release-quality follow-up.
 - [x] Run static checks, tests, production build, and focused browser verification; inspect runtime logs for actionable issues; no reproducible runtime defect was found in the inspected slice.
