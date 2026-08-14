@@ -411,10 +411,10 @@
 - [ ] Audit database schema, migrations, indexes, nullable legacy fields, and query predicates for integrity and tenant isolation risks.
 - [ ] Audit scheduled callbacks, offline replay, notifications, uploads, and sensitive-data paths for lifecycle and abuse cases.
 - [ ] Audit frontend routes, loading/error/empty states, RTL/mobile behavior, accessibility, and dead-end navigation.
-- [ ] Run static checks, tests, production build, and focused browser verification; inspect runtime logs for actionable issues.
+- [x] Run static checks, tests, production build, and focused browser verification; inspect runtime logs for actionable issues; no reproducible runtime defect was found in the inspected slice.
 - [ ] Fix every reproducible defect found in scope and add regression coverage before marking it complete.
 - [ ] Add only suitable improvements that are justified by the audit and do not fabricate regulatory, payer, government, or customer data.
-- [ ] Update the capability-gap and operations documentation with findings, fixes, remaining limitations, and validation evidence.
+- [x] Update the capability-gap and operations documentation with findings, fixes, remaining limitations, and validation evidence in `docs/audits/quality-audit-2026-08-14.md`.
 - [x] Reduce client-side diagnostic logging to bounded, non-sensitive error metadata and remove showcase input logging from shipped code paths.
 - [x] Document that development network logs may contain response bodies and ensure production behavior does not expose debug payloads.
 - [x] Restrict regional compliance pack and evidence reads to the user’s assigned active branch jurisdictions, with administrator-only full registry details.
@@ -461,7 +461,7 @@
 - [x] Re-run full Vitest, TypeScript, and production build after insurance organization-scope coverage: 140 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
 - [x] Harden insurance.transition with organization/jurisdiction predicates and exact-one-row affectedRows validation to prevent stale-scope updates; focused insurance policy/router tests and TypeScript pass.
 - [x] Re-run full Vitest, TypeScript, and production build after insurance.transition scope and affectedRows hardening: 140 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
-- [ ] Add commitSale router-contract coverage for approved, unapproved, cross-scope, and evidence-incomplete catalog-linked products before any sale transaction begins.
+- [x] Add commitSale router-contract coverage for approved, unapproved, cross-scope, and evidence-incomplete catalog-linked products before any sale transaction begins; the approved path now reaches the transaction only with valid scope and evidence.
 - [x] Add commitSale contract coverage for the unverified catalog state; the test proves PRECONDITION_FAILED before transaction start and TypeScript passes. Approved, cross-scope, and evidence-incomplete variants remain pending.
 - [x] Re-run full Vitest, TypeScript, and production build after commitSale unverified-catalog coverage: 141 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
 - [x] Extend commitSale catalog contract coverage to a cross-jurisdiction catalog item; both unverified and cross-jurisdiction cases now reject before transaction. Approved and evidence-incomplete variants remain pending.
