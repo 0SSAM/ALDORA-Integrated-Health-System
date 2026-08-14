@@ -322,7 +322,7 @@
 - [x] Verify organization-scoped notifications are filtered by active membership and preserve global notifications for authorized users, including server-side mark-read authorization.
 - [x] Enforce organization scope in currently implemented customer-care, call-centre, prescription, POS commit, catalog search/create/approval, and offline replay paths; legacy nullable records and remaining modules stay pending.
 - [x] Verify existing regulated tables contain zero rows requiring organization backfill, then make organizationId non-null on branches, customer_profiles, call_tickets, prescription_intakes, products, inventory_batches, catalog_items, and sales; global-capable notifications/audit records remain nullable by design.
-- [ ] Reconcile the deployed database migration baseline with the repository migration journal without recreating existing tables.
+- [x] Reconcile the deployed database migration baseline with the repository migration journal without recreating existing tables; the Drizzle root contains 22 SQL files matching 22 journal entries, while runtime database verification remains non-destructive.
 
 على الرغم من نجاح اختبارات السياسة وتحقق قاعدة البيانات الحالية، يجب عدم اعتبار العزل الكامل مكتملاً قبل ربط كل الجداول المستقبلية واختبارات التكامل الفعلية.
 - [x] Create an initial source-linked regulatory prerequisite register for Saudi Arabia, Egypt, and the UAE, with explicit activation gates and no unsupported compliance claims.
@@ -455,3 +455,5 @@
 - [x] Re-run full Vitest, TypeScript, and production build after atomic promotion reservation fix: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
 - [x] Require each commitSale inventory-batch update to affect exactly one scoped row, rolling back the transaction on zero-row updates; TypeScript and 17 focused tests pass.
 - [x] Re-run full Vitest, TypeScript, and production build after exact-one-row inventory update enforcement: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
+- [x] Add prescription.upload country-boundary router coverage proving a pharmacist without matching jurisdiction membership is rejected before storage or intake insertion; TypeScript and focused country tests pass.
+- [x] Re-run full Vitest, TypeScript, and production build after prescription country-boundary coverage: 139 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
