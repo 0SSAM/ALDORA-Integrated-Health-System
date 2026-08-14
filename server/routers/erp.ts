@@ -380,6 +380,7 @@ export const erpRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const payload = input.module === "customerCare" ? customerCareDraftSchema.parse(input.payload) : callCentreDraftSchema.parse(input.payload);
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, payload.branchId);
         const existing = (await db.select().from(offlineDrafts).where(eq(offlineDrafts.idempotencyKey, input.idempotencyKey)).limit(1))[0];
         if (existing) {
           if (existing.createdByUserId !== ctx.user.id) throw new TRPCError({ code: "CONFLICT", message: "Idempotency key belongs to another user" });

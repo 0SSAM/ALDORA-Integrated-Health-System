@@ -65,4 +65,14 @@ describe("organizations.members protected tRPC contract", () => {
     const caller = appRouter.createCaller(contextFor(admin));
     await expect(caller.organizations.members({ organizationId: 10 })).resolves.toEqual(directory);
   });
+
+  it("rejects an offline draft enqueue for an unauthorized branch", async () => {
+    getDbMock.mockResolvedValue(dbWithRows([]));
+    const caller = appRouter.createCaller(contextFor(baseUser));
+    await expect(caller.erp.offlineDrafts.enqueue({
+      idempotencyKey: "offline-branch-scope-1",
+      module: "callCentre",
+      payload: { subject: "Callback", channel: "phone", direction: "inbound", priority: "normal", branchId: 999 },
+    })).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
 });

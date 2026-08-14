@@ -394,3 +394,5 @@
 - [x] Refresh operations validation counts and lifecycle guard notes after the latest report and insurance hardening.
 - [x] Enforce organization and branch membership for call-centre ticket assignees before accepting assignedUserId updates.
 - [x] Add regression coverage for cross-organization and cross-branch assignment rejection.
+- [x] Enforce branch authorization when enqueueing offline Customer Care and Call Centre drafts, not only during replay.
+- [x] Add regression coverage for unauthorized offline enqueue attempts.
