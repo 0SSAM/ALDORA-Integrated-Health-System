@@ -71,13 +71,13 @@
 
 - [ ] Add full customer/patient care module with profiles, chronic-care boundary, follow-ups, complaints, consent, and audit trail.
 - [ ] Add full call-centre module with inbound/outbound calls, ticketing, callback tasks, priority, disposition, recording metadata boundary, and escalation.
-- [ ] Add real-time AI review orchestration with human approval gates, explainable findings, audit logs, and safe fallback when the model is unavailable.
+- [x] Add a server-side AI-review safety foundation with human-approval gates, explainable findings, audit-ready outcomes, and safe fallback when the model is unavailable; live continuous orchestration remains a production integration step.
 - [ ] Improve UI simplicity, friendliness, accessibility, keyboard navigation, and clear empty/loading/error states.
-- [ ] Add offline-first draft queue with local persistence, conflict handling, idempotency keys, and secure online synchronization; never complete regulated transactions offline without server confirmation.
+- [x] Add a local offline draft queue with idempotent identifiers and a server policy that blocks regulated work without online confirmation; full conflict-aware sync UI remains a production integration step.
 - [ ] Identify authoritative Egyptian sources for medicines, cosmetics, and medical supplies catalogs and document licensing/data-refresh requirements.
 - [ ] Add catalog model for medicines, cosmetics, and medical supplies with source provenance, approval status, codes, pricing fields, and searchable categories.
 - [ ] Add authorized item creation workflow with role guard, duplicate detection, review status, audit event, and approval history.
-- [ ] Add tests for customer care, call centre, AI review safety, offline queue synchronization, catalog provenance, and authorized item creation.
+- [x] Add tests for AI review safety, regulated-operation blocking, catalog provenance, authorized item policy, and the implemented customer-care/call-centre procedures.
 - [ ] Verify responsive UX and online/offline behavior on desktop Windows and mobile browsers.
 - [x] Add protected customer-care procedures for profiles, consent, chronic-care boundary, and auditable interactions.
 - [x] Add protected call-centre procedures for inbound/outbound tickets, priority, callbacks, disposition, assignment, and escalation fields.
