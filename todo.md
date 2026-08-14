@@ -546,3 +546,5 @@
 - [x] Add a reusable regulated-mutation readiness policy requiring branch-jurisdiction assignment, approved non-stale compliance pack, and verified catalog evidence where a product is involved; 2 policy tests and TypeScript passed.
 
 - [x] Add a jurisdiction-aware privacy and retention readiness policy requiring legal basis, retention period, data-subject rights handling, deletion/export controls, and effective source evidence before activation; 2 policy tests and TypeScript passed.
+
+- [x] Add a controlled-substance dispensing readiness policy requiring jurisdiction evidence, facility licence, authorized prescriber/pharmacist roles, verified prescription, and dual review before activation; 2 policy tests and TypeScript passed.
