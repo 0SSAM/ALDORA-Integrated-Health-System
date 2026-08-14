@@ -7,6 +7,7 @@ import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { ARAB_COUNTRY_REGISTRY, normalizeCountryCode } from "../domain/regional-engine";
 import { assertPackApprovalReady, transitionPackStatus } from "../domain/compliance-lifecycle";
 import { canAccessJurisdiction } from "../domain/jurisdiction-access";
+import { countryPackRulesReady } from "../domain/country-pack-policy";
 
 const profileInput = z.object({
   countryCode: z.string().length(2),
@@ -45,7 +46,8 @@ export const regionalRouter = router({
       if (pack) {
         const rules = JSON.parse(pack.rulesJson || "{}") as Record<string, boolean>;
         const requiredRuleKeys = Object.entries(rules).filter(([, enabled]) => enabled).map(([key]) => key);
-        evidenceReady = requiredRuleKeys.length > 0 && requiredRuleKeys.every(ruleKey => evidence.some(item => item.packId === pack.id && item.ruleKey === ruleKey && item.verificationStatus === "verified"));
+        const completeDomainMatrix = countryPackRulesReady(rules);
+        evidenceReady = completeDomainMatrix && requiredRuleKeys.length > 0 && requiredRuleKeys.every(ruleKey => evidence.some(item => item.packId === pack.id && item.ruleKey === ruleKey && item.verificationStatus === "verified"));
       }
       const packReady = Boolean(pack && pack.effectiveFrom.getTime() <= now.getTime() && (!pack.reviewDueAt || pack.reviewDueAt.getTime() >= now.getTime()) && evidenceReady);
       return { ...country, status: profile?.active && packReady ? "configured" : profile ? "pending_approval" : "not_configured", profile, packReady };
@@ -116,6 +118,7 @@ export const regionalRouter = router({
     const pack = (await db.select().from(compliancePacks).where(eq(compliancePacks.id, input.packId)).limit(1))[0];
     if (!pack) throw new TRPCError({ code: "NOT_FOUND", message: "Compliance pack not found" });
     const rules = JSON.parse(pack.rulesJson || "{}") as Record<string, boolean>;
+    if (!countryPackRulesReady(rules)) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Compliance pack approval rejected" });
     const evidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified")));
     try {
       assertPackApprovalReady({ status: pack.status, rules, evidence, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt });

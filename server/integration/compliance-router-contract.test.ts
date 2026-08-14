@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appRouter } from "../routers";
+import { REQUIRED_COUNTRY_PACK_DOMAINS } from "../domain/country-pack-policy";
 import type { TrpcContext } from "../_core/context";
 
 const { getDbMock } = vi.hoisted(() => ({ getDbMock: vi.fn() }));
 vi.mock("../db", () => ({ getDb: getDbMock }));
 
 type TestUser = NonNullable<TrpcContext["user"]>;
+
+const completeRules = Object.fromEntries(REQUIRED_COUNTRY_PACK_DOMAINS.map(domain => [domain, true]));
+const completeEvidence = REQUIRED_COUNTRY_PACK_DOMAINS.map((ruleKey, index) => ({ id: 10 + index, packId: 44, ruleKey, verificationStatus: "verified" }));
 
 const staffUser: TestUser = {
   id: 81,
@@ -55,10 +59,10 @@ describe("regional compliance protected router contracts", () => {
       [{ id: 3, countryCode: "EG", active: 1 }],
       [{ id: 44 }],
       [{ id: 9, packId: 44, verificationStatus: "review", ruleKey: "tax" }],
-      [{ id: 9, packId: 44, jurisdictionId: 3, status: "review", rulesJson: JSON.stringify({ tax: true }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
-      [{ id: 10, packId: 44, ruleKey: "tax", verificationStatus: "verified" }],
-      [{ id: 9, packId: 44, jurisdictionId: 3, status: "approved", rulesJson: JSON.stringify({ tax: true }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
-      [{ id: 9, packId: 44, jurisdictionId: 3, status: "rolled_back", rulesJson: JSON.stringify({ tax: true }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
+      [{ id: 9, packId: 44, jurisdictionId: 3, status: "review", rulesJson: JSON.stringify(completeRules), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
+      completeEvidence,
+      [{ id: 9, packId: 44, jurisdictionId: 3, status: "approved", rulesJson: JSON.stringify(completeRules), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
+      [{ id: 9, packId: 44, jurisdictionId: 3, status: "rolled_back", rulesJson: JSON.stringify(completeRules), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
       [{ id: 1, packId: 44, action: "approved", actorUserId: 82 }],
     ];
     const next = () => queue.shift() ?? [];
@@ -66,7 +70,7 @@ describe("regional compliance protected router contracts", () => {
     const db = { select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn(query) })) })), insert: vi.fn(() => ({ values: vi.fn(async () => [{ insertId: 44 }]) })), update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(async () => []) })) })) };
     getDbMock.mockResolvedValue(db);
     const caller = appRouter.createCaller(contextFor(admin));
-    await expect(caller.regional.createPack({ jurisdictionId: 3, packVersion: "2026.1", authorityName: "EDA", sourceUrl: "https://eda.gov.eg/rules", effectiveFrom: new Date("2026-01-01"), rules: { tax: true } })).resolves.toMatchObject({ packId: 44 });
+    await expect(caller.regional.createPack({ jurisdictionId: 3, packVersion: "2026.1", authorityName: "EDA", sourceUrl: "https://eda.gov.eg/rules", effectiveFrom: new Date("2026-01-01"), rules: completeRules })).resolves.toMatchObject({ packId: 44 });
     await expect(caller.regional.addEvidence({ jurisdictionId: 3, packId: 44, operation: "invoice", ruleKey: "tax", authorityName: "EDA", sourceUrl: "https://eda.gov.eg/tax", sourceRetrievedAt: new Date("2026-01-01") })).resolves.toMatchObject({ evidenceId: 44 });
     await expect(caller.regional.verifyEvidence({ evidenceId: 9, decision: "verified" })).resolves.toMatchObject({ status: "verified" });
     await expect(caller.regional.approvePack({ packId: 44 })).resolves.toMatchObject({ status: "approved" });
@@ -76,11 +80,11 @@ describe("regional compliance protected router contracts", () => {
     expect(db.insert).toHaveBeenCalled();
   });
 
-  it("rejects approval for a stale pack before mutation or audit writes", async () => {
+  it("rejects approval for a pack missing timezone or audit coverage before mutation or audit writes", async () => {
     const admin = { ...staffUser, id: 82, role: "admin" as const };
     const rows = [
-      [{ id: 7, status: "review", jurisdictionId: 3, rulesJson: JSON.stringify({ tax: true }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-08-01") }],
-      [{ id: 9, packId: 7, ruleKey: "tax", verificationStatus: "verified" }],
+      [{ id: 7, status: "review", jurisdictionId: 3, rulesJson: JSON.stringify({ ...completeRules, timezone: false }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
+      completeEvidence.map(item => ({ ...item, packId: 7 })),
     ];
     const next = () => rows.shift() ?? [];
     const db = { select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn(() => { const p = Promise.resolve(next()) as Promise<unknown[]> & { limit: () => Promise<unknown[]> }; p.limit = async () => next(); return p; }) })) })), update: vi.fn(), insert: vi.fn() };

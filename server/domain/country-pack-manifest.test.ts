@@ -10,4 +10,10 @@ describe("country pack source manifest", () => {
       expect(pack.activationBlockers.length).toBeGreaterThan(0);
     }
   });
+
+  it("has no enabled country without an independent source-linked domain matrix", () => {
+    const enabled = manifest.packs.filter(pack => pack.status === "enabled");
+    expect(enabled).toHaveLength(0);
+    expect(manifest.packs.every(pack => pack.activationBlockers.includes("acceptance tests") || pack.activationBlockers.includes("complete source-linked domain matrix"))).toBe(true);
+  });
 });

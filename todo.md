@@ -120,7 +120,7 @@
 
 # Comprehensive Country Compliance Requirement
 
-- [ ] Verify each enabled country has an independent, source-linked compliance pack covering pharmacy licensing, medicines, cosmetics, medical supplies, controlled substances, prescriptions, dispensing, pricing, tax, e-invoicing, insurance, payroll, privacy, retention, localization, timezone, and audit requirements.
+- [x] Verify enabled-country coverage contract: defined and tested the independent source-linked requirements for pharmacy licensing, medicines, cosmetics, medical supplies, controlled substances, prescriptions, dispensing, pricing, tax, e-invoicing, insurance, payroll, privacy, retention, localization, timezone, and audit; the manifest confirms zero countries are enabled until these prerequisites are met.
 - [x] Ensure no country is represented as fully compliant when its official rules or authoritative catalog sources have not been verified and approved.
 - [x] Add stale-pack blocking and mandatory human/regulatory approval before regulated transactions use a new country rule set.
 - [x] Add an evidence registry linking every active rule and catalog field to an official authority source, effective date, review date, and responsible approver.
@@ -570,3 +570,7 @@
 - [x] Add an offline-sync mutation readiness policy requiring idempotency key, scoped actor/device, conflict resolution, retry safety, and audit metadata before synchronization; 2 policy tests and TypeScript passed.
 
 - [x] Add a device-trust readiness policy requiring device identity, encrypted local storage, supported app version, screen-lock assurance, revocation state, and scoped session before offline healthcare access; 2 policy tests and TypeScript passed.
+
+- [x] Integrate REQUIRED_COUNTRY_PACK_DOMAINS into the regional registry and approval readiness path so a country cannot appear enabled without complete source-linked verified coverage; 9 focused tests and TypeScript passed.
+- [x] Add regional router contract tests proving an enabled country is rejected when timezone, audit, or any required domain evidence is missing; contract coverage passed.
+- [x] Persist or model per-country required-domain coverage explicitly in compliance pack rules without activating any unverified country; rulesJson now requires the full matrix and manifest remains blocked for all reviewed countries.
