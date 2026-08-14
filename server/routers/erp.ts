@@ -172,7 +172,7 @@ export const erpRouter = router({
             for (const item of checkedItems) await tx.update(inventoryBatches).set({ quantityOnHand: (item.remaining - item.quantity).toFixed(3) }).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId), eq(inventoryBatches.branchId, input.branchId), eq(inventoryBatches.jurisdictionId, assignment.jurisdictionId)));
             if (appliedPromotionId !== null) {
               const updated = await tx.update(promotions).set({ usageCount: sql`${promotions.usageCount} + 1` }).where(and(eq(promotions.id, appliedPromotionId), eq(promotions.status, "active"), or(isNull(promotions.usageLimit), lt(promotions.usageCount, promotions.usageLimit)))).execute();
-              if (!updated) throw new Error("Promotion usage could not be reserved");
+              if (Number(updated[0]?.affectedRows ?? 0) !== 1) throw new Error("Promotion usage could not be reserved");
             }
             return saleId;
           });

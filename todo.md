@@ -449,3 +449,7 @@
 - [x] Re-run full Vitest, TypeScript, and production build after compliance router-contract coverage: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
 - [x] Tighten commitSale product/batch reads and inventory-batch updates with organization, branch, and jurisdiction predicates; focused ERP and country-isolation tests pass.
 - [x] Re-run full Vitest, TypeScript, and production build after commitSale record-boundary hardening: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
+- [x] Create a provenance-preserving, coverage-limited Egyptian medicine workbook with an explicit zero-record result and EDA source register; a complete medicine-record workbook remains blocked until authorized public export/API access is verified.
+- [x] Skip clinical-trials archive generation and delivery per user instruction; retain existing source notes without treating the trial archive as a required deliverable.
+- [x] Fix promotion usage reservation to require exactly one affected row from the Drizzle MySQL ResultSetHeader, preventing silent limit-bypass on concurrent or stale reservations; TypeScript and 15 focused tests pass.
+- [x] Re-run full Vitest, TypeScript, and production build after atomic promotion reservation fix: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
