@@ -212,3 +212,14 @@
     50% { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(25, 197, 209, 0.28); }
   }
 }
+
+
+@layer components {
+  .aldo-loading-shell { isolation: isolate; }
+  .aldo-loading-orb { position: absolute; width: 22rem; height: 22rem; border-radius: 9999px; filter: blur(10px); opacity: .45; pointer-events: none; background: radial-gradient(circle, rgba(25, 197, 209, .26), rgba(159, 242, 228, 0) 68%); }
+  .aldo-loading-orb-one { inset: -8rem auto auto -7rem; }
+  .aldo-loading-orb-two { inset: auto -8rem -9rem auto; background: radial-gradient(circle, rgba(111, 130, 255, .18), rgba(159, 242, 228, 0) 68%); }
+  .aldo-loading-bar { animation: aldo-loading-slide 1.35s cubic-bezier(.23, 1, .32, 1) infinite; transform-origin: right center; }
+  @keyframes aldo-loading-slide { 0% { transform: translateX(120%); opacity: .45; } 45%, 70% { transform: translateX(0); opacity: 1; } 100% { transform: translateX(-120%); opacity: .45; } }
+  @media (prefers-reduced-motion: reduce) { .aldo-loading-bar { animation: none; transform: translateX(0); } }
+}
