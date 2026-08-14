@@ -508,3 +508,5 @@
 - [x] Expand compliance lifecycle coverage across evidence verification, approval readiness, stale blocking, rollback, and audit visibility contract; 4 lifecycle tests and TypeScript passed.
 
 - [x] Add protected-router contract coverage for invoice.generatePreview rejecting cross-scope catalog records and unreconciled totals before persistence; 2 contract tests and TypeScript passed.
+
+- [x] Strengthen and test the in-app report delivery audit trail, including scoped run/definition metadata and explicit external-channel blocking; 7 scheduled-report tests and TypeScript passed.

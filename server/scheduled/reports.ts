@@ -21,8 +21,18 @@ export function reportExecutionSkipReason(definition: ReportExecutionDefinition)
   return undefined;
 }
 
+export function buildReportDeliveryAudit(input: { reportRunId: number; definitionId: number; organizationId: number; jurisdictionId: number | null; channel: "in_app" | "email" | "webhook"; status: "queued" | "delivered" | "skipped" | "failed"; notificationId?: number | null; errorCode?: string | null }) {
+  if (input.channel !== "in_app") throw new Error("External report delivery is disabled until an approved adapter exists");
+  if (!Number.isInteger(input.reportRunId) || input.reportRunId <= 0) throw new Error("Report run is required");
+  if (!Number.isInteger(input.definitionId) || input.definitionId <= 0) throw new Error("Report definition is required");
+  if (!Number.isInteger(input.organizationId) || input.organizationId <= 0) throw new Error("Report organization scope is required");
+  if (!Number.isInteger(input.jurisdictionId) || (input.jurisdictionId ?? 0) <= 0) throw new Error("Report jurisdiction scope is required");
+  return { reportRunId: input.reportRunId, definitionId: input.definitionId, organizationId: input.organizationId, jurisdictionId: input.jurisdictionId, channel: input.channel, status: input.status, notificationId: input.notificationId ?? null, errorCode: input.errorCode ?? null };
+}
+
 async function recordInAppDelivery(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, definition: typeof reportDefinitions.$inferSelect, reportRunId: number) {
-  const base = { reportRunId, definitionId: definition.id, organizationId: definition.organizationId, jurisdictionId: definition.jurisdictionId, recipientRole: definition.recipientRole, recipientUserId: definition.recipientUserId, channel: "in_app" as const };
+  const audit = buildReportDeliveryAudit({ reportRunId, definitionId: definition.id, organizationId: definition.organizationId, jurisdictionId: definition.jurisdictionId, channel: "in_app", status: "queued" });
+  const base = { ...audit, recipientRole: definition.recipientRole, recipientUserId: definition.recipientUserId };
   if (definition.recipientUserId !== null) {
     await db.insert(reportDeliveryAttempts).values({ ...base, status: "skipped", errorCode: "RECIPIENT_USER_TARGET_UNSUPPORTED", completedAt: new Date() });
     return { status: "skipped" as const, reason: "recipient_user_target_unsupported" as const };
