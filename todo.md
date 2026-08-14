@@ -314,4 +314,4 @@
 # Notification Organization Scope Bug
 
 - [x] Resolve the stale COOKIE_NAME import error reported by the development server by restarting the stale HMR process; TypeScript, 72 tests, and production build are passing.
-- [ ] Verify organization-scoped notifications are filtered by active membership and preserve global notifications for authorized users.
+- [x] Verify organization-scoped notifications are filtered by active membership and preserve global notifications for authorized users, including server-side mark-read authorization.

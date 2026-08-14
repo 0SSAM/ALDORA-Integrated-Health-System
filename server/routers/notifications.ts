@@ -5,6 +5,7 @@ import { notificationReads, notifications, organizationMemberships } from "../..
 import { TRPCError } from "@trpc/server";
 import { canViewNotification } from "../domain/notifications-policy";
 import { summarizeNotifications } from "../domain/notifications-view";
+import { canAccessNotificationScope } from "../domain/notification-scope";
 import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 
 const notificationInput = z.object({
@@ -51,7 +52,15 @@ export const notificationsRouter = router({
       .orderBy(desc(notifications.createdAt))
       .limit(50);
 
-    const items = rows.filter(row => canViewNotification(row.notification.audienceRole, ctx.user.role)).map(row => ({ ...row.notification, isRead: row.read !== null }));
+    const items = rows
+      .filter(row => canViewNotification(row.notification.audienceRole, ctx.user.role))
+      .filter(row => canAccessNotificationScope({
+        isAdmin: ctx.user.role === "admin",
+        hasActiveOrganizationMembership: Boolean(input?.organizationId),
+        requestedOrganizationId: input?.organizationId,
+        notification: { organizationId: row.notification.organizationId, branchId: row.notification.branchId },
+      }))
+      .map(row => ({ ...row.notification, isRead: row.read !== null }));
     return summarizeNotifications(items);
   }),
 
@@ -60,13 +69,31 @@ export const notificationsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "قاعدة البيانات غير متاحة حالياً." });
-      const visible = await db.select({ id: notifications.id }).from(notifications).where(and(
+      const visible = await db.select({
+        id: notifications.id,
+        organizationId: notifications.organizationId,
+        branchId: notifications.branchId,
+      }).from(notifications).where(and(
         eq(notifications.id, input.notificationId),
         eq(notifications.active, 1),
-        isNull(notifications.organizationId),
-        isNull(notifications.branchId),
       )).limit(1);
       if (!visible.length) throw new TRPCError({ code: "NOT_FOUND", message: "الإشعار غير متاح." });
+      const notification = visible[0];
+      let hasActiveOrganizationMembership = notification.organizationId === null;
+      if (notification.organizationId !== null && ctx.user.role !== "admin") {
+        const membership = await db.select({ id: organizationMemberships.id }).from(organizationMemberships).where(and(
+          eq(organizationMemberships.organizationId, notification.organizationId),
+          eq(organizationMemberships.userId, ctx.user.id),
+          eq(organizationMemberships.active, 1),
+        )).limit(1);
+        hasActiveOrganizationMembership = membership.length > 0;
+      }
+      if (!canAccessNotificationScope({
+        isAdmin: ctx.user.role === "admin",
+        hasActiveOrganizationMembership,
+        requestedOrganizationId: notification.organizationId,
+        notification: { organizationId: notification.organizationId, branchId: notification.branchId },
+      })) throw new TRPCError({ code: "FORBIDDEN", message: "الإشعار خارج نطاق عضويتك." });
       await db.insert(notificationReads).values({ notificationId: input.notificationId, userId: ctx.user.id }).onDuplicateKeyUpdate({ set: { readAt: new Date() } });
       return { success: true } as const;
     }),
