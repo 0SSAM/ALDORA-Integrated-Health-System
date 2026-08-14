@@ -516,3 +516,5 @@
 - [x] Add a protected-router regression proving approvePack rejects a stale compliance pack before update or audit writes; 3 compliance-router contract tests and TypeScript passed.
 
 - [x] Add a reusable external-adapter readiness gate that blocks government/e-invoicing submission until verified specifications, credentials, organization registration, and human acceptance are present; 2 tests and TypeScript passed.
+
+- [x] Record a primary-source review for EDA Egypt and JFDA Jordan with source URLs and explicit limitations; no unverified regulatory rows or automatic submission were enabled.
