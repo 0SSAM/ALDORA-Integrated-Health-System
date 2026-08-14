@@ -197,3 +197,9 @@
 - [x] Apply dynamic direction and country/currency display in the main Home workspace.
 - [x] Avoid defaulting the UI to Egypt; use an unset country until a verified branch jurisdiction is selected.
 - [ ] Drive the provider from the authenticated branch jurisdiction registry instead of localStorage once branch selection UI is connected.
+
+# Offline Safety Foundation
+
+- [x] Add a country-aware offline decision policy that allows only non-regulated drafts offline and blocks sale, inventory mutation, prescription, and invoice operations.
+- [x] Add conflict resolution policy requiring manual review instead of silent overwrite.
+- [ ] Wire the offline policy into the PWA queue/service worker and visible sync-status UI.
