@@ -562,3 +562,5 @@
 - [x] Add a notification-delivery readiness policy requiring recipient scope, consent/preferences, allowed channel, quiet-hours handling, localized content, and audit metadata before delivery; 2 policy tests and TypeScript passed.
 
 - [x] Add a clinical-data access readiness policy requiring role authorization, declared purpose, organization/branch/jurisdiction scope, consent where applicable, and audited break-glass handling; 2 policy tests and TypeScript passed.
+
+- [x] Add a patient-identity matching readiness policy requiring trusted internal identifier, minimum demographic confirmation, ambiguity blocking, and manual review for unresolved matches; 2 policy tests and TypeScript passed.
