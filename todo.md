@@ -208,10 +208,10 @@
 
 - [x] Update the Service Worker to reject regulated non-GET requests offline and preserve app-shell fallback.
 - [x] Add visible online/offline status to Home and request sync status from the Service Worker.
-- [ ] Implement a durable IndexedDB draft queue with idempotency keys and manual conflict review UI for non-regulated drafts.
+- [x] Implement a durable IndexedDB draft queue with idempotency keys and manual conflict review UI for non-regulated drafts.
 
 # Durable Offline Draft Queue
 
 - [x] Persist non-regulated drafts in IndexedDB with a localStorage fallback and stable idempotency keys.
 - [x] Store auditable queued/conflict/failed status metadata and expose durable listing and conflict marking helpers.
-- [ ] Add a visible manual conflict review panel and connect draft replay to authenticated server procedures.
+- [ ] Connect draft replay to authenticated server procedures with explicit idempotency validation; the visible review/removal panel is implemented.
