@@ -304,7 +304,7 @@
 # Multi-Organization Healthcare Expansion
 
 - [x] Define organization types for government, independent pharmacy, pharmacy chain, distributor, insurer, rehabilitation/physiotherapy center, hospital, laboratory, and radiology center.
-- [ ] Add organization membership and scoped roles so each account sees only its organization, branches, facilities, and permitted modules.
+- [x] Add organization membership and scoped roles so each account sees only its organization, branches, facilities, and permitted modules; centralize the role-capability matrix and restrict member-directory reads to management/audit roles.
 - [ ] Add server-side organization isolation to queries and mutations, including explicit denial of cross-organization access.
 - [x] Add organization-specific workspace navigation and safe empty states without implying unsupported regulatory certification.
 - [ ] Add privacy/security controls for patient, prescription, diagnostic, imaging, insurance, and audit data, including least privilege and demo restrictions.

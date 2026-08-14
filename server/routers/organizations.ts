@@ -4,7 +4,7 @@ import { organizationMemberships, organizations, users } from "../../drizzle/sch
 import { getDb } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
-import { canManageOrganization } from "../domain/organization-access";
+import { canManageOrganization, canViewOrganizationAudit } from "../domain/organization-access";
 
 const organizationTypeSchema = z.enum([
   "government",
@@ -69,8 +69,9 @@ export const organizationsRouter = router({
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "SERVICE_UNAVAILABLE", message: "Database unavailable" });
     if (ctx.user.role !== "admin") {
-      const membership = (await db.select().from(organizationMemberships).where(and(eq(organizationMemberships.organizationId, input.organizationId), eq(organizationMemberships.userId, ctx.user.id), eq(organizationMemberships.active, 1))).limit(1))[0];
-      if (!membership) throw new TRPCError({ code: "FORBIDDEN", message: "Organization access denied" });
+      const memberships = await db.select().from(organizationMemberships).where(and(eq(organizationMemberships.userId, ctx.user.id), eq(organizationMemberships.active, 1)));
+      const canReadDirectory = canManageOrganization(ctx.user.role, memberships, input.organizationId) || canViewOrganizationAudit(ctx.user.role, memberships, input.organizationId);
+      if (!canReadDirectory) throw new TRPCError({ code: "FORBIDDEN", message: "Organization member directory access denied" });
     }
     return db.select({ userId: users.id, name: users.name, email: users.email, organizationRole: organizationMemberships.organizationRole, active: organizationMemberships.active }).from(organizationMemberships).innerJoin(users, eq(users.id, organizationMemberships.userId)).where(eq(organizationMemberships.organizationId, input.organizationId));
   }),

@@ -16,17 +16,52 @@ export const ORGANIZATION_ROLES = [
 
 export type OrganizationRole = (typeof ORGANIZATION_ROLES)[number];
 
+export const ORGANIZATION_CAPABILITIES = [
+  "view_workspace",
+  "manage_members",
+  "view_sensitive_clinical",
+  "view_audit",
+] as const;
+
+export type OrganizationCapability = (typeof ORGANIZATION_CAPABILITIES)[number];
+
+const ROLE_CAPABILITIES: Record<OrganizationRole, readonly OrganizationCapability[]> = {
+  owner: ["view_workspace", "manage_members", "view_sensitive_clinical", "view_audit"],
+  org_admin: ["view_workspace", "manage_members", "view_sensitive_clinical", "view_audit"],
+  compliance_officer: ["view_workspace", "view_sensitive_clinical", "view_audit"],
+  clinical_lead: ["view_workspace", "view_sensitive_clinical"],
+  operations_manager: ["view_workspace"],
+  staff: ["view_workspace"],
+  auditor: ["view_workspace", "view_sensitive_clinical", "view_audit"],
+};
+
+function isActiveMember(
+  memberships: OrganizationMembershipSnapshot[],
+  organizationId: number,
+) {
+  return memberships.find(
+    membership => membership.organizationId === organizationId && membership.active === 1,
+  );
+}
+
+export function hasOrganizationCapability(
+  userRole: string,
+  memberships: OrganizationMembershipSnapshot[],
+  organizationId: number,
+  capability: OrganizationCapability,
+) {
+  if (userRole === "admin") return true;
+  const membership = isActiveMember(memberships, organizationId);
+  if (!membership || !ORGANIZATION_ROLES.includes(membership.organizationRole as OrganizationRole)) return false;
+  return ROLE_CAPABILITIES[membership.organizationRole as OrganizationRole].includes(capability);
+}
+
 export function canAccessOrganization(
   userRole: string,
   memberships: OrganizationMembershipSnapshot[],
   organizationId: number,
 ) {
-  if (userRole === "admin") return true;
-  return memberships.some(
-    membership =>
-      membership.organizationId === organizationId &&
-      membership.active === 1,
-  );
+  return hasOrganizationCapability(userRole, memberships, organizationId, "view_workspace");
 }
 
 export function canManageOrganization(
@@ -34,13 +69,7 @@ export function canManageOrganization(
   memberships: OrganizationMembershipSnapshot[],
   organizationId: number,
 ) {
-  if (userRole === "admin") return true;
-  return memberships.some(
-    membership =>
-      membership.organizationId === organizationId &&
-      membership.active === 1 &&
-      ["owner", "org_admin"].includes(membership.organizationRole),
-  );
+  return hasOrganizationCapability(userRole, memberships, organizationId, "manage_members");
 }
 
 export function canViewSensitiveClinicalData(
@@ -48,13 +77,15 @@ export function canViewSensitiveClinicalData(
   memberships: OrganizationMembershipSnapshot[],
   organizationId: number,
 ) {
-  if (userRole === "admin") return true;
-  return memberships.some(
-    membership =>
-      membership.organizationId === organizationId &&
-      membership.active === 1 &&
-      ["owner", "org_admin", "clinical_lead", "compliance_officer", "auditor"].includes(membership.organizationRole),
-  );
+  return hasOrganizationCapability(userRole, memberships, organizationId, "view_sensitive_clinical");
+}
+
+export function canViewOrganizationAudit(
+  userRole: string,
+  memberships: OrganizationMembershipSnapshot[],
+  organizationId: number,
+) {
+  return hasOrganizationCapability(userRole, memberships, organizationId, "view_audit");
 }
 
 export function isSupportedOrganizationType(value: string) {
