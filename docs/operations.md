@@ -34,7 +34,7 @@ EDA, ETA, MOH, NFSA, UHIA, and syndicate workflows accept only reference identif
 
 ## Intelligent reporting boundary
 
-The current release has persisted report definitions and run history, scoped creation, a Heartbeat callback at `POST /api/scheduled/report-execution`, compliance-pack gates, and deterministic idempotency. A report must use a server-owned query key rather than user-supplied SQL, carry both organization and jurisdiction scope, name authorized recipient roles, and use a six-field UTC schedule. The callback records `skipped` with `REPORT_QUERY_EXECUTION_NOT_IMPLEMENTED` until a reviewed server-side query executor and delivery audit are implemented; no external delivery is represented as active.
+The current release has persisted report definitions and run history, scoped creation, a Heartbeat callback at `POST /api/scheduled/report-execution`, compliance-pack gates, deterministic idempotency, and an allowlisted server-side executor for inventory alerts, daily sales, expiry review, and operations summaries. A report must use a server-owned query key rather than user-supplied SQL, carry both organization and jurisdiction scope, name authorized recipient roles, and use a six-field UTC schedule. Runs store compact output references and are marked `succeeded` only after the scoped query completes; external email, push, and webhook delivery remains disabled until a reviewed delivery audit and channel are configured.
 
 ## Insurance eligibility and preauthorization boundary
 
