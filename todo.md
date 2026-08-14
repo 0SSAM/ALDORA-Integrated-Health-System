@@ -351,11 +351,11 @@
 
 # Egyptian Medicines and Clinical-Trials Research
 
-- [ ] Identify accessible official Egyptian medicine-register sources and document coverage limits, licensing status, update date, and terms of use.
+- [x] Identify accessible official Egyptian medicine-register sources and document coverage limits, licensing status, update date, and terms of use (interactive EDA search documented; no bulk export asserted)
 - [ ] Build an Excel workbook from verified public medicine records, preserving source URLs, Arabic/English names, active ingredients, strength, dosage form, manufacturer, registration/status fields, and verification timestamps where available.
-- [ ] Identify authoritative public clinical-trial registries and official Egyptian sources, then collect Egypt-linked trial records without fabricating missing fields.
-- [ ] Build a separate clinical-trials archive workbook with registry identifiers, titles, conditions, interventions, sponsors, sites, recruitment status, dates, and source URLs where available.
-- [ ] Validate duplicates, missingness, date formats, source provenance, and country/site matching; document records that could not be verified.
+- [x] Identify authoritative public clinical-trial registries and official Egyptian sources, then collect Egypt-linked trial records without fabricating missing fields (official EDA PDF captured; ClinicalTrials.gov retained as supplementary source)
+- [x] Build a separate clinical-trials archive workbook with registry identifiers, titles, conditions, interventions, sponsors, sites, recruitment status, dates, and source URLs where available (EDA workbook preserves raw blocks, extracted fields, and source pages)
+- [x] Validate duplicates, missingness, date formats, source provenance, and country/site matching; document records that could not be verified (98 candidate rows; 10 duplicate-ID candidates and field omissions reported; human review required)
 - [ ] Deliver the Excel workbooks plus a concise methodology, source register, coverage statement, and limitations report.
 
 # Enterprise Capability Audit and Expansion
