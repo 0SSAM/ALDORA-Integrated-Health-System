@@ -153,3 +153,9 @@
 - [x] Add nullable jurisdictionId to inventory_batches and sales schema; apply non-destructive migration 0010 for inventory batches.
 - [ ] Populate jurisdictionId from the confirmed branch assignment in every inventory and sale write path before allowing regulated persistence.
 - [ ] Add database/query tests proving products, batches, sales, prescriptions, and catalog records cannot cross jurisdiction boundaries.
+
+# Jurisdiction Record Policy
+
+- [x] Add reusable server policy for product, inventory batch, sale, prescription, and catalog jurisdiction-bound records.
+- [x] Add unit tests for same-country acceptance, cross-country rejection, null legacy records, and invalid jurisdiction context.
+- [ ] Integrate the record policy into every database read/write query rather than relying only on isolated policy tests.
