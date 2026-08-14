@@ -437,3 +437,4 @@
 - [x] Run final validation after report delivery audit (130 passed, 4 optional skipped; TypeScript and production build passed)
 - [x] Implement a scoped promotion/coupon foundation with server-side eligibility, immutable discount-cap enforcement, approval state, and audit metadata; no fabricated campaign usage or customer claims (migration 0021; router and policy tests pass; sale application remains a tracked integration step)
 - [x] Wire approved promotion eligibility into POS preparation/commitSale with revalidation, scope checks, and atomic usage reservation after successful sale writes (134 tests and TypeScript passed)
+- [x] Add a router-contract test proving catalog.search rejects an unassigned jurisdiction before product reads; combined catalog, POS, and report country-contract tests pass.
