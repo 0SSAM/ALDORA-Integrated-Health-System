@@ -577,7 +577,7 @@
 
 - [x] Check the official EDA registered-drug search endpoint for a reproducible bulk/API source; the endpoint was reachable by URL but exposed no usable export or interactive data in the test environment, so the catalog remains safely blocked pending an authorized source.
 
-- [ ] Enforce Device-Trust readiness at offline draft replay and pass an explicit trusted-device context from the authorized client path.
+- [ ] Provide a real trusted-device attestation from an authorized client path for offline replay; server-side readiness enforcement and blocked UI are complete, but browser capabilities alone must not be treated as device trust.
 
 - [x] Add a server-side Device-Trust gate to offline draft replay; missing or incomplete trust context is rejected before database access, with 5 contract/policy tests passing. Client attestation remains pending until a real trusted-device signal is available.
 
