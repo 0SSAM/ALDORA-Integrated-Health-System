@@ -539,4 +539,4 @@
 
 - [x] Add a pure prescription/dispensing product-consumption policy that rejects cross-scope, unapproved, and evidence-incomplete catalog links before any future persistence entry point; 2 policy tests and TypeScript passed.
 
-- [x] Add an authorized catalog-intake policy requiring role permission, organization/branch/jurisdiction scope, and source verification before new medicine, cosmetic, or medical-supply records are accepted; 2 policy tests and TypeScript passed.
+- [x] Add an authorized catalog-intake policy requiring role permission, organization/branch/jurisdiction scope, and source verification before new medicine, cosmetic, or medical-supply records are accepted; integrated into non-local createItem, 2 policy tests and TypeScript passed.

@@ -20,6 +20,7 @@ import { canAccessJurisdiction } from "../domain/jurisdiction-access";
 import { canAccessBranch } from "../domain/branch-access";
 import { assertAssigneeScope, assertCustomerTicketScope, buildCallTicketUpdate } from "../domain/customer-care-policy";
 import { evaluatePromotion } from "../domain/promotion-policy";
+import { assertCatalogIntakeReady } from "../domain/catalog-intake-policy";
 
 async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
   if (role === "admin") return null;
@@ -516,6 +517,13 @@ export const erpRouter = router({
         const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
         const organizationId = input.organizationId ?? (organizationIds.length === 1 ? organizationIds[0] : null);
         if (!organizationId || (ctx.user.role !== "admin" && !organizationIds.includes(organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item requires an authorized organization scope" });
+        if (input.sourceAuthority !== "LOCAL_PENDING_REVIEW") {
+          try {
+            assertCatalogIntakeReady({ actorRole: ctx.user.role === "admin" ? "admin" : "catalog_manager", organizationId: String(organizationId), branchId: String(input.jurisdictionId), jurisdictionCode: profile.countryCode, recordOrganizationId: String(organizationId), recordBranchId: String(input.jurisdictionId), recordJurisdictionCode: profile.countryCode, sourceUrl: input.sourceUrl ?? "", sourceVerified: Boolean(input.sourceUrl) });
+          } catch (error) {
+            throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" });
+          }
+        }
         const inserted = await db.insert(catalogItems).values({ ...input, organizationId, verificationStatus: input.sourceAuthority === "LOCAL_PENDING_REVIEW" ? "PENDING_REVIEW" : "UNVERIFIED", createdByUserId: ctx.user.id, sourceRetrievedAt: new Date() });
         const itemId = Number(inserted[0].insertId);
         await db.insert(catalogSyncQueue).values({ entityType: input.category, operation: "create", entityId: itemId, idempotencyKey: `catalog-create-${itemId}-${ctx.user.id}`, payloadJson: JSON.stringify(input), createdByUserId: ctx.user.id });
