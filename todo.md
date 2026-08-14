@@ -335,3 +335,5 @@
 - [ ] Verify detailed Jordan and Qatar country-pack requirements with current primary sources, effective dates, local licences, privacy rules, and test credentials before activation.
 - [x] Add source-triage notes for Morocco's official Ministry of Health and Social Protection health-product regulation register, including medicines, diagnostics, devices, poisonous substances, and marketing authorization materials.
 - [ ] Verify Morocco's organization-specific licences, privacy/hosting, fiscal, insurance, payroll, effective legal versions, and integration credentials before activation.
+- [x] Add a mocked-database tRPC contract test for organizations.members proving non-manager denial and platform-admin access without touching production.
+- [ ] Run the same protected-router lifecycle against TEST_DATABASE_URL with real persisted organizations and memberships; mocked contracts do not replace database integration.
