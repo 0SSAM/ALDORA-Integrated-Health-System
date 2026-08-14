@@ -2,8 +2,9 @@ import { createConnection, type Connection } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+const hasValidTestDatabase = /^(mysql|mysql2|mariadb):\/\//.test(testDatabaseUrl ?? "");
 
-describe.skipIf(!testDatabaseUrl)("persisted organization boundary contract", () => {
+describe.skipIf(!hasValidTestDatabase)("persisted organization boundary contract", () => {
   let connection: Connection;
 
   beforeAll(async () => {
@@ -11,7 +12,7 @@ describe.skipIf(!testDatabaseUrl)("persisted organization boundary contract", ()
   });
 
   afterAll(async () => {
-    await connection.end();
+    if (connection) await connection.end();
   });
 
   it("denies cross-organization reads while allowing the matching jurisdiction and organization", async () => {
@@ -43,10 +44,10 @@ describe.skipIf(!testDatabaseUrl)("persisted organization boundary contract", ()
   });
 });
 
-if (!testDatabaseUrl) {
+if (!hasValidTestDatabase) {
   describe("persisted organization boundary contract configuration", () => {
     it("skips safely without TEST_DATABASE_URL", () => {
-      expect(testDatabaseUrl).toBeUndefined();
+      expect(hasValidTestDatabase).toBe(false);
     });
   });
 }

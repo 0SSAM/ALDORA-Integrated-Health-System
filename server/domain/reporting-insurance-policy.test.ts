@@ -1,0 +1,60 @@
+import { describe, expect, it } from "vitest";
+import { authorizeReportRecipient, buildIdempotencyKey, validateReportDefinition } from "./reporting-policy";
+import { assertInsuranceRequestScope, assertInsuranceTransition, insuranceIntegrationReadiness, validateInsuranceRequest, type InsuranceRequest } from "./insurance-policy";
+
+const report = {
+  code: "inventory.expiry",
+  title: "Expiry report",
+  organizationId: 10,
+  jurisdictionId: 20,
+  recipientRoles: ["manager" as const],
+  scheduleCron: "0 0 9 * * *",
+  deliveryChannel: "in_app" as const,
+  queryKey: "inventoryExpirySummary",
+  active: true,
+  containsSensitiveData: false,
+};
+
+const insurance: InsuranceRequest = {
+  requestType: "PREAUTHORIZATION",
+  organizationId: 10,
+  jurisdictionId: 20,
+  payerCode: "UHIA",
+  memberReference: "member-token",
+  serviceCode: "RX-001",
+  status: "DRAFT",
+  credentialGate: "NOT_CONFIGURED",
+};
+
+describe("reporting policy", () => {
+  it("accepts a server-owned scoped report and creates a stable idempotency key", () => {
+    expect(validateReportDefinition(report)).toBe(true);
+    const first = buildIdempotencyKey({ reportCode: report.code, organizationId: 10, jurisdictionId: 20, scheduledForUtc: "2026-08-14T09:00:00Z" });
+    const second = buildIdempotencyKey({ reportCode: report.code, organizationId: 10, jurisdictionId: 20, scheduledForUtc: "2026-08-14T09:00:00Z" });
+    expect(first).toBe(second);
+  });
+
+  it("rejects raw SQL-like query keys and cross-scope recipients", () => {
+    expect(() => validateReportDefinition({ ...report, queryKey: "select * from sales" })).toThrow(/server-owned/);
+    expect(() => authorizeReportRecipient({ role: "manager", organizationId: 99, jurisdictionId: 20, definition: report, context: { organizationId: 10, jurisdictionId: 20 } })).toThrow(/scope/);
+  });
+});
+
+describe("insurance policy", () => {
+  it("blocks preauthorization submission without configured credentials", () => {
+    expect(() => validateInsuranceRequest({ ...insurance, status: "READY_FOR_SUBMISSION" })).toThrow(/credentials/);
+  });
+
+  it("requires external reference after submission and enforces scope", () => {
+    expect(() => validateInsuranceRequest({ ...insurance, status: "SUBMITTED" })).toThrow(/external reference/);
+    expect(() => assertInsuranceRequestScope(insurance, { organizationId: 99, jurisdictionId: 20 })).toThrow(/organization/);
+    expect(assertInsuranceRequestScope(insurance, { organizationId: 10, jurisdictionId: 20 })).toBe(true);
+  });
+
+  it("allows only explicit lifecycle transitions and reports readiness gates", () => {
+    expect(assertInsuranceTransition("DRAFT", "READY_FOR_SUBMISSION")).toBe(true);
+    expect(() => assertInsuranceTransition("APPROVED", "SUBMITTED")).toThrow(/transition/);
+    expect(insuranceIntegrationReadiness({ credentialsConfigured: false, endpointConfigured: true, organizationRegistered: true, humanApproved: true })).toBe("BLOCKED");
+    expect(insuranceIntegrationReadiness({ credentialsConfigured: true, endpointConfigured: true, organizationRegistered: true, humanApproved: true })).toBe("PRODUCTION_READY");
+  });
+});

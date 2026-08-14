@@ -348,3 +348,33 @@
 - [ ] Add router/database acceptance and rejection tests for prescription/dispensing consumption of approved, unapproved, cross-scope, and evidence-incomplete catalog-linked products; current tests cover the reusable guard only.
 - [ ] Keep standalone invoice-generation enforcement pending until a real invoice persistence/submission entry point exists.
 - [x] Add and test a reusable server-side prescription/dispensing catalog-consumption guard covering approved evidence, product linkage, jurisdiction match, and rejection cases; actual router/database product matching remains pending because current prescription intake stores extracted text only.
+
+# Egyptian Medicines and Clinical-Trials Research
+
+- [ ] Identify accessible official Egyptian medicine-register sources and document coverage limits, licensing status, update date, and terms of use.
+- [ ] Build an Excel workbook from verified public medicine records, preserving source URLs, Arabic/English names, active ingredients, strength, dosage form, manufacturer, registration/status fields, and verification timestamps where available.
+- [ ] Identify authoritative public clinical-trial registries and official Egyptian sources, then collect Egypt-linked trial records without fabricating missing fields.
+- [ ] Build a separate clinical-trials archive workbook with registry identifiers, titles, conditions, interventions, sponsors, sites, recruitment status, dates, and source URLs where available.
+- [ ] Validate duplicates, missingness, date formats, source provenance, and country/site matching; document records that could not be verified.
+- [ ] Deliver the Excel workbooks plus a concise methodology, source register, coverage statement, and limitations report.
+
+# Enterprise Capability Audit and Expansion
+
+- [x] Inventory implemented ERP, CRM, HR, promotion, development, AI, notifications, reporting, government, insurer, offline, security, and multi-organization features against actual routes, schema, UI, tests, and deployment state; raw and focused inventories are preserved in `docs/capability-inventory-raw.txt` and `docs/capability-inventory-focused.txt`.
+- [x] Produce a capability matrix labeled implemented-and-tested, partially implemented, policy-only, placeholder, or missing; the result is documented in `docs/capability-gap-report.md` and does not claim feature parity with Odoo, Microsoft Dynamics, SAP, Oracle, or other suites.
+- [x] Audit scheduled/automatic reports and notifications for real scheduling infrastructure, recipient authorization, retry/audit behavior, and data-scope enforcement.
+- [x] Audit government and insurer integrations; document which require official APIs, credentials, certificates, contracts, or local approvals before activation.
+- [x] Implement only safe, supported additions identified by the audit, with tests and migration review where applicable.
+- [x] Deliver a concise capability-gap report and update project documentation with explicit limitations and activation prerequisites.
+
+# ALDO Health Care Eco System — Intelligent Reporting and Integration Hardening
+
+- [x] Convert the current capability-gap findings into an explicit implementation boundary for intelligent reports, insurer workflows, HR/payroll, promotions, and government connectors.
+- [ ] Add a generalized report-definition and report-run model only if it can preserve organization/jurisdiction scope, recipient authorization, idempotency, and auditability.
+- [x] Add deterministic scheduled-report policy helpers and tests; do not claim delivery until a configured channel and delivery audit exist.
+- [x] Add an insurance eligibility/preauthorization boundary with policy-first request/response states and no live payer calls without credentials.
+- [x] Review official regulatory and payer source notes; keep every country integration disabled until source, credentials, registration, and human approval gates are satisfied.
+- [x] Run TypeScript, Vitest, production build, and focused browser verification for the new boundary work.
+- [x] Update capability-gap and operations documentation with precise implemented, policy-only, and integration-gated statuses.
+- [ ] Save a checkpoint only after all completed items are marked [x].
+- [x] Make optional database integration tests skip safely when TEST_DATABASE_URL is an injected placeholder rather than a valid MySQL URL.

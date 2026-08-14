@@ -1,17 +1,18 @@
 import { createConnection, type Connection } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-const hasTestDatabase = Boolean(process.env.TEST_DATABASE_URL);
+const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+const hasTestDatabase = /^(mysql|mysql2|mariadb):\/\//.test(testDatabaseUrl ?? "");
 
 describe.skipIf(!hasTestDatabase)("regulated database boundary contract", () => {
   let connection: Connection;
 
   beforeAll(async () => {
-    connection = await createConnection(process.env.TEST_DATABASE_URL!);
+    connection = await createConnection(testDatabaseUrl!);
   });
 
   afterAll(async () => {
-    await connection.end();
+    if (connection) await connection.end();
   });
 
   it("requires organization scope on implemented regulated tables", async () => {

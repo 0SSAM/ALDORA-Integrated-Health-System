@@ -31,3 +31,15 @@ Cold-chain batches must be evaluated against a configured minimum and maximum te
 ## Regulatory artifact boundaries
 
 EDA, ETA, MOH, NFSA, UHIA, and syndicate workflows accept only reference identifiers and verification state in the current release. Legal labels carry product code, batch number, expiry date, barcode value, and QR payload, and remain marked unverified until the corresponding authority connector confirms them. No approval, invoice submission, license verification, or payment response is claimed without external credentials and a successful response.
+
+## Intelligent reporting boundary
+
+The current release has a reusable policy foundation for future scheduled reports. A report must use a server-owned query key rather than user-supplied SQL, carry both organization and jurisdiction scope, name authorized recipient roles, use a six-field UTC schedule, and receive a deterministic idempotency key. Sensitive reports are restricted to elevated organizational or clinical roles. The policy is tested, but there is not yet a persisted report catalog, report-run history, delivery worker, retry/dead-letter queue, or configured email, push, or webhook sender; therefore no automatic report delivery should be represented as active.
+
+## Insurance eligibility and preauthorization boundary
+
+The current release provides a non-networked eligibility/preauthorization contract. Requests require payer code, member reference, service code, organization scope, jurisdiction scope, explicit lifecycle transitions, and a credential readiness gate. A preauthorization cannot be submitted when credentials are not configured, and a submitted request must carry an external reference. The policy does not call UHIA, a TPA, or any insurer API and must not infer coverage or approval from local state. Production activation requires verified payer documentation, facility registration, credentials or certificates, test and production endpoints, data-processing approval, and a responsible human owner.
+
+## Validation note
+
+With the current injected environment, `pnpm test` reports 109 passing tests and 4 optional database tests skipped because no valid MySQL `TEST_DATABASE_URL` is configured. TypeScript and the production build pass. A real database lifecycle remains a release prerequisite and must be run only against a disposable isolated test database.
