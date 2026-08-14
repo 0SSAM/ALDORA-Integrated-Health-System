@@ -184,3 +184,9 @@
 - [x] Add protected commitSale transaction that validates branch assignment, approved sale pack, product jurisdiction, batch branch/jurisdiction, discount cap, stock, and persists sales/sale_items with jurisdictionId.
 - [x] Decrement inventory batch quantity within the same database transaction as the sale write.
 - [ ] Add country-specific e-invoicing submission/acknowledgement adapters only after each jurisdiction pack supplies verified technical requirements and credentials.
+
+# E-Invoicing Safety Contract
+
+- [x] Add a country-neutral invoicing policy that requires an approved pack rule, official endpoint, country-matched adapter, and reconciled invoice document.
+- [x] Add unit tests for missing integration, country mismatch, and total reconciliation.
+- [ ] Register and integrate a real adapter per country only after official technical specifications, credentials, and acceptance testing are supplied.
