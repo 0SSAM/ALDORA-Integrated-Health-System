@@ -11,11 +11,20 @@ const complete: DeviceTrustContext = {
 };
 
 describe("device trust readiness", () => {
-  it("blocks offline healthcare access when identity, encryption, version, lock, revocation, or scope is missing", () => {
+  it("blocks offline healthcare access when any individual trust signal is missing", () => {
     expect(deviceTrustReadiness(null)).toBe("BLOCKED");
-    expect(deviceTrustReadiness({ ...complete, deviceIdentityVerified: false })).toBe("BLOCKED");
-    expect(deviceTrustReadiness({ ...complete, localStorageEncrypted: false })).toBe("BLOCKED");
-    expect(() => assertDeviceTrustReady({ ...complete, sessionScopeVerified: false })).toThrow(/not ready/);
+    const gates: Array<keyof DeviceTrustContext> = [
+      "deviceIdentityVerified",
+      "localStorageEncrypted",
+      "supportedAppVersion",
+      "screenLockAssured",
+      "deviceRevocationChecked",
+      "sessionScopeVerified",
+    ];
+    for (const gate of gates) {
+      expect(deviceTrustReadiness({ ...complete, [gate]: false })).toBe("BLOCKED");
+      expect(() => assertDeviceTrustReady({ ...complete, [gate]: false })).toThrow(/not ready/);
+    }
   });
 
   it("allows access only when every device trust gate is verified", () => {

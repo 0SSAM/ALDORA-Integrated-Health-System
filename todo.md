@@ -580,3 +580,5 @@
 - [ ] Enforce Device-Trust readiness at offline draft replay and pass an explicit trusted-device context from the authorized client path.
 
 - [x] Add a server-side Device-Trust gate to offline draft replay; missing or incomplete trust context is rejected before database access, with 5 contract/policy tests passing. Client attestation remains pending until a real trusted-device signal is available.
+
+- [x] Expand Device-Trust policy tests to cover each individual missing trust signal and confirm all failures remain blocked; 7 focused tests and TypeScript passed.
