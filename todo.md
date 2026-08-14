@@ -94,4 +94,4 @@
 - [x] Compare the available evidence with the current BDF system; no verified proposal was available for implementation.
 - [x] Avoid unverified changes and add a documented shared-link review report.
 - [x] Run TypeScript, 19 Vitest tests, and production build for the review-driven documentation change; no UI code changed, so no new responsive regression was introduced.
-- [ ] Save a review-driven checkpoint and report exact additions and remaining prerequisites.
+- [x] Save a review-driven checkpoint and report exact additions and remaining prerequisites.
