@@ -391,3 +391,4 @@
 - [x] Add regression coverage for insurance transition authorization and external-reference rules.
 - [x] Harden report Heartbeat execution against inactive, legacy-unscoped, or unsupported persisted definitions before querying regulated data.
 - [x] Add regression coverage for report callback lifecycle guards and idempotent duplicate behavior.
+- [x] Refresh operations validation counts and lifecycle guard notes after the latest report and insurance hardening.
