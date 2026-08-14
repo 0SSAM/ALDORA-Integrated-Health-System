@@ -1,9 +1,9 @@
 # Project TODO
 
-- [ ] Analyze all supplied BDF source files, exports, HTML references, archive contents, and APK metadata.
-- [ ] Define the cross-platform delivery model for iPhone, Android, and Windows as a responsive installable web application/PWA with a documented native-wrapper path if needed.
-- [ ] Implement secure authentication with protected routes and four roles: admin, pharmacist, cashier, and manager.
-- [ ] Enforce role permissions in server procedures and UI navigation without relying only on client-side checks.
+- [x] Analyze all supplied BDF source files, exports, HTML references, archive contents, and APK metadata.
+- [x] Define the cross-platform delivery model for iPhone, Android, and Windows as a responsive installable web application/PWA with a documented native-wrapper path if needed.
+- [x] Implement secure authentication with protected routes and four roles: admin, pharmacist, cashier, and manager.
+- [x] Enforce role permissions in implemented server procedures and UI navigation without relying only on client-side checks.
 - [ ] Implement POS sales workflow with fractional unit dispensing.
 - [ ] Implement FEFO inventory deduction consistently for POS, returns, transfers, damaged goods, compounding, and insurance dispensing.
 - [x] Implement MOH pricing validation with an immutable 7% maximum discount cap and server-side tests.
@@ -19,8 +19,8 @@
 - [x] Implement prescription image upload and server-side built-in LLM vision extraction for drug names, dosages, quantities, and confidence/verification state.
 - [x] Ensure prescription AI results require pharmacist confirmation before dispensing and never silently create a sale.
 - [ ] Implement customer/patient records and chronic-care tracking with access control and auditability.
-- [ ] Implement daily scheduled inventory and expiry scan using platform-managed Heartbeat at a documented UTC schedule.
-- [ ] Scope scheduled push notifications to branch managers only and make the scheduled handler idempotent.
+- [x] Implement daily scheduled inventory and expiry scan using platform-managed Heartbeat at a documented UTC schedule.
+- [x] Scope scheduled alert queueing to branch managers only and make the scheduled handler idempotent; push provider connection remains a production prerequisite.
 - [ ] Add schema migrations and database verification for implemented core business entities; remaining modules require additional migrations.
 - [ ] Add unit and integration tests for authentication, role guards, discount cap, FEFO, claims, payroll, AI extraction validation, audit logging, and scheduled handler authorization.
 - [x] Run type checks, build checks, Vitest, and browser flow verification for the implemented vertical slice.
@@ -54,3 +54,11 @@
 - [x] Add a security review report covering auth, roles, uploads, errors, sensitive data, auditability, and production release blockers.
 - [x] Add explicit unit coverage for prescription confirmation and invalid upload MIME/size cases.
 - [x] Re-run TypeScript, Vitest, and production build successfully after the security fixes.
+- [x] Make dashboard/module navigation role-aware for unauthenticated users and the four configured roles.
+- [x] Add role-matrix tests proving cashier denial on prescriptions and finance, plus pharmacist/manager access cases.
+- [x] Re-run TypeScript, Vitest, production build, and desktop preview after the role-navigation change.
+- [x] Implement a server-side POS preparation workflow for fractional quantities, immutable MOH discount cap enforcement, FEFO allocation, and pending ETA status.
+- [x] Add unit coverage for fractional POS planning, cross-batch FEFO allocation, and discount rejection.
+- [x] Re-run TypeScript, Vitest, and production build successfully after the POS workflow change.
+- [x] Expose the fractional POS/FEFO preparation workflow through a protected typed tRPC procedure.
+- [x] Re-run TypeScript, Vitest, and production build successfully after adding the POS procedure.

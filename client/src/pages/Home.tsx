@@ -34,8 +34,14 @@ export default function Home() {
   const [active, setActive] = useState("overview");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const activeModule = modules.find(item => item.id === active) ?? modules[0];
-  const filteredModules = useMemo(() => modules.filter(item => item.label.includes(query.trim())), [query]);
+  const role = user?.role as "admin" | "manager" | "pharmacist" | "cashier" | "user" | undefined;
+  const allowedModules = useMemo(() => {
+    if (!role) return modules.filter(item => item.id === "overview");
+    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], people: ["admin", "manager"] };
+    return modules.filter(item => access[item.id]?.includes(role));
+  }, [role]);
+  const activeModule = allowedModules.find(item => item.id === active) ?? allowedModules[0] ?? modules[0];
+  const filteredModules = useMemo(() => allowedModules.filter(item => item.label.includes(query.trim())), [allowedModules, query]);
 
   if (loading) return <div className="min-h-screen grid place-items-center bg-[#f4f7fb] text-slate-500">جارٍ التحقق من جلسة الدخول…</div>;
 
@@ -46,7 +52,7 @@ export default function Home() {
           <div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-2xl bg-cyan-400 text-[#0d1b2a]"><HeartPulse className="h-5 w-5" /></div><div><p className="font-bold tracking-tight">BDF Pharma ERP</p><p className="text-[11px] text-cyan-200/70">منصة الصيدلية المصرية</p></div></div>
           <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 lg:hidden" onClick={() => setMobileOpen(false)}><X className="h-5 w-5" /></Button>
         </div>
-        <div className="px-4 py-5"><p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">مساحة العمل</p><nav className="space-y-1">{filteredModules.map(item => { const Icon = item.icon; const selected = active === item.id; return <button key={item.id} onClick={() => { setActive(item.id); setMobileOpen(false); }} className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-3 text-right text-sm transition", selected ? "bg-cyan-400 font-semibold text-[#0d1b2a] shadow-lg shadow-cyan-950/20" : "text-slate-300 hover:bg-white/10 hover:text-white")}><Icon className="h-[18px] w-[18px]" /><span>{item.label}</span>{selected && <ChevronLeft className="mr-auto h-4 w-4" />}</button>; })}</nav></div>
+        <div className="px-4 py-5"><p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">مساحة العمل</p><p className="mb-3 px-3 text-xs text-cyan-200/70">{user ? `الدور: ${user.role}` : "الوضع العام: تسجيل الدخول مطلوب"}</p><nav className="space-y-1">{filteredModules.map(item => { const Icon = item.icon; const selected = active === item.id; return <button key={item.id} onClick={() => { setActive(item.id); setMobileOpen(false); }} className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-3 text-right text-sm transition", selected ? "bg-cyan-400 font-semibold text-[#0d1b2a] shadow-lg shadow-cyan-950/20" : "text-slate-300 hover:bg-white/10 hover:text-white")}><Icon className="h-[18px] w-[18px]" /><span>{item.label}</span>{selected && <ChevronLeft className="mr-auto h-4 w-4" />}</button>; })}</nav></div>
         <div className="mt-auto border-t border-white/10 p-4"><div className="rounded-2xl bg-white/5 p-4"><div className="mb-3 flex items-center gap-2 text-cyan-200"><LockKeyhole className="h-4 w-4" /><span className="text-xs font-semibold">حماية مؤسسية</span></div><p className="text-xs leading-6 text-slate-400">صلاحيات الخادم، سجل تدقيق، وقواعد FEFO مركزية للعمليات الحساسة.</p></div></div>
       </aside>
       {mobileOpen && <button aria-label="إغلاق القائمة" className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden" onClick={() => setMobileOpen(false)} />}

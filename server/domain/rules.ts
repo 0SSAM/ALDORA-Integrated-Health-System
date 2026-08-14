@@ -46,3 +46,19 @@ export function getInventoryAlert(quantityOnHand: number, reorderPoint: number, 
     daysToExpiry,
   };
 }
+
+export type ModuleId = "overview" | "pos" | "inventory" | "prescriptions" | "insurance" | "compliance" | "compounding" | "finance" | "people";
+const MODULE_ROLES: Record<ModuleId, AppRole[]> = {
+  overview: ["admin", "manager", "pharmacist", "cashier"],
+  pos: ["admin", "manager", "pharmacist", "cashier"],
+  inventory: ["admin", "manager", "pharmacist"],
+  prescriptions: ["admin", "manager", "pharmacist"],
+  insurance: ["admin", "manager", "pharmacist"],
+  compliance: ["admin", "manager", "pharmacist"],
+  compounding: ["admin", "manager", "pharmacist"],
+  finance: ["admin", "manager"],
+  people: ["admin", "manager"],
+};
+export function canAccessModule(role: AppRole | "user", module: ModuleId) {
+  return role !== "user" && MODULE_ROLES[module].includes(role as AppRole);
+}

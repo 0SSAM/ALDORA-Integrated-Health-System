@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { enforceDiscount, getInventoryAlert, hasPermission, selectFefoBatches } from "./rules";
+import { canAccessModule, enforceDiscount, getInventoryAlert, hasPermission, selectFefoBatches } from "./rules";
 
 describe("BDF business rules", () => {
   it("enforces the MOH 7% discount cap", () => {
@@ -7,6 +7,15 @@ describe("BDF business rules", () => {
     expect(enforceDiscount(100, 7.01).allowed).toBe(false);
     expect(hasPermission("cashier", "pos.sell")).toBe(true);
     expect(hasPermission("cashier", "reports.read")).toBe(false);
+  });
+
+  it("enforces the module role matrix", () => {
+    expect(canAccessModule("cashier", "pos")).toBe(true);
+    expect(canAccessModule("cashier", "prescriptions")).toBe(false);
+    expect(canAccessModule("cashier", "finance")).toBe(false);
+    expect(canAccessModule("pharmacist", "prescriptions")).toBe(true);
+    expect(canAccessModule("manager", "people")).toBe(true);
+    expect(canAccessModule("user", "overview")).toBe(false);
   });
 
   it("deducts stock by earliest expiry first and spans batches when needed", () => {

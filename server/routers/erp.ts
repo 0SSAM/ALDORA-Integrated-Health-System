@@ -9,7 +9,7 @@ import { z } from "zod";
 import { invokeLLM } from "../_core/llm";
 import { protectedProcedure, router } from "../_core/trpc";
 import { enforceDiscount, selectFefoBatches, type AppRole } from "../domain/rules";
-import { assertPrescriptionConfirmed, validatePrescriptionUpload } from "../domain/erp";
+import { assertPrescriptionConfirmed, preparePosSale, validatePrescriptionUpload } from "../domain/erp";
 import { storageGetSignedUrl, storagePut } from "../storage";
 
 const pharmacistProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -28,6 +28,13 @@ export const erpRouter = router({
     planFefo: protectedProcedure
       .input(z.object({ requestedQuantity: z.number().positive(), batches: z.array(z.object({ id: z.string(), expiryDate: z.coerce.date(), quantityOnHand: z.number().nonnegative() })) }))
       .query(({ input }) => selectFefoBatches(input.batches, input.requestedQuantity)),
+  }),
+  pos: router({
+    prepareSale: protectedProcedure
+      .input(z.object({ officialPrice: z.number().nonnegative(), quantity: z.number().positive(), discountAmount: z.number().nonnegative(), batches: z.array(z.object({ id: z.string(), expiryDate: z.coerce.date(), quantityOnHand: z.number().nonnegative() })) }))
+      .mutation(({ input }) => {
+        try { return preparePosSale(input); } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
+      }),
   }),
   schedule: router({
     createDailyInventoryAlerts: protectedProcedure

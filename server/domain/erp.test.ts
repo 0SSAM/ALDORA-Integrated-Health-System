@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertPrescriptionConfirmed, calculateEgyptianPayroll, classifyInsuranceClaim, createAuditHash, EGYPTIAN_TPA_PROVIDER_CODES, validateEtaInvoice, validatePrescriptionUpload } from "./erp";
+import { assertPrescriptionConfirmed, calculateEgyptianPayroll, classifyInsuranceClaim, createAuditHash, EGYPTIAN_TPA_PROVIDER_CODES, preparePosSale, validateEtaInvoice, validatePrescriptionUpload } from "./erp";
 
 describe("ERP domain services", () => {
   it("calculates overtime and Ramadan/night shift metrics", () => {
@@ -23,6 +23,13 @@ describe("ERP domain services", () => {
   it("blocks dispensing before pharmacist confirmation", () => {
     expect(() => assertPrescriptionConfirmed("PENDING_REVIEW")).toThrow(/confirmation is required/);
     expect(assertPrescriptionConfirmed("CONFIRMED")).toBe(true);
+  });
+
+  it("prepares fractional POS quantity with MOH discount and FEFO allocation", () => {
+    const result = preparePosSale({ officialPrice: 100, quantity: 1.5, discountAmount: 10, batches: [{ id: "early", expiryDate: new Date("2026-10-01"), quantityOnHand: 1 }, { id: "late", expiryDate: new Date("2027-01-01"), quantityOnHand: 2 }] });
+    expect(result.allocations).toEqual([{ batchId: "early", quantity: 1 }, { batchId: "late", quantity: 0.5 }]);
+    expect(result.net).toBe(140);
+    expect(() => preparePosSale({ officialPrice: 100, quantity: 1, discountAmount: 7.01, batches: [{ id: "one", expiryDate: new Date("2027-01-01"), quantityOnHand: 1 }] })).toThrow(/MOH/);
   });
 
   it("rejects invalid prescription uploads", () => {

@@ -46,3 +46,13 @@ export function validatePrescriptionUpload(input: { mimeType: string; byteLength
   if (input.byteLength > 8 * 1024 * 1024) throw new Error("Prescription image must be 8MB or smaller");
   return true as const;
 }
+
+import { enforceDiscount, selectFefoBatches, type StockBatch } from "./rules";
+
+export function preparePosSale(input: { officialPrice: number; quantity: number; discountAmount: number; batches: StockBatch[] }) {
+  if (!Number.isFinite(input.quantity) || input.quantity <= 0) throw new Error("Quantity must be positive");
+  const discount = enforceDiscount(input.officialPrice * input.quantity, input.discountAmount);
+  if (!discount.allowed) throw new Error("MOH discount cap exceeded");
+  const allocations = selectFefoBatches(input.batches, input.quantity);
+  return { allocations, gross: Number((input.officialPrice * input.quantity).toFixed(2)), discountAmount: input.discountAmount, net: Number((input.officialPrice * input.quantity - input.discountAmount).toFixed(2)), etaStatus: "pending" as const };
+}
