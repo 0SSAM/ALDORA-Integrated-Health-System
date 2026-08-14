@@ -261,3 +261,8 @@
 
 - [x] Re-check the assigned branch, jurisdiction record, approved current prescription pack, and pack usability before confirming a prescription.
 - [ ] Add equivalent database-backed gates to future invoice, insurance, payroll, and reporting procedures when those persistence entry points are implemented.
+
+# Server Jurisdiction Access Hardening
+
+- [x] Require non-admin catalog and regulated branch operations to match an active branch membership before reading or writing jurisdiction-scoped records.
+- [x] Add unit coverage for rejecting a jurisdiction request that is not assigned to the authenticated user.
