@@ -383,3 +383,5 @@
 - [x] Add persisted insurance request records for eligibility and preauthorization using hashed references, composite scope, lifecycle states, idempotency, and explicit credential readiness.
 - [x] Add scoped insurance request procedures and regression tests without enabling live payer transport.
 - [x] Apply current branch-jurisdiction, approved-pack, and verified-evidence gates to persisted reporting and insurance procedures; leave future invoice/payroll connectors explicitly gated until implemented.
+- [x] Add a taskUid-authenticated Heartbeat callback for persisted reports with orphan handling, deterministic idempotency, explicit skipped status, and no external delivery claim.
+- [x] Refresh operations documentation for persisted reporting, insurance requests, compliance gates, and the current validation count.

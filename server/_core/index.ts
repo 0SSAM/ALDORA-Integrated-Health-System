@@ -9,6 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { inventoryAlertHandler } from "../scheduled/inventory";
+import { reportExecutionHandler } from "../scheduled/reports";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -47,6 +48,7 @@ async function startServer() {
   );
   // Heartbeat callback: production cron only; handler authenticates task UID.
   app.post("/api/scheduled/inventory-alerts", inventoryAlertHandler);
+  app.post("/api/scheduled/report-execution", reportExecutionHandler);
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);

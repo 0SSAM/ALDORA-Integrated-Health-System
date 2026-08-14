@@ -4,6 +4,9 @@ import { branches, branchJurisdictions, complianceEvidence, compliancePacks, jur
 import { getDb } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
+import { parse as parseCookie } from "cookie";
+import { COOKIE_NAME } from "@shared/const";
+import { createHeartbeatJob } from "../_core/heartbeat";
 import { assertCompliancePackUsable } from "../domain/regional-engine";
 
 const REPORT_CATALOG = {
@@ -74,6 +77,25 @@ export const reportsRouter = router({
       const selected = REPORT_CATALOG[input.reportKey];
       const inserted = await db.insert(reportDefinitions).values({ organizationId: input.organizationId, jurisdictionId: input.jurisdictionId, reportKey: input.reportKey, name: input.name ?? selected.name, description: input.description, cronExpression: input.cronExpression, status: "draft", queryKey: selected.queryKey, recipientUserId: input.recipientUserId, recipientRole: input.recipientRole, deliveryChannel: "in_app", deliveryEnabled: 0, createdByUserId: ctx.user.id });
       return { definitionId: Number(inserted[0].insertId), status: "draft" as const, deliveryEnabled: false };
+    }),
+
+  schedule: protectedProcedure
+    .input(z.object({ definitionId: z.number().int().positive(), cronExpression: z.string().regex(/^\\d+ \\S+ \\S+ \\S+ \\S+ \\S+$/) }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      const definition = (await db.select().from(reportDefinitions).where(eq(reportDefinitions.id, input.definitionId)).limit(1))[0];
+      if (!definition) throw new TRPCError({ code: "NOT_FOUND", message: "Report definition not found" });
+      await assertOrganizationAccess(db, ctx.user.id, ctx.user.role, definition.organizationId);
+      if (ctx.user.role !== "admin") {
+        const manager = await db.select({ id: organizationMemberships.id }).from(organizationMemberships).where(and(eq(organizationMemberships.organizationId, definition.organizationId), eq(organizationMemberships.userId, ctx.user.id), eq(organizationMemberships.active, 1), inArray(organizationMemberships.organizationRole, ["owner", "org_admin", "compliance_officer", "operations_manager"]))).limit(1);
+        if (!manager.length) throw new TRPCError({ code: "FORBIDDEN", message: "Report scheduling requires organization management access" });
+      }
+      if (definition.scheduleCronTaskUid) return { taskUid: definition.scheduleCronTaskUid, status: "already_scheduled" as const };
+      const sessionToken = parseCookie(ctx.req.headers.cookie ?? "")[COOKIE_NAME] ?? "";
+      const job = await createHeartbeatJob({ name: `report-${definition.id}`, cron: input.cronExpression, path: "/api/scheduled/report-execution", description: `Scheduled report ${definition.reportKey}` }, sessionToken);
+      await db.update(reportDefinitions).set({ scheduleCronTaskUid: job.taskUid, cronExpression: input.cronExpression, status: "active" }).where(eq(reportDefinitions.id, definition.id));
+      return { taskUid: job.taskUid, status: "scheduled" as const, nextExecutionAt: job.nextExecutionAt ?? null };
     }),
 
   runs: protectedProcedure
