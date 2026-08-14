@@ -598,3 +598,5 @@
 - [x] Consolidate the remaining blocked prerequisites into a dated audit index that separates implementable code gaps from missing database, regulatory source, credential, and trusted-device dependencies; saved as docs/audits/open-prerequisites-index-2026-08-15.md.
 
 - [x] Align every DB-touching integration test with the isolation guard, including organization-scope and TEST_DATABASE_URL smoke checks, so no test opens a MySQL connection without TEST_DATABASE_ISOLATED=true and a non-production URL; 5 focused tests passed, 5 optional schema tests skipped safely, and TypeScript passed.
+
+- [x] Update the open-prerequisites audit index after DB harness hardening to record that all current connection-opening tests are fail-closed behind the isolation guard.

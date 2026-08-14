@@ -5,7 +5,7 @@
 
 ## Engineering work completed and verified
 
-The current codebase has strict organization, branch, and jurisdiction guards; readiness policies for regulated mutation, privacy, controlled substances, inventory, tax, invoice preparation, localization, audit, notifications, clinical access, patient identity, data export, offline sync, and device trust; country-pack domain coverage enforcement; fail-closed offline replay; a production-safe database test harness; and source-level regulated-entrypoint coverage for the implemented POS and prescription procedures. The latest regression passed 70 test files and 220 tests, with 5 optional database tests skipped because an isolated `TEST_DATABASE_URL` is unavailable. The production build passed.
+The current codebase has strict organization, branch, and jurisdiction guards; readiness policies for regulated mutation, privacy, controlled substances, inventory, tax, invoice preparation, localization, audit, notifications, clinical access, patient identity, data export, offline sync, and device trust; country-pack domain coverage enforcement; fail-closed offline replay; a production-safe database test harness; all current connection-opening database tests aligned with that fail-closed guard; and source-level regulated-entrypoint coverage for the implemented POS and prescription procedures. The latest regression passed 70 test files and 220 tests, with 5 optional database tests skipped because an isolated `TEST_DATABASE_URL` is unavailable. The production build passed.
 
 ## Blocked by isolated infrastructure
 
