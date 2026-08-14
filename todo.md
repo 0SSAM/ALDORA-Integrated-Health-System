@@ -85,3 +85,13 @@
 - [x] Add authorized catalog-item creation and approval workflow with role guard and idempotent sync queue record.
 - [x] Add customer-care, call-centre, and catalog UI workspaces with clear empty/loading/error states and mobile-friendly controls.
 - [x] Run TypeScript, Vitest, and production build successfully after the customer-care, call-centre, catalog, and authorized-item changes.
+
+# Shared Review Links TODO
+
+- [x] Attempt to open and review the Claude shared conversation; content was unavailable in the current browser session.
+- [x] Attempt to open and review the Grok shared conversation; only the page title was available in the current browser session.
+- [x] Record that no concrete requirements could be safely extracted because both shared pages exposed no conversation text.
+- [x] Compare the available evidence with the current BDF system; no verified proposal was available for implementation.
+- [x] Avoid unverified changes and add a documented shared-link review report.
+- [x] Run TypeScript, 19 Vitest tests, and production build for the review-driven documentation change; no UI code changed, so no new responsive regression was introduced.
+- [ ] Save a review-driven checkpoint and report exact additions and remaining prerequisites.
