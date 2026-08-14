@@ -128,7 +128,8 @@ export const erpRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
-        try { assertBranchAssignmentReady(assignment); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
         const evidence = pack ? await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
@@ -139,11 +140,11 @@ export const erpRouter = router({
         if (!discount.allowed) throw new TRPCError({ code: "BAD_REQUEST", message: discount.reason });
         const checkedItems: Array<{ productId: number; batchId: number; quantity: number; unit: string; unitPrice: number; remaining: number }> = [];
         for (const item of input.items) {
-          const product = (await db.select().from(products).where(eq(products.id, item.productId)).limit(1))[0];
-          const batch = (await db.select().from(inventoryBatches).where(eq(inventoryBatches.id, item.batchId)).limit(1))[0];
-          if (!product || !batch || batch.branchId !== input.branchId || batch.productId !== item.productId || batch.jurisdictionId !== assignment.jurisdictionId || product.jurisdictionId !== assignment.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Product or batch is outside the branch jurisdiction" });
+          const product = (await db.select().from(products).where(and(eq(products.id, item.productId), eq(products.organizationId, organizationId))).limit(1))[0];
+          const batch = (await db.select().from(inventoryBatches).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId))).limit(1))[0];
+          if (!product || !batch || batch.branchId !== input.branchId || batch.productId !== item.productId || batch.jurisdictionId !== assignment.jurisdictionId || product.jurisdictionId !== assignment.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Product or batch is outside the branch organization or jurisdiction" });
           if (!product.catalogItemId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Product requires a verified jurisdiction catalog record before regulated sale" });
-          const catalogItem = (await db.select().from(catalogItems).where(and(eq(catalogItems.id, product.catalogItemId), eq(catalogItems.jurisdictionId, assignment.jurisdictionId))).limit(1))[0];
+          const catalogItem = (await db.select().from(catalogItems).where(and(eq(catalogItems.id, product.catalogItemId), eq(catalogItems.jurisdictionId, assignment.jurisdictionId), eq(catalogItems.organizationId, organizationId))).limit(1))[0];
           if (!catalogItem || catalogItem.verificationStatus !== "VERIFIED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog record is not verified for this jurisdiction" });
           const catalogEvidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.jurisdictionId, assignment.jurisdictionId), eq(complianceEvidence.operation, "catalog"), eq(complianceEvidence.verificationStatus, "verified")));
           try { assertConsumableCatalogContext({ productCatalogItemId: product.catalogItemId, catalogItemId: catalogItem.id, productJurisdictionId: product.jurisdictionId, catalogJurisdictionId: catalogItem.jurisdictionId!, catalogStatus: catalogItem.verificationStatus === "VERIFIED" ? "approved" : catalogItem.verificationStatus === "REJECTED" ? "rejected" : "pending", category: catalogItem.category, item: catalogItem, evidence: catalogEvidence }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
@@ -153,10 +154,10 @@ export const erpRouter = router({
         }
         try {
           const result = await db.transaction(async (tx) => {
-            const inserted = await tx.insert(sales).values({ branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, cashierId: ctx.user.id, invoiceNumber: input.invoiceNumber, subtotal: subtotal.toFixed(2), discountAmount: input.discountAmount.toFixed(2), totalAmount: (subtotal - input.discountAmount).toFixed(2), discountValidation: "MOH_7_PERCENT", paymentMethod: input.paymentMethod, etaStatus: "pending" });
+            const inserted = await tx.insert(sales).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, cashierId: ctx.user.id, invoiceNumber: input.invoiceNumber, subtotal: subtotal.toFixed(2), discountAmount: input.discountAmount.toFixed(2), totalAmount: (subtotal - input.discountAmount).toFixed(2), discountValidation: "MOH_7_PERCENT", paymentMethod: input.paymentMethod, etaStatus: "pending" });
             const saleId = Number(inserted[0].insertId);
             await tx.insert(saleItems).values(checkedItems.map((item) => ({ saleId, productId: item.productId, batchId: item.batchId, unit: item.unit, quantity: item.quantity.toFixed(3), unitPrice: item.unitPrice.toFixed(2) })));
-            for (const item of checkedItems) await tx.update(inventoryBatches).set({ quantityOnHand: (item.remaining - item.quantity).toFixed(3) }).where(eq(inventoryBatches.id, item.batchId));
+            for (const item of checkedItems) await tx.update(inventoryBatches).set({ quantityOnHand: (item.remaining - item.quantity).toFixed(3) }).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId), eq(inventoryBatches.branchId, input.branchId)));
             return saleId;
           });
           return { saleId: result, jurisdictionId: assignment.jurisdictionId, status: "COMMITTED" as const };
@@ -190,14 +191,15 @@ export const erpRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
-        try { assertBranchAssignmentReady(assignment); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
         if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Branch requires an approved current jurisdiction pack" });
         const evidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified")));
         try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "prescription"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
         const stored = await storagePut(`prescriptions/${ctx.user.id}/${input.fileName}`, bytes, input.mimeType);
-        const inserted = await db.insert(prescriptionIntakes).values({ branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, createdByUserId: ctx.user.id, imageKey: stored.key, imageMimeType: input.mimeType, status: "UPLOADED" });
+        const inserted = await db.insert(prescriptionIntakes).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, createdByUserId: ctx.user.id, imageKey: stored.key, imageMimeType: input.mimeType, status: "UPLOADED" });
         return { intakeId: Number(inserted[0].insertId), key: stored.key, status: "UPLOADED" as const };
       }),
     extractFromIntake: pharmacistProcedure
@@ -208,7 +210,8 @@ export const erpRouter = router({
         const intake = (await db.select().from(prescriptionIntakes).where(eq(prescriptionIntakes.id, input.intakeId)).limit(1))[0];
         if (!intake) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription intake not found" });
         const assignment = intake.branchId ? (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, intake.branchId)).limit(1))[0] : undefined;
-        try { assertBranchAssignmentReady(assignment); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        if (!intake.organizationId || !intake.branchId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(intake.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Prescription intake is outside the active organization scope" });
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
         try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
@@ -240,7 +243,8 @@ export const erpRouter = router({
         const intake = (await db.select().from(prescriptionIntakes).where(eq(prescriptionIntakes.id, input.intakeId)).limit(1))[0];
         if (!intake) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription intake not found" });
         const assignment = intake.branchId ? (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, intake.branchId)).limit(1))[0] : undefined;
-        try { assertBranchAssignmentReady(assignment); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        if (!intake.organizationId || !intake.branchId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(intake.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Prescription intake is outside the active organization scope" });
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
         try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
@@ -259,7 +263,8 @@ export const erpRouter = router({
         const intake = (await db.select().from(prescriptionIntakes).where(eq(prescriptionIntakes.id, input.intakeId)).limit(1))[0];
         if (!intake) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription intake not found" });
         const assignment = intake.branchId ? (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, intake.branchId)).limit(1))[0] : undefined;
-        try { assertBranchAssignmentReady(assignment); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        if (!intake.organizationId || !intake.branchId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(intake.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Prescription intake is outside the active organization scope" });
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
         try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
@@ -282,8 +287,9 @@ export const erpRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       const branchIds = await getUserBranchIds(db, ctx.user.id, ctx.user.role);
-      const scope = branchIds === null ? undefined : branchIds.length ? inArray(customerProfiles.branchId, branchIds) : eq(customerProfiles.id, -1);
-      return db.select().from(customerProfiles).where(scope).orderBy(desc(customerProfiles.updatedAt)).limit(100);
+      const organizationIds = ctx.user.role === "admin" ? null : await getUserOrganizationIds(db, ctx.user.id);
+      const filters = [branchIds === null ? undefined : branchIds.length ? inArray(customerProfiles.branchId, branchIds) : eq(customerProfiles.id, -1), organizationIds === null ? undefined : organizationIds.length ? inArray(customerProfiles.organizationId, organizationIds) : eq(customerProfiles.id, -1)].filter(Boolean) as any[];
+      return db.select().from(customerProfiles).where(filters.length ? and(...filters) : undefined).orderBy(desc(customerProfiles.updatedAt)).limit(100);
     }),
     create: customerCareProcedure
       .input(z.object({ fullName: z.string().min(2).max(220), phone: z.string().min(7).max(40), consentStatus: z.enum(["pending", "granted", "withdrawn"]).default("pending"), chronicCareEnabled: z.boolean().default(false), notes: z.string().max(4000).optional(), branchId: z.number().int().positive() }))
@@ -300,8 +306,9 @@ export const erpRouter = router({
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
-        const customer = (await db.select({ branchId: customerProfiles.branchId }).from(customerProfiles).where(eq(customerProfiles.id, input.customerId)).limit(1))[0];
+        const customer = (await db.select({ branchId: customerProfiles.branchId, organizationId: customerProfiles.organizationId }).from(customerProfiles).where(eq(customerProfiles.id, input.customerId)).limit(1))[0];
         if (!customer) throw new TRPCError({ code: "NOT_FOUND", message: "Customer profile not found" });
+        if (!customer.organizationId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(customer.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Customer profile is outside the active organization scope" });
         if (customer.branchId === null) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Customer profile has no branch assignment" });
         await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, customer.branchId);
         const inserted = await db.insert(careInteractions).values({ ...input, userId: ctx.user.id });
@@ -313,8 +320,9 @@ export const erpRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       const branchIds = await getUserBranchIds(db, ctx.user.id, ctx.user.role);
-      const scope = branchIds === null ? undefined : branchIds.length ? inArray(callTickets.branchId, branchIds) : eq(callTickets.id, -1);
-      return db.select().from(callTickets).where(scope).orderBy(desc(callTickets.updatedAt)).limit(100);
+      const organizationIds = ctx.user.role === "admin" ? null : await getUserOrganizationIds(db, ctx.user.id);
+      const filters = [branchIds === null ? undefined : branchIds.length ? inArray(callTickets.branchId, branchIds) : eq(callTickets.id, -1), organizationIds === null ? undefined : organizationIds.length ? inArray(callTickets.organizationId, organizationIds) : eq(callTickets.id, -1)].filter(Boolean) as any[];
+      return db.select().from(callTickets).where(filters.length ? and(...filters) : undefined).orderBy(desc(callTickets.updatedAt)).limit(100);
     }),
     create: customerCareProcedure
       .input(z.object({ subject: z.string().min(2).max(220), channel: z.enum(["phone", "whatsapp", "web", "in_person"]), direction: z.enum(["inbound", "outbound"]), priority: z.enum(["low", "normal", "high", "urgent"]).default("normal"), customerId: z.number().int().positive().optional(), branchId: z.number().int().positive(), callbackAt: z.coerce.date().optional() }))
@@ -331,8 +339,9 @@ export const erpRouter = router({
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
-        const ticket = (await db.select({ branchId: callTickets.branchId }).from(callTickets).where(eq(callTickets.id, input.ticketId)).limit(1))[0];
+        const ticket = (await db.select({ branchId: callTickets.branchId, organizationId: callTickets.organizationId }).from(callTickets).where(eq(callTickets.id, input.ticketId)).limit(1))[0];
         if (!ticket) throw new TRPCError({ code: "NOT_FOUND", message: "Call ticket not found" });
+        if (!ticket.organizationId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(ticket.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Call ticket is outside the active organization scope" });
         if (ticket.branchId === null) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Call ticket has no branch assignment" });
         await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, ticket.branchId);
         await db.update(callTickets).set(input).where(eq(callTickets.id, input.ticketId));
