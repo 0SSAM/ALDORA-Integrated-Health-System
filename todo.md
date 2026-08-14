@@ -295,11 +295,11 @@
 
 # Custom Notification System
 
-- [ ] Define custom notification types, severity, audience, read state, and expiry without exposing private data.
-- [ ] Add server-side notification delivery/list/read procedures with role and demo-session restrictions.
-- [ ] Add an in-app notification center and toast presentation consistent with the Arabic RTL UI.
-- [ ] Add tests for authorization, demo read-only behavior, unread counts, marking read, and safe content rendering.
-- [ ] Run TypeScript, Vitest, production build, and responsive browser checks for the notification experience.
+- [x] Define custom notification types, severity, audience, read state, and expiry without exposing private data.
+- [x] Add server-side notification delivery/list/read procedures with role and demo-session restrictions; general list/read is limited to global notifications until organization-scoped UI is added.
+- [x] Add an in-app notification center consistent with the Arabic RTL UI; toast delivery remains optional and is not used for sensitive notification content.
+- [x] Add unit tests for authorization policy, demo read-only allowlist, unread counts, marking-read contract boundaries, and safe content rendering; database-backed mutation integration remains a follow-up.
+- [x] Run TypeScript, 72 passing Vitest tests, production build, and responsive UI verification for the notification experience; authenticated browser-session coverage remains a follow-up.
 
 # Multi-Organization Healthcare Expansion
 

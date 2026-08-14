@@ -136,6 +136,29 @@ export const branchAlerts = mysqlTable("branch_alerts", {
   status: mysqlEnum("status", ["queued", "sent", "read"]).default("queued").notNull(),
 }, table => ({ dedupeIdx: uniqueIndex("branch_alerts_dedupe_idx").on(table.managerUserId, table.inventoryBatchId, table.alertType, table.alertDate) }));
 
+export const notifications = mysqlTable("notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId"),
+  branchId: int("branchId"),
+  audienceRole: mysqlEnum("audienceRole", ["all", "admin", "manager", "pharmacist", "cashier", "org_admin", "clinical_lead", "operations_manager", "staff", "auditor"]).default("all").notNull(),
+  severity: mysqlEnum("severity", ["info", "success", "warning", "critical"]).default("info").notNull(),
+  title: varchar("title", { length: 160 }).notNull(),
+  body: varchar("body", { length: 1000 }).notNull(),
+  expiresAt: timestamp("expiresAt"),
+  createdByUserId: int("createdByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  active: int("active").default(1).notNull(),
+}, table => ({ scopeIdx: index("notifications_scope_idx").on(table.organizationId, table.branchId, table.active, table.createdAt) }));
+
+export const notificationReads = mysqlTable("notification_reads", {
+  id: int("id").autoincrement().primaryKey(),
+  notificationId: int("notificationId").notNull(),
+  userId: int("userId").notNull(),
+  readAt: timestamp("readAt").defaultNow().notNull(),
+}, table => ({ readIdx: uniqueIndex("notification_reads_unique_idx").on(table.notificationId, table.userId), userIdx: index("notification_reads_user_idx").on(table.userId, table.readAt) }));
+
+export type Notification = typeof notifications.$inferSelect;
+
 export const prescriptionIntakes = mysqlTable("prescription_intakes", {
   id: int("id").autoincrement().primaryKey(),
   branchId: int("branchId"),
