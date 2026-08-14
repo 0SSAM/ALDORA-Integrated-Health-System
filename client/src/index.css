@@ -175,3 +175,39 @@
     }
   }
 }
+
+
+@layer components {
+  .aldo-app-shell {
+    background:
+      linear-gradient(135deg, rgba(244, 250, 251, 0.96), rgba(248, 247, 255, 0.92)),
+      url('/manus-storage/aldo-background_9cf02ecd.png') center top / cover fixed;
+    position: relative;
+    isolation: isolate;
+  }
+
+  .aldo-app-shell::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(circle at 18% 12%, rgba(25, 197, 209, 0.12), transparent 30%), radial-gradient(circle at 82% 76%, rgba(124, 92, 252, 0.08), transparent 28%);
+  }
+
+  .aldo-brand-mark {
+    background: linear-gradient(145deg, #19c5d1, #b8f0e7);
+    box-shadow: 0 10px 24px rgba(25, 197, 209, 0.22);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .aldo-brand-mark {
+      animation: aldo-breathe 5s ease-in-out infinite;
+    }
+  }
+
+  @keyframes aldo-breathe {
+    0%, 100% { transform: translateY(0); box-shadow: 0 10px 24px rgba(25, 197, 209, 0.18); }
+    50% { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(25, 197, 209, 0.28); }
+  }
+}
