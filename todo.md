@@ -542,3 +542,5 @@
 - [x] Add an authorized catalog-intake policy requiring role permission, organization/branch/jurisdiction scope, and source verification before new medicine, cosmetic, or medical-supply records are accepted; integrated into non-local createItem, 2 policy tests and TypeScript passed.
 
 - [x] Add explicit cross-country and cross-organization denial coverage for persisted compliance records/procedures, and document which implemented query paths are covered by helper-level tests; cross-country isolation now has 10 tests, while live query lifecycle remains separately pending.
+
+- [x] Add a reusable regulated-mutation readiness policy requiring branch-jurisdiction assignment, approved non-stale compliance pack, and verified catalog evidence where a product is involved; 2 policy tests and TypeScript passed.
