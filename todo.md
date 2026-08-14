@@ -325,3 +325,5 @@
 على الرغم من نجاح اختبارات السياسة وتحقق قاعدة البيانات الحالية، يجب عدم اعتبار العزل الكامل مكتملاً قبل ربط كل الجداول المستقبلية واختبارات التكامل الفعلية.
 - [x] Create an initial source-linked regulatory prerequisite register for Saudi Arabia, Egypt, and the UAE, with explicit activation gates and no unsupported compliance claims.
 - [ ] Expand the source-linked register to every requested country and organization type only after current primary sources, effective dates, local licences, credentials, and acceptance criteria are verified.
+- [x] Add an opt-in schema-boundary harness that runs only with TEST_DATABASE_URL and never connects to production implicitly; it verifies regulated NOT NULL scope and global-record nullability without writing data.
+- [ ] Run the protected-router integration harness against a disposable test database and add rollback/cleanup assertions before marking database-backed isolation complete.
