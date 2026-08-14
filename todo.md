@@ -228,7 +228,7 @@
 
 - [x] Add protected admin procedures to verify or reject compliance evidence and record verifier identity/date.
 - [x] Add protected audit-history listing for compliance_rule_audits and evidence review history where available.
-- [ ] Add end-to-end lifecycle tests covering create pack, add evidence, verify evidence, approve, stale blocking, rollback, and audit visibility.
+- [x] Add end-to-end mocked-router lifecycle tests covering create pack, add evidence, verify evidence, approve, stale blocking, rollback, and audit visibility; live-database execution remains a separate prerequisite.
 
 # Evidence Governance Verification
 
@@ -511,6 +511,6 @@
 
 - [x] Strengthen and test the in-app report delivery audit trail, including scoped run/definition metadata and explicit external-channel blocking; 7 scheduled-report tests and TypeScript passed.
 
-- [ ] Add a mocked protected-router lifecycle contract for create pack, add evidence, verify, approve, rollback, and audit listing; retain live-database execution as a separate pending prerequisite.
+- [x] Add a mocked protected-router lifecycle contract for create pack, add evidence, verify, approve, rollback, and audit listing; 4 contract tests and TypeScript passed, while live-database execution remains pending.
 
 - [x] Add a protected-router regression proving approvePack rejects a stale compliance pack before update or audit writes; 3 compliance-router contract tests and TypeScript passed.

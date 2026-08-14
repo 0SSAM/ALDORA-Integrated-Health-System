@@ -49,6 +49,33 @@ describe("regional compliance protected router contracts", () => {
     expect(getDbMock).not.toHaveBeenCalled();
   });
 
+  it("runs the protected pack lifecycle through audit listing with scoped mutations", async () => {
+    const admin = { ...staffUser, id: 82, role: "admin" as const };
+    const queue: unknown[][] = [
+      [{ id: 3, countryCode: "EG", active: 1 }],
+      [{ id: 44 }],
+      [{ id: 9, packId: 44, verificationStatus: "review", ruleKey: "tax" }],
+      [{ id: 9, packId: 44, jurisdictionId: 3, status: "review", rulesJson: JSON.stringify({ tax: true }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
+      [{ id: 10, packId: 44, ruleKey: "tax", verificationStatus: "verified" }],
+      [{ id: 9, packId: 44, jurisdictionId: 3, status: "approved", rulesJson: JSON.stringify({ tax: true }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
+      [{ id: 9, packId: 44, jurisdictionId: 3, status: "rolled_back", rulesJson: JSON.stringify({ tax: true }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-09-01") }],
+      [{ id: 1, packId: 44, action: "approved", actorUserId: 82 }],
+    ];
+    const next = () => queue.shift() ?? [];
+    const query = () => ({ then: (resolve: (value: unknown[]) => unknown, reject?: (reason: unknown) => unknown) => Promise.resolve(next()).then(resolve, reject), limit: async () => next(), orderBy: () => Promise.resolve(next()) });
+    const db = { select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn(query) })) })), insert: vi.fn(() => ({ values: vi.fn(async () => [{ insertId: 44 }]) })), update: vi.fn(() => ({ set: vi.fn(() => ({ where: vi.fn(async () => []) })) })) };
+    getDbMock.mockResolvedValue(db);
+    const caller = appRouter.createCaller(contextFor(admin));
+    await expect(caller.regional.createPack({ jurisdictionId: 3, packVersion: "2026.1", authorityName: "EDA", sourceUrl: "https://eda.gov.eg/rules", effectiveFrom: new Date("2026-01-01"), rules: { tax: true } })).resolves.toMatchObject({ packId: 44 });
+    await expect(caller.regional.addEvidence({ jurisdictionId: 3, packId: 44, operation: "invoice", ruleKey: "tax", authorityName: "EDA", sourceUrl: "https://eda.gov.eg/tax", sourceRetrievedAt: new Date("2026-01-01") })).resolves.toMatchObject({ evidenceId: 44 });
+    await expect(caller.regional.verifyEvidence({ evidenceId: 9, decision: "verified" })).resolves.toMatchObject({ status: "verified" });
+    await expect(caller.regional.approvePack({ packId: 44 })).resolves.toMatchObject({ status: "approved" });
+    await expect(caller.regional.rollbackPack({ packId: 44, reason: "Policy review" })).resolves.toMatchObject({ status: "rolled_back" });
+    await expect(caller.regional.listPackAudits({ packId: 44 })).resolves.toHaveLength(1);
+    expect(db.update).toHaveBeenCalled();
+    expect(db.insert).toHaveBeenCalled();
+  });
+
   it("rejects approval for a stale pack before mutation or audit writes", async () => {
     const admin = { ...staffUser, id: 82, role: "admin" as const };
     const rows = [
