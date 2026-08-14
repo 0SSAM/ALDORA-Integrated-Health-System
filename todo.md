@@ -441,3 +441,5 @@
 - [x] Fix the debug collector's remaining XHR responseText read so sensitive response bodies are never read or retained; privacy regression test, TypeScript, and production build pass.
 - [x] Re-run the full regression suite after the debug-collector privacy fix; 135 tests passed and 4 optional database tests were skipped because the configured test database URL is not a valid MySQL lifecycle target.
 - [x] Remove raw XMLHttpRequest request bodies from development network logs; the collector now retains transport metadata and fixed privacy markers only, with regression and TypeScript checks passing.
+- [x] Generate and save a static server-boundary inventory under docs/audits/static-boundary-audit.json; it is a review aid only and does not replace code review or disposable-database lifecycle tests.
+- [x] Validate the static-audit addition with the full suite, TypeScript, and production build: 135 tests passed, 4 optional database tests skipped, TypeScript passed, and the production build passed with only the existing chunk-size warning.
