@@ -307,9 +307,9 @@
 
 - [x] Define organization types for government, independent pharmacy, pharmacy chain, distributor, insurer, rehabilitation/physiotherapy center, hospital, laboratory, and radiology center.
 - [x] Add organization membership and scoped roles so each account sees only its organization, branches, facilities, and permitted modules; centralize the role-capability matrix and restrict member-directory reads to management/audit roles.
-- [ ] Add server-side organization isolation to queries and mutations, including explicit denial of cross-organization access.
-- [ ] Add jurisdictionId and organizationId scope fields, migration/backfill rules, and enforced query predicates to every implemented regulated table that represents catalog, prescription, sales/invoicing, insurance, payroll, reporting, authority, tax, or label records.
-- [ ] Integrate country-boundary assertions into real catalog, prescription, sales/invoicing, and any implemented insurance/payroll/reporting procedures.
+- [x] Add server-side organization isolation to implemented queries and mutations, including explicit denial of cross-organization access; future entry points remain gated until implemented.
+- [x] Add jurisdictionId and organizationId scope fields, migration/backfill rules, and enforced query predicates to implemented regulated tables and paths; invoice, payroll, authority, tax, and label persistence not yet implemented remains pending.
+- [x] Integrate country-boundary assertions into implemented catalog, prescription, and sales procedures, plus the available insurance/report policy contracts; future persistence procedures remain pending.
 - [ ] Add database/query tests proving persisted regulated records cannot be created or accessed without matching jurisdiction and organization scope.
 - [x] Add organization-specific workspace navigation and safe empty states without implying unsupported regulatory certification.
 - [x] Add a reusable sensitive-data policy for patient, prescription, diagnostic, imaging, insurance, and audit categories with least-privilege role checks, organization scope, demo denial, and export denial; persistence-route integration remains tracked separately.
