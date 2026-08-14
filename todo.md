@@ -568,3 +568,5 @@
 - [x] Add a data-export readiness policy requiring subject verification, organization/branch/jurisdiction scope, legal basis, field minimization/redaction, and audit metadata before export; 2 policy tests and TypeScript passed.
 
 - [x] Add an offline-sync mutation readiness policy requiring idempotency key, scoped actor/device, conflict resolution, retry safety, and audit metadata before synchronization; 2 policy tests and TypeScript passed.
+
+- [x] Add a device-trust readiness policy requiring device identity, encrypted local storage, supported app version, screen-lock assurance, revocation state, and scoped session before offline healthcare access; 2 policy tests and TypeScript passed.
