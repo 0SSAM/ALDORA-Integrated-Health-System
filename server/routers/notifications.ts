@@ -1,7 +1,7 @@
-import { and, desc, eq, gt, isNull, or } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../db";
-import { notificationReads, notifications, organizationMemberships } from "../../drizzle/schema";
+import { branchUsers, branches, notificationReads, notifications, organizationMemberships } from "../../drizzle/schema";
 import { TRPCError } from "@trpc/server";
 import { canViewNotification } from "../domain/notifications-policy";
 import { summarizeNotifications } from "../domain/notifications-view";
@@ -33,6 +33,20 @@ export const notificationsRouter = router({
       )).limit(1);
       if (!membership.length) throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك عضوية في هذه المؤسسة." });
     }
+    const branchMemberships = ctx.user.role === "admin" || !input?.organizationId ? [] : await db.select({ branchId: branchUsers.branchId }).from(branchUsers).innerJoin(branches, eq(branches.id, branchUsers.branchId)).where(and(
+      eq(branchUsers.userId, ctx.user.id),
+      eq(branchUsers.active, 1),
+      eq(branches.organizationId, input.organizationId),
+      eq(branches.active, 1),
+    ));
+    const accessibleBranchIds = branchMemberships.map(row => row.branchId);
+    const notificationScope = [
+      eq(notifications.active, 1),
+      or(isNull(notifications.expiresAt), gt(notifications.expiresAt, now)),
+      or(isNull(notifications.organizationId), input?.organizationId ? eq(notifications.organizationId, input.organizationId) : isNull(notifications.organizationId)),
+      ctx.user.role === "admin" ? undefined : or(isNull(notifications.branchId), accessibleBranchIds.length ? inArray(notifications.branchId, accessibleBranchIds) : eq(notifications.branchId, -1)),
+      or(eq(notifications.audienceRole, "all"), eq(notifications.audienceRole, visibleRole as typeof notifications.audienceRole.enumValues[number])),
+    ].filter((condition): condition is NonNullable<typeof condition> => Boolean(condition));
     const rows = await db.select({
       notification: notifications,
       read: notificationReads.id,
@@ -42,13 +56,7 @@ export const notificationsRouter = router({
         eq(notificationReads.notificationId, notifications.id),
         eq(notificationReads.userId, ctx.user.id),
       ))
-      .where(and(
-        eq(notifications.active, 1),
-        or(isNull(notifications.expiresAt), gt(notifications.expiresAt, now)),
-        or(isNull(notifications.organizationId), input?.organizationId ? eq(notifications.organizationId, input.organizationId) : isNull(notifications.organizationId)),
-        isNull(notifications.branchId),
-        or(eq(notifications.audienceRole, "all"), eq(notifications.audienceRole, visibleRole as typeof notifications.audienceRole.enumValues[number])),
-      ))
+      .where(and(...notificationScope))
       .orderBy(desc(notifications.createdAt))
       .limit(50);
 
@@ -56,8 +64,10 @@ export const notificationsRouter = router({
       .filter(row => canViewNotification(row.notification.audienceRole, ctx.user.role))
       .filter(row => canAccessNotificationScope({
         isAdmin: ctx.user.role === "admin",
-        hasActiveOrganizationMembership: Boolean(input?.organizationId),
+        hasActiveOrganizationMembership: ctx.user.role === "admin" || Boolean(input?.organizationId),
+        hasActiveBranchMembership: row.notification.branchId === null || accessibleBranchIds.includes(row.notification.branchId),
         requestedOrganizationId: input?.organizationId,
+        requestedBranchId: row.notification.branchId,
         notification: { organizationId: row.notification.organizationId, branchId: row.notification.branchId },
       }))
       .map(row => ({ ...row.notification, isRead: row.read !== null }));
@@ -88,10 +98,17 @@ export const notificationsRouter = router({
         )).limit(1);
         hasActiveOrganizationMembership = membership.length > 0;
       }
+      const branchMembership = notification.branchId === null || ctx.user.role === "admin" ? true : Boolean((await db.select({ id: branchUsers.id }).from(branchUsers).where(and(
+        eq(branchUsers.branchId, notification.branchId),
+        eq(branchUsers.userId, ctx.user.id),
+        eq(branchUsers.active, 1),
+      )).limit(1))[0]);
       if (!canAccessNotificationScope({
         isAdmin: ctx.user.role === "admin",
         hasActiveOrganizationMembership,
+        hasActiveBranchMembership: branchMembership,
         requestedOrganizationId: notification.organizationId,
+        requestedBranchId: notification.branchId,
         notification: { organizationId: notification.organizationId, branchId: notification.branchId },
       })) throw new TRPCError({ code: "FORBIDDEN", message: "الإشعار خارج نطاق عضويتك." });
       await db.insert(notificationReads).values({ notificationId: input.notificationId, userId: ctx.user.id }).onDuplicateKeyUpdate({ set: { readAt: new Date() } });
@@ -120,9 +137,17 @@ export const notificationsRouter = router({
         )).limit(1);
         if (!membership.length) throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك عضوية في هذه المؤسسة." });
       }
+      const branchMemberships = ctx.user.role === "admin" ? [] : await db.select({ branchId: branchUsers.branchId }).from(branchUsers).innerJoin(branches, eq(branches.id, branchUsers.branchId)).where(and(
+        eq(branchUsers.userId, ctx.user.id),
+        eq(branchUsers.active, 1),
+        eq(branches.organizationId, input.organizationId),
+        eq(branches.active, 1),
+      ));
+      const branchIds = branchMemberships.map(row => row.branchId);
       return db.select().from(notifications).where(and(
         eq(notifications.organizationId, input.organizationId),
         eq(notifications.active, 1),
+        ctx.user.role === "admin" ? undefined : or(isNull(notifications.branchId), branchIds.length ? inArray(notifications.branchId, branchIds) : eq(notifications.branchId, -1)),
       )).orderBy(desc(notifications.createdAt)).limit(100);
     }),
 });

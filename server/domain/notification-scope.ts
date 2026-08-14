@@ -6,12 +6,16 @@ export type NotificationScope = {
 export function canAccessNotificationScope(args: {
   isAdmin: boolean;
   hasActiveOrganizationMembership: boolean;
+  hasActiveBranchMembership?: boolean;
   requestedOrganizationId?: number | null;
+  requestedBranchId?: number | null;
   notification: NotificationScope;
 }) {
-  if (args.notification.branchId !== null) return false;
   if (args.isAdmin) return true;
   if (!args.hasActiveOrganizationMembership) return false;
-  if (args.notification.organizationId === null) return true;
-  return args.requestedOrganizationId === args.notification.organizationId;
+  if (args.notification.organizationId !== null && args.requestedOrganizationId !== args.notification.organizationId) return false;
+  if (args.notification.branchId !== null) {
+    return args.hasActiveBranchMembership === true && args.requestedBranchId === args.notification.branchId;
+  }
+  return true;
 }

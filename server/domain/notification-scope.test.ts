@@ -26,7 +26,26 @@ describe("notification scope policy", () => {
     })).toBe(false);
   });
 
-  it("rejects inactive or branch-scoped access from this organization-wide policy", () => {
+  it("allows only an active member of the matching branch to access branch notifications", () => {
+    expect(canAccessNotificationScope({
+      isAdmin: false,
+      hasActiveOrganizationMembership: true,
+      hasActiveBranchMembership: true,
+      requestedOrganizationId: 9,
+      requestedBranchId: 4,
+      notification: { organizationId: 9, branchId: 4 },
+    })).toBe(true);
+    expect(canAccessNotificationScope({
+      isAdmin: false,
+      hasActiveOrganizationMembership: true,
+      hasActiveBranchMembership: false,
+      requestedOrganizationId: 9,
+      requestedBranchId: 5,
+      notification: { organizationId: 9, branchId: 4 },
+    })).toBe(false);
+  });
+
+  it("rejects inactive members while allowing administrator scope", () => {
     expect(canAccessNotificationScope({
       isAdmin: false,
       hasActiveOrganizationMembership: false,
@@ -38,6 +57,6 @@ describe("notification scope policy", () => {
       hasActiveOrganizationMembership: false,
       requestedOrganizationId: 9,
       notification: { organizationId: 9, branchId: 4 },
-    })).toBe(false);
+    })).toBe(true);
   });
 });
