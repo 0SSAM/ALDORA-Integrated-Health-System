@@ -152,8 +152,8 @@ export const erpRouter = router({
         if (!discount.allowed) throw new TRPCError({ code: "BAD_REQUEST", message: discount.reason });
         const checkedItems: Array<{ productId: number; batchId: number; quantity: number; unit: string; unitPrice: number; remaining: number }> = [];
         for (const item of input.items) {
-          const product = (await db.select().from(products).where(and(eq(products.id, item.productId), eq(products.organizationId, organizationId))).limit(1))[0];
-          const batch = (await db.select().from(inventoryBatches).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId))).limit(1))[0];
+          const product = (await db.select().from(products).where(and(eq(products.id, item.productId), eq(products.organizationId, organizationId), eq(products.jurisdictionId, assignment.jurisdictionId))).limit(1))[0];
+          const batch = (await db.select().from(inventoryBatches).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId), eq(inventoryBatches.jurisdictionId, assignment.jurisdictionId))).limit(1))[0];
           if (!product || !batch || batch.branchId !== input.branchId || batch.productId !== item.productId || batch.jurisdictionId !== assignment.jurisdictionId || product.jurisdictionId !== assignment.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Product or batch is outside the branch organization or jurisdiction" });
           if (!product.catalogItemId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Product requires a verified jurisdiction catalog record before regulated sale" });
           const catalogItem = (await db.select().from(catalogItems).where(and(eq(catalogItems.id, product.catalogItemId), eq(catalogItems.jurisdictionId, assignment.jurisdictionId), eq(catalogItems.organizationId, organizationId))).limit(1))[0];
@@ -169,7 +169,7 @@ export const erpRouter = router({
             const inserted = await tx.insert(sales).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, cashierId: ctx.user.id, invoiceNumber: input.invoiceNumber, subtotal: subtotal.toFixed(2), discountAmount: input.discountAmount.toFixed(2), totalAmount: (subtotal - input.discountAmount).toFixed(2), discountValidation: "MOH_7_PERCENT", paymentMethod: input.paymentMethod, etaStatus: "pending" });
             const saleId = Number(inserted[0].insertId);
             await tx.insert(saleItems).values(checkedItems.map((item) => ({ saleId, productId: item.productId, batchId: item.batchId, unit: item.unit, quantity: item.quantity.toFixed(3), unitPrice: item.unitPrice.toFixed(2) })));
-            for (const item of checkedItems) await tx.update(inventoryBatches).set({ quantityOnHand: (item.remaining - item.quantity).toFixed(3) }).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId), eq(inventoryBatches.branchId, input.branchId)));
+            for (const item of checkedItems) await tx.update(inventoryBatches).set({ quantityOnHand: (item.remaining - item.quantity).toFixed(3) }).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId), eq(inventoryBatches.branchId, input.branchId), eq(inventoryBatches.jurisdictionId, assignment.jurisdictionId)));
             if (appliedPromotionId !== null) {
               const updated = await tx.update(promotions).set({ usageCount: sql`${promotions.usageCount} + 1` }).where(and(eq(promotions.id, appliedPromotionId), eq(promotions.status, "active"), or(isNull(promotions.usageLimit), lt(promotions.usageCount, promotions.usageLimit)))).execute();
               if (!updated) throw new Error("Promotion usage could not be reserved");
