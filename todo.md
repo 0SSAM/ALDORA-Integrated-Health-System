@@ -524,3 +524,5 @@
 - [x] Add a country-pack activation policy requiring source-linked evidence, effective dates, local licensing, credentials, and acceptance criteria for every required regulatory domain; 2 policy tests and TypeScript passed, with incomplete packs blocked.
 
 - [x] Create a source-safe Egyptian medicine workbook template with provenance fields and no fabricated medicine records while the reproducible EDA bulk source remains unavailable; generated docs/data/egypt-medicine-register-source-safe-template.xlsx.
+
+- [x] Package the source-safe workbook with a concise methodology, source register, coverage statement, and limitations note for review; created docs/data/egypt-medicine-register-delivery.md.
