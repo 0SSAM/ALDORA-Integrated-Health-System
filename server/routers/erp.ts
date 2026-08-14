@@ -202,8 +202,16 @@ export const erpRouter = router({
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const intake = (await db.select().from(prescriptionIntakes).where(eq(prescriptionIntakes.id, input.intakeId)).limit(1))[0];
         if (!intake) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription intake not found" });
+        const assignment = intake.branchId ? (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, intake.branchId)).limit(1))[0] : undefined;
+        try { assertBranchAssignmentReady(assignment); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
+        const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
+        const evidence = pack ? await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
+        if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current prescription review pack required" });
+        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "prescription"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
         const status = input.approved ? "CONFIRMED" : "REJECTED";
-        await db.update(prescriptionIntakes).set({ status }).where(eq(prescriptionIntakes.id, intake.id));
+        await db.update(prescriptionIntakes).set({ status }).where(and(eq(prescriptionIntakes.id, intake.id), eq(prescriptionIntakes.jurisdictionId, assignment.jurisdictionId)));
         return { intakeId: intake.id, status, confirmedBy: ctx.user.id };
       }),
     dispense: pharmacistProcedure

@@ -256,3 +256,8 @@
 
 - [x] Apply assertConsumableCatalogContext in commitSale so every active catalog field requires verified evidence at regulated sale use.
 - [x] Add regression coverage for a sale rejected when a non-empty active catalog field lacks verified evidence.
+
+# Prescription Confirmation Boundary Hardening
+
+- [x] Re-check the assigned branch, jurisdiction record, approved current prescription pack, and pack usability before confirming a prescription.
+- [ ] Add equivalent database-backed gates to future invoice, insurance, payroll, and reporting procedures when those persistence entry points are implemented.
