@@ -1,9 +1,10 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { branches, branchJurisdictions, organizationMemberships, reportDefinitions, reportRuns } from "../../drizzle/schema";
+import { branches, branchJurisdictions, complianceEvidence, compliancePacks, jurisdictionProfiles, organizationMemberships, reportDefinitions, reportRuns } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
+import { assertCompliancePackUsable } from "../domain/regional-engine";
 
 const REPORT_CATALOG = {
   "inventory.alerts": { name: "Inventory alerts", queryKey: "inventory.alerts.v1" },
@@ -24,6 +25,14 @@ async function accessibleOrganizationIds(db: NonNullable<Awaited<ReturnType<type
 async function assertOrganizationAccess(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string, organizationId: number) {
   const ids = await accessibleOrganizationIds(db, userId, role);
   if (ids !== null && !ids.includes(organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Organization is outside the active scope" });
+}
+
+async function assertReportRegulatoryScope(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, organizationId: number, jurisdictionId: number) {
+  const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, jurisdictionId)).limit(1))[0];
+  const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
+  const evidence = pack ? await db.select({ id: complianceEvidence.id }).from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
+  if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved reporting compliance pack is required" });
+  try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "report"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
 }
 
 export const reportsRouter = router({
@@ -57,6 +66,7 @@ export const reportsRouter = router({
       }
       const jurisdiction = await db.select({ branchId: branches.id }).from(branches).innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, branches.id)).where(and(eq(branches.organizationId, input.organizationId), eq(branchJurisdictions.jurisdictionId, input.jurisdictionId))).limit(1);
       if (!jurisdiction.length) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Jurisdiction is not configured for this organization" });
+      await assertReportRegulatoryScope(db, input.organizationId, input.jurisdictionId);
       if (input.recipientUserId !== undefined) {
         const recipient = await db.select({ id: organizationMemberships.id }).from(organizationMemberships).where(and(eq(organizationMemberships.organizationId, input.organizationId), eq(organizationMemberships.userId, input.recipientUserId), eq(organizationMemberships.active, 1))).limit(1);
         if (!recipient.length) throw new TRPCError({ code: "FORBIDDEN", message: "Recipient is outside the organization" });

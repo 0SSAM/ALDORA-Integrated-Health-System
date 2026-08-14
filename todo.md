@@ -382,3 +382,4 @@
 - [x] Add regression tests for call-centre customer scope and update-field safety.
 - [x] Add persisted insurance request records for eligibility and preauthorization using hashed references, composite scope, lifecycle states, idempotency, and explicit credential readiness.
 - [x] Add scoped insurance request procedures and regression tests without enabling live payer transport.
+- [x] Apply current branch-jurisdiction, approved-pack, and verified-evidence gates to persisted reporting and insurance procedures; leave future invoice/payroll connectors explicitly gated until implemented.

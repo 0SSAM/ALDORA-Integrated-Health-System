@@ -1,11 +1,12 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { branches, branchJurisdictions, insuranceRequests, organizationMemberships } from "../../drizzle/schema";
+import { branches, branchJurisdictions, complianceEvidence, compliancePacks, insuranceRequests, jurisdictionProfiles, organizationMemberships } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { validateInsuranceRequest, type InsuranceRequestStatus } from "../domain/insurance-policy";
 import { assertPersistedInsuranceTransition, buildInsuranceRequestPayload, hashInsuranceMemberReference } from "../domain/insurance-persistence-policy";
+import { assertCompliancePackUsable } from "../domain/regional-engine";
 
 const requestType = z.enum(["ELIGIBILITY", "PREAUTHORIZATION"]);
 const statuses = z.enum(["DRAFT", "READY_FOR_SUBMISSION", "SUBMITTED", "APPROVED", "PARTIALLY_APPROVED", "REJECTED", "CANCELLED"]);
@@ -21,6 +22,11 @@ async function assertScope(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, u
   if (ids !== null && !ids.includes(organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Organization is outside the active scope" });
   const configured = await db.select({ id: branches.id }).from(branches).innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, branches.id)).where(and(eq(branches.organizationId, organizationId), eq(branchJurisdictions.jurisdictionId, jurisdictionId))).limit(1);
   if (!configured.length) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Jurisdiction is not configured for this organization" });
+  const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, jurisdictionId)).limit(1))[0];
+  const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
+  const evidence = pack ? await db.select({ id: complianceEvidence.id }).from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
+  if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved insurance compliance pack is required" });
+  try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "insurance"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
 }
 
 export const insuranceRouter = router({
