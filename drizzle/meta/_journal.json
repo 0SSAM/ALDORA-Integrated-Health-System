@@ -36,6 +36,34 @@
       "when": 1786716376117,
       "tag": "0004_cold_robin_chapel",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1786717399259,
+      "tag": "0005_faulty_layla_miller",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1786717675513,
+      "tag": "0006_plain_leper_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1786717930063,
+      "tag": "0007_aromatic_zombie",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1786717956452,
+      "tag": "0008_chubby_steel_serpent",
+      "breakpoints": true
     }
   ]
 }

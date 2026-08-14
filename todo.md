@@ -95,3 +95,40 @@
 - [x] Avoid unverified changes and add a documented shared-link review report.
 - [x] Run TypeScript, 19 Vitest tests, and production build for the review-driven documentation change; no UI code changed, so no new responsive regression was introduced.
 - [x] Save a review-driven checkpoint and report exact additions and remaining prerequisites.
+
+# Multi-country Arabic Expansion TODO
+
+- [x] Define supported-country configuration model with country code, legal authority profile, currency, tax profile, timezone, locale, language, date/number formats, and branch jurisdiction.
+- [ ] Implement branch geolocation capture with explicit admin confirmation and a manual override; never infer legal jurisdiction from IP alone.
+- [x] Separate shared ERP rules from versioned country compliance packs with activation date, source URL, owner, status, and expiry/review date.
+- [ ] Add country-aware tax, invoicing, pricing, prescription, controlled-medicine, labeling, insurance, payroll, and reporting rule interfaces.
+- [ ] Add Arabic localization architecture with RTL, country-specific terminology, currencies, calendars, numerals, and fallback translations.
+- [ ] Add country-aware offline policy, sync conflict rules, and safeguards against using stale regulatory rules.
+- [ ] Add admin workflow for legal-pack review, approval, rollback, and audit history.
+- [x] Research and document authoritative regulatory sources for the initial Arabic-country coverage; do not fabricate legal rules or claim legal certification.
+- [ ] Add country, jurisdiction, rule-version, stale-rule, and geolocation override tests.
+- [x] Run TypeScript, Vitest, and production build for the multi-country changes; responsive verification remains a final release check.
+- [ ] Save a multi-country checkpoint and report supported scope and legal prerequisites.
+
+# Per-country Data Isolation Clarification
+
+- [ ] Create a country data-boundary model so every medicine, cosmetic, medical-supply, authority, tax, invoice, price, prescription, insurance, payroll, and label record belongs to a jurisdiction profile.
+- [ ] Add explicit per-country catalog provenance and refresh metadata; never merge records across countries without a controlled mapping.
+- [ ] Add per-country regulatory pack lifecycle with approval, effective dates, stale detection, rollback, and audit history.
+- [ ] Add branch-to-country assignment with admin confirmation/manual override and deny transactions when jurisdiction is missing or stale.
+- [ ] Add cross-country isolation tests for catalog search, pricing, tax, prescription, and compliance procedures.
+
+# Comprehensive Country Compliance Requirement
+
+- [ ] Verify each enabled country has an independent, source-linked compliance pack covering pharmacy licensing, medicines, cosmetics, medical supplies, controlled substances, prescriptions, dispensing, pricing, tax, e-invoicing, insurance, payroll, privacy, retention, localization, timezone, and audit requirements.
+- [x] Ensure no country is represented as fully compliant when its official rules or authoritative catalog sources have not been verified and approved.
+- [ ] Add stale-pack blocking and mandatory human/regulatory approval before regulated transactions use a new country rule set.
+- [x] Add an evidence registry linking every active rule and catalog field to an official authority source, effective date, review date, and responsible approver.
+
+# Remaining Compliance Hardening
+
+- [x] Add explicit language and legal-authority-profile fields to jurisdiction configuration and enforce them in Regional Engine validation.
+- [x] Update regional registry readiness so a country is only configured with an approved, non-stale pack and verified evidence for enabled rule keys.
+- [ ] Enforce evidence linkage for every active catalog field before catalog approval and regulated use.
+- [x] Add unit coverage for country code normalization, profile completeness, approval, stale-pack blocking, missing evidence, and cross-country access denial.
+- [x] Block stale or unapproved packs in the Regional Engine before regulated operations.

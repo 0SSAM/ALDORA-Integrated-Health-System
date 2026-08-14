@@ -29,6 +29,7 @@ export const branchUsers = mysqlTable("branch_users", {
 
 export const products = mysqlTable("products", {
   id: int("id").autoincrement().primaryKey(),
+  jurisdictionId: int("jurisdictionId"),
   sku: varchar("sku", { length: 64 }).notNull(),
   barcode: varchar("barcode", { length: 64 }),
   nameAr: varchar("nameAr", { length: 220 }).notNull(),
@@ -164,6 +165,7 @@ export const callTickets = mysqlTable("call_tickets", {
 
 export const catalogItems = mysqlTable("catalog_items", {
   id: int("id").autoincrement().primaryKey(),
+  jurisdictionId: int("jurisdictionId"),
   category: mysqlEnum("category", ["medicine", "cosmetic", "medical_supply"]).notNull(),
   sku: varchar("sku", { length: 80 }).notNull(),
   barcode: varchar("barcode", { length: 80 }),
@@ -185,6 +187,7 @@ export const catalogItems = mysqlTable("catalog_items", {
 
 export const catalogSyncQueue = mysqlTable("catalog_sync_queue", {
   id: int("id").autoincrement().primaryKey(),
+  jurisdictionId: int("jurisdictionId"),
   entityType: mysqlEnum("entityType", ["medicine", "cosmetic", "medical_supply"]).notNull(),
   operation: mysqlEnum("operation", ["create", "update", "review"]).notNull(),
   entityId: int("entityId"),
@@ -198,3 +201,82 @@ export const catalogSyncQueue = mysqlTable("catalog_sync_queue", {
 export type CustomerProfile = typeof customerProfiles.$inferSelect;
 export type CallTicket = typeof callTickets.$inferSelect;
 export type CatalogItem = typeof catalogItems.$inferSelect;
+
+
+export const jurisdictionProfiles = mysqlTable("jurisdiction_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  countryCode: varchar("countryCode", { length: 2 }).notNull(),
+  countryNameAr: varchar("countryNameAr", { length: 120 }).notNull(),
+  legalAuthorityProfile: varchar("legalAuthorityProfile", { length: 240 }).default("UNVERIFIED_AUTHORITY").notNull(),
+  language: varchar("language", { length: 16 }).notNull().default("ar"),
+  defaultLocale: varchar("defaultLocale", { length: 16 }).notNull(),
+  currencyCode: varchar("currencyCode", { length: 3 }).notNull(),
+  timezone: varchar("timezone", { length: 64 }).notNull(),
+  taxProfile: varchar("taxProfile", { length: 80 }).notNull(),
+  dateFormat: varchar("dateFormat", { length: 32 }).notNull(),
+  numberSystem: varchar("numberSystem", { length: 16 }).default("latn").notNull(),
+  active: int("active").default(0).notNull(),
+  approvedByUserId: int("approvedByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ countryIdx: uniqueIndex("jurisdiction_profiles_country_idx").on(table.countryCode) }));
+
+export const branchJurisdictions = mysqlTable("branch_jurisdictions", {
+  id: int("id").autoincrement().primaryKey(),
+  branchId: int("branchId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 7 }),
+  longitude: decimal("longitude", { precision: 10, scale: 7 }),
+  locationSource: mysqlEnum("locationSource", ["admin_confirmed", "manual_override", "device"]).notNull(),
+  confirmedByUserId: int("confirmedByUserId").notNull(),
+  confirmedAt: timestamp("confirmedAt").defaultNow().notNull(),
+}, table => ({ branchIdx: uniqueIndex("branch_jurisdictions_branch_idx").on(table.branchId) }));
+
+export const compliancePacks = mysqlTable("compliance_packs", {
+  id: int("id").autoincrement().primaryKey(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  packVersion: varchar("packVersion", { length: 40 }).notNull(),
+  authorityName: varchar("authorityName", { length: 160 }).notNull(),
+  sourceUrl: varchar("sourceUrl", { length: 500 }).notNull(),
+  effectiveFrom: timestamp("effectiveFrom").notNull(),
+  reviewDueAt: timestamp("reviewDueAt"),
+  status: mysqlEnum("status", ["draft", "review", "approved", "expired", "rolled_back"]).default("draft").notNull(),
+  rulesJson: text("rulesJson").notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  approvedByUserId: int("approvedByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ versionIdx: uniqueIndex("compliance_packs_version_idx").on(table.jurisdictionId, table.packVersion) }));
+
+export const complianceRuleAudits = mysqlTable("compliance_rule_audits", {
+  id: int("id").autoincrement().primaryKey(),
+  packId: int("packId").notNull(),
+  action: mysqlEnum("action", ["created", "approved", "activated", "expired", "rolled_back"]).notNull(),
+  actorUserId: int("actorUserId").notNull(),
+  reason: text("reason"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type JurisdictionProfile = typeof jurisdictionProfiles.$inferSelect;
+export type BranchJurisdiction = typeof branchJurisdictions.$inferSelect;
+export type CompliancePack = typeof compliancePacks.$inferSelect;
+
+export const complianceEvidence = mysqlTable("compliance_evidence", {
+  id: int("id").autoincrement().primaryKey(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  packId: int("packId").notNull(),
+  operation: varchar("operation", { length: 40 }).notNull(),
+  ruleKey: varchar("ruleKey", { length: 120 }),
+  catalogField: varchar("catalogField", { length: 120 }),
+  authorityName: varchar("authorityName", { length: 160 }).notNull(),
+  sourceUrl: varchar("sourceUrl", { length: 500 }).notNull(),
+  sourceRecordId: varchar("sourceRecordId", { length: 160 }),
+  sourceRetrievedAt: timestamp("sourceRetrievedAt").notNull(),
+  effectiveFrom: timestamp("effectiveFrom"),
+  reviewDueAt: timestamp("reviewDueAt"),
+  verificationStatus: mysqlEnum("verificationStatus", ["unverified", "review", "verified", "rejected"]).default("unverified").notNull(),
+  verifiedByUserId: int("verifiedByUserId"),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ sourceIdx: index("compliance_evidence_source_idx").on(table.jurisdictionId, table.packId, table.operation) }));
+
+export type ComplianceEvidence = typeof complianceEvidence.$inferSelect;
