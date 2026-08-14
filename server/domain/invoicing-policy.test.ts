@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { requireInvoiceIntegration, validateInvoiceDocument, type InvoiceAdapter } from "./invoicing-policy";
+import { assertInvoiceCatalogScope, requireInvoiceIntegration, validateInvoiceDocument, type InvoiceAdapter } from "./invoicing-policy";
 
 const adapter: InvoiceAdapter = { countryCode: "SA", submit: async () => ({ externalId: "x", status: "submitted" }) };
 const rules = { invoicing: { integration: true, endpoint: "https://official.example/invoice" } } as const;
@@ -17,5 +17,17 @@ describe("invoicing policy", () => {
 
   it("rejects an unreconciled invoice", () => {
     expect(() => validateInvoiceDocument({ invoiceNumber: "INV-1", currencyCode: "SAR", subtotal: 100, discountAmount: 7, totalAmount: 94, items: [{ sku: "A", quantity: 1, unitPrice: 100 }] })).toThrow(/reconcile/);
+  });
+
+  it("requires matching jurisdiction, organization, approval, and evidence for invoice catalog use", () => {
+    const valid = { jurisdictionId: 1, organizationId: 7, catalogJurisdictionId: 1, catalogOrganizationId: 7, catalogVerificationStatus: "approved" as const, verifiedEvidenceCount: 1 };
+    expect(assertInvoiceCatalogScope(valid)).toBe(true);
+    expect(() => assertInvoiceCatalogScope({ ...valid, catalogOrganizationId: 8 })).toThrow(/outside/);
+    expect(() => assertInvoiceCatalogScope({ ...valid, catalogVerificationStatus: "pending" })).toThrow(/approved/);
+    expect(() => assertInvoiceCatalogScope({ ...valid, verifiedEvidenceCount: 0 })).toThrow(/evidence/);
+  });
+
+  it("rejects invoice catalog scope without tenant or jurisdiction", () => {
+    expect(() => assertInvoiceCatalogScope({ jurisdictionId: null, organizationId: 7, catalogJurisdictionId: null, catalogOrganizationId: 7, catalogVerificationStatus: "approved", verifiedEvidenceCount: 1 })).toThrow(/scope/);
   });
 });

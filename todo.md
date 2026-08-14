@@ -136,7 +136,7 @@
 # Enforcement Coverage Follow-up
 
 - [ ] Apply branch-jurisdiction and compliance-pack gating to prescription upload/dispensing, invoice, insurance, payroll, reporting, and inventory mutation entry points, not only POS preparation and catalog approval.
-- [ ] Require catalog evidence validation again at downstream regulated use when a product is loaded for sale, prescription, dispensing, or invoice generation.
+- [ ] Require catalog evidence validation again at downstream regulated use when a product is loaded for sale, prescription, dispensing, or invoice generation; POS, prescription, dispensing, and catalog paths enforce it, but invoice-generation enforcement is not yet implemented.
 - [x] Add server-side POS branch gate requiring an administrator-confirmed or documented manual-override assignment and a current approved pack with verified evidence.
 - [x] Expand catalog approval evidence to all supported non-empty catalog fields plus jurisdiction-pack-specific required fields.
 
@@ -147,6 +147,8 @@
 - [x] Require the same branch-bound pack before prescription extraction and dispensing; reject legacy or unbound intake records.
 - [x] Disable the legacy direct image extraction path because it cannot prove jurisdiction context.
 - [ ] Apply equivalent gates to any future invoice, insurance, payroll, reporting, and inventory mutation procedures as those entry points are wired to the database.
+- [ ] Add invoice-generation or invoice-persistence procedures that revalidate catalog evidence and composite jurisdiction/organization scope before creating regulated invoice records.
+- [ ] Add tests proving invoice paths reject missing verified catalog evidence or mismatched jurisdiction/organization scope.
 
 # Core Operational Data Boundary
 
@@ -337,3 +339,5 @@
 - [ ] Verify Morocco's organization-specific licences, privacy/hosting, fiscal, insurance, payroll, effective legal versions, and integration credentials before activation.
 - [x] Add a mocked-database tRPC contract test for organizations.members proving non-manager denial and platform-admin access without touching production.
 - [ ] Run the same protected-router lifecycle against TEST_DATABASE_URL with real persisted organizations and memberships; mocked contracts do not replace database integration.
+- [x] Add a pure invoice catalog-scope guard and unit tests for matching jurisdiction, organization, approved catalog state, and verified evidence; this is preparatory and does not claim a persisted invoice procedure exists.
+- [ ] Wire the invoice catalog-scope guard into a real invoice creation/persistence procedure once an invoice table and supported jurisdiction adapter are implemented.

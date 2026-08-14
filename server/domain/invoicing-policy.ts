@@ -30,3 +30,31 @@ export function validateInvoiceDocument(document: InvoiceDocument) {
   if (!document.items.length || document.items.some(item => !item.sku.trim() || !Number.isFinite(item.quantity) || item.quantity <= 0 || !Number.isFinite(item.unitPrice) || item.unitPrice < 0)) throw new Error("Invoice items are invalid");
   return document;
 }
+
+export type InvoiceCatalogScope = {
+  jurisdictionId: number | null | undefined;
+  organizationId: number | null | undefined;
+  catalogJurisdictionId: number | null | undefined;
+  catalogOrganizationId: number | null | undefined;
+  catalogVerificationStatus: "approved" | "pending" | "rejected";
+  verifiedEvidenceCount: number;
+};
+
+/**
+ * Invoice adapters must call this at regulated invoice creation time. It is
+ * deliberately pure so a future persistence procedure cannot bypass the
+ * jurisdiction/tenant/evidence boundary while remaining easy to test.
+ */
+export function assertInvoiceCatalogScope(scope: InvoiceCatalogScope) {
+  if (!Number.isInteger(scope.jurisdictionId) || !Number.isInteger(scope.organizationId)) {
+    throw new Error("Invoice jurisdiction and organization scope are required");
+  }
+  if (scope.catalogJurisdictionId !== scope.jurisdictionId || scope.catalogOrganizationId !== scope.organizationId) {
+    throw new Error("Invoice catalog record is outside the active jurisdiction and organization");
+  }
+  if (scope.catalogVerificationStatus !== "approved") throw new Error("Invoice catalog record is not approved");
+  if (!Number.isInteger(scope.verifiedEvidenceCount) || scope.verifiedEvidenceCount < 1) {
+    throw new Error("Invoice catalog evidence is missing");
+  }
+  return true as const;
+}
