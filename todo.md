@@ -234,7 +234,7 @@
 
 - [x] Connect the tested compliance lifecycle policy to approvePack and rollbackPack router mutations.
 - [x] Restrict audit-history listing to admin users and return reviewer timestamp consistently for evidence decisions.
-- [ ] Add an integration test harness that exercises the actual protected router lifecycle against a test database.
+- [x] Add an integration test harness for the actual protected router lifecycle with fail-closed isolation guards, explicit safe-skip behavior, and cleanup/runbook documentation; execution against a live test database remains skipped by user instruction because TEST_DATABASE_URL is unavailable.
 
 # Product-to-Catalog Evidence Link
 
