@@ -510,3 +510,7 @@
 - [x] Add protected-router contract coverage for invoice.generatePreview rejecting cross-scope catalog records and unreconciled totals before persistence; 2 contract tests and TypeScript passed.
 
 - [x] Strengthen and test the in-app report delivery audit trail, including scoped run/definition metadata and explicit external-channel blocking; 7 scheduled-report tests and TypeScript passed.
+
+- [ ] Add a mocked protected-router lifecycle contract for create pack, add evidence, verify, approve, rollback, and audit listing; retain live-database execution as a separate pending prerequisite.
+
+- [x] Add a protected-router regression proving approvePack rejects a stale compliance pack before update or audit writes; 3 compliance-router contract tests and TypeScript passed.

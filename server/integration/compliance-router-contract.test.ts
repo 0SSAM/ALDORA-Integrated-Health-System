@@ -48,4 +48,19 @@ describe("regional compliance protected router contracts", () => {
     await expect(caller.regional.listPackAudits({ packId: 7 })).rejects.toMatchObject({ code: "FORBIDDEN" });
     expect(getDbMock).not.toHaveBeenCalled();
   });
+
+  it("rejects approval for a stale pack before mutation or audit writes", async () => {
+    const admin = { ...staffUser, id: 82, role: "admin" as const };
+    const rows = [
+      [{ id: 7, status: "review", jurisdictionId: 3, rulesJson: JSON.stringify({ tax: true }), effectiveFrom: new Date("2026-01-01"), reviewDueAt: new Date("2026-08-01") }],
+      [{ id: 9, packId: 7, ruleKey: "tax", verificationStatus: "verified" }],
+    ];
+    const next = () => rows.shift() ?? [];
+    const db = { select: vi.fn(() => ({ from: vi.fn(() => ({ where: vi.fn(() => { const p = Promise.resolve(next()) as Promise<unknown[]> & { limit: () => Promise<unknown[]> }; p.limit = async () => next(); return p; }) })) })), update: vi.fn(), insert: vi.fn() };
+    getDbMock.mockResolvedValue(db);
+    const caller = appRouter.createCaller(contextFor(admin));
+    await expect(caller.regional.approvePack({ packId: 7, reason: "stale pack" })).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
+    expect(db.update).not.toHaveBeenCalled();
+    expect(db.insert).not.toHaveBeenCalled();
+  });
 });
