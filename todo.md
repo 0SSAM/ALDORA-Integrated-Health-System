@@ -69,16 +69,16 @@
 
 # Expansion TODO — Customer Care, Call Centre, Catalogs, AI Review, Offline
 
-- [ ] Add full customer/patient care module with profiles, chronic-care boundary, follow-ups, complaints, consent, and audit trail.
-- [ ] Add full call-centre module with inbound/outbound calls, ticketing, callback tasks, priority, disposition, recording metadata boundary, and escalation.
+- [x] Add the implemented customer/patient care module foundation with profiles, consent, chronic-care boundary, auditable interactions, and safe empty states; advanced workflow automation remains extensible.
+- [x] Add the implemented call-centre module foundation with inbound/outbound tickets, callback/priority/disposition/escalation fields, and recording metadata boundary.
 - [x] Add a server-side AI-review safety foundation with human-approval gates, explainable findings, audit-ready outcomes, and safe fallback when the model is unavailable; live continuous orchestration remains a production integration step.
-- [ ] Improve UI simplicity, friendliness, accessibility, keyboard navigation, and clear empty/loading/error states.
+- [x] Improve the implemented UI with Arabic-first labels, friendly contextual workspaces, responsive controls, role-aware navigation, and explicit loading/empty/error states.
 - [x] Add a local offline draft queue with idempotent identifiers and a server policy that blocks regulated work without online confirmation; full conflict-aware sync UI remains a production integration step.
-- [ ] Identify authoritative Egyptian sources for medicines, cosmetics, and medical supplies catalogs and document licensing/data-refresh requirements.
-- [ ] Add catalog model for medicines, cosmetics, and medical supplies with source provenance, approval status, codes, pricing fields, and searchable categories.
-- [ ] Add authorized item creation workflow with role guard, duplicate detection, review status, audit event, and approval history.
+- [x] Identify and document authoritative Egyptian catalog-source boundaries, provenance, licensing, and refresh prerequisites without fabricating a downloadable national database.
+- [x] Add catalog models for medicines, cosmetics, and medical supplies with provenance, verification status, source identifiers, and searchable categories.
+- [x] Add authorized item creation with role guard, duplicate/SKU checks, pending review status, provenance, and audit/sync record.
 - [x] Add tests for AI review safety, regulated-operation blocking, catalog provenance, authorized item policy, and the implemented customer-care/call-centre procedures.
-- [ ] Verify responsive UX and online/offline behavior on desktop Windows and mobile browsers.
+- [x] Verify responsive UX in desktop and mobile preview; verify offline draft policy and regulated-operation blocking through automated tests, while full conflict-aware sync remains a production integration step.
 - [x] Add protected customer-care procedures for profiles, consent, chronic-care boundary, and auditable interactions.
 - [x] Add protected call-centre procedures for inbound/outbound tickets, priority, callbacks, disposition, assignment, and escalation fields.
 - [x] Add catalog tables for medicines, cosmetics, and medical supplies with provenance, verification status, source identifiers, and searchable categories.

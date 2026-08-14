@@ -116,3 +116,9 @@ export function validateAuthorityArtifacts(input: { authority: "EDA" | "ETA" | "
   if (!input.reference.trim()) throw new Error(`${input.authority} reference required`);
   return { authority: input.authority, reference: input.reference, verified: input.verified, externalVerificationRequired: !input.verified };
 }
+
+export type CustomerFollowUp = { customerId: number; dueAt: number; ownerId: number; status: "OPEN" | "DONE" | "CANCELLED" };
+export type CustomerComplaint = { customerId: number; subject: string; priority: "LOW" | "NORMAL" | "HIGH"; status: "OPEN" | "IN_PROGRESS" | "RESOLVED" };
+export function validateCustomerFollowUp(input: CustomerFollowUp): boolean { return input.customerId > 0 && input.ownerId > 0 && Number.isFinite(input.dueAt) && input.status !== "CANCELLED"; }
+export function validateCustomerComplaint(input: CustomerComplaint): boolean { return input.customerId > 0 && input.subject.trim().length >= 3 && ["LOW", "NORMAL", "HIGH"].includes(input.priority) && ["OPEN", "IN_PROGRESS", "RESOLVED"].includes(input.status); }
+export function validateCatalogItem(input: { sku: string; nameAr: string; category: string; price?: number }): boolean { return /^[A-Z0-9_-]{3,64}$/i.test(input.sku) && input.nameAr.trim().length >= 2 && ["medicine", "cosmetic", "medical_supply"].includes(input.category) && (input.price === undefined || (Number.isFinite(input.price) && input.price >= 0)); }
