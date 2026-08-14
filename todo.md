@@ -112,11 +112,11 @@
 
 # Per-country Data Isolation Clarification
 
-- [ ] Create a country data-boundary model so every medicine, cosmetic, medical-supply, authority, tax, invoice, price, prescription, insurance, payroll, and label record belongs to a jurisdiction profile.
+- [ ] Create a country data-boundary model requiring every medicine, cosmetic, medical-supply, authority, tax, invoice, price, prescription, insurance, payroll, and label record to carry both a jurisdiction profile and organization scope.
 - [x] Add explicit per-country catalog provenance and refresh metadata; never merge records across countries without a controlled mapping.
 - [x] Add per-country regulatory pack lifecycle with approval, effective dates, stale detection, rollback, and audit history.
 - [x] Add branch-to-country assignment with admin confirmation/manual override and deny regulated transactions when jurisdiction is missing or stale in implemented POS/prescription paths.
-- [ ] Add cross-country isolation tests for catalog search, pricing, tax, prescription, and compliance procedures.
+- [ ] Add cross-country isolation tests for catalog search, pricing, tax, prescription, and compliance procedures, including persisted-record denial.
 
 # Comprehensive Country Compliance Requirement
 
@@ -306,6 +306,9 @@
 - [x] Define organization types for government, independent pharmacy, pharmacy chain, distributor, insurer, rehabilitation/physiotherapy center, hospital, laboratory, and radiology center.
 - [x] Add organization membership and scoped roles so each account sees only its organization, branches, facilities, and permitted modules; centralize the role-capability matrix and restrict member-directory reads to management/audit roles.
 - [ ] Add server-side organization isolation to queries and mutations, including explicit denial of cross-organization access.
+- [ ] Add jurisdictionId and organizationId scope fields, migration/backfill rules, and enforced query predicates to every implemented regulated table that represents catalog, prescription, sales/invoicing, insurance, payroll, reporting, authority, tax, or label records.
+- [ ] Integrate country-boundary assertions into real catalog, prescription, sales/invoicing, and any implemented insurance/payroll/reporting procedures.
+- [ ] Add database/query tests proving persisted regulated records cannot be created or accessed without matching jurisdiction and organization scope.
 - [x] Add organization-specific workspace navigation and safe empty states without implying unsupported regulatory certification.
 - [x] Add a reusable sensitive-data policy for patient, prescription, diagnostic, imaging, insurance, and audit categories with least-privilege role checks, organization scope, demo denial, and export denial; persistence-route integration remains tracked separately.
 - [ ] Add integration-contract tests for protected organization routers and database-backed cross-tenant denial; unit coverage now includes the role matrix, sensitive-data access, demo denial, export denial, and cross-organization policy checks.
