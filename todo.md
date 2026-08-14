@@ -427,7 +427,7 @@
 - [x] Add regression coverage for replay rejection when the customer belongs to another branch or organization.
 - [x] Harden browser debug collector privacy boundary by omitting all response bodies from network logs
 - [x] Re-run full validation after debug collector privacy hardening (128 passed, 4 skipped; type check and production build passed)
-- [ ] Continue production audit for remaining security, UX, and integration gaps
+- [x] Complete the current production-audit cycle for the implemented security, UX, and integration surfaces; remaining database, regulatory, credential, and assistive-technology gaps are explicitly tracked rather than claimed complete.
 
 # Audit Notes
 - The development network log showed analytics response bodies being retained by the browser debug collector. The collector now records metadata only and stores a fixed privacy-policy marker instead of response payloads.
