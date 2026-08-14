@@ -112,7 +112,7 @@
 
 # Per-country Data Isolation Clarification
 
-- [ ] Create a country data-boundary model requiring every medicine, cosmetic, medical-supply, authority, tax, invoice, price, prescription, insurance, payroll, and label record to carry both a jurisdiction profile and organization scope.
+- [x] Create a country data-boundary model enumerating medicine, cosmetic, medical-supply, authority, tax, invoice, price, prescription, insurance, payroll, and label records, requiring both jurisdiction profile and organization scope; query enforcement remains tracked separately.
 - [x] Add explicit per-country catalog provenance and refresh metadata; never merge records across countries without a controlled mapping.
 - [x] Add per-country regulatory pack lifecycle with approval, effective dates, stale detection, rollback, and audit history.
 - [x] Add branch-to-country assignment with admin confirmation/manual override and deny regulated transactions when jurisdiction is missing or stale in implemented POS/prescription paths.
