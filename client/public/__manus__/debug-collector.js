@@ -599,7 +599,8 @@
       xhr._manusData.url.indexOf("/__manus__/") !== 0
     ) {
       xhr._manusData.startTime = Date.now();
-      xhr._manusData.requestBody = body ? sanitizeValue(tryParseJson(body)) : null;
+      // Privacy boundary: request payloads may contain health or identity data; never retain them.
+      xhr._manusData.requestBody = "[Request body omitted by privacy policy]";
 
       xhr.addEventListener("load", function () {
         // Privacy boundary: never read or retain XMLHttpRequest response bodies.

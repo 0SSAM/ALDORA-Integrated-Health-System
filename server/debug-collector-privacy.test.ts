@@ -9,8 +9,10 @@ describe("browser debug collector privacy boundary", () => {
     );
 
     expect(source).toContain("[Response body omitted by privacy policy]");
+    expect(source).toContain("[Request body omitted by privacy policy]");
     expect(source).not.toContain("var clonedResponse = response.clone()");
     expect(source).not.toContain("clonedResponse.text()");
     expect(source).not.toContain("responseText");
+    expect(source).not.toContain("tryParseJson(body)");
   });
 });
