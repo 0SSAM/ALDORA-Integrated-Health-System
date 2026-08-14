@@ -74,4 +74,59 @@ describe("commitSale catalog evidence contract", () => {
     })).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
     expect(db.transaction).not.toHaveBeenCalled();
   });
+
+  it("rejects a catalog-linked product from another jurisdiction before opening the sale transaction", async () => {
+    const db = queuedDb([
+      [{ branchId: 9, jurisdictionId: 2, active: 1 }],
+      [{ branchId: 9 }],
+      [{ branchId: 9 }],
+      [{ branchId: 9, jurisdictionId: 2, active: 1 }],
+      [{ organizationId: 10 }],
+      [{ id: 2, countryCode: "EG", active: 1, legalAuthorityProfile: "EDA", language: "ar", defaultLocale: "ar-EG", currencyCode: "EGP", timezone: "Africa/Cairo", taxProfile: "EG-TAX", dateFormat: "YYYY-MM-DD", numberSystem: "latn" }],
+      [{ id: 50, jurisdictionId: 2, status: "approved", packVersion: "2026.1", effectiveFrom: new Date("2026-01-01"), reviewDueAt: null, rulesJson: JSON.stringify({ sale: true }), createdAt: new Date("2026-01-01") }],
+      [{ id: 501, packId: 50, jurisdictionId: 2, operation: "sale", verificationStatus: "verified" }],
+      [{ id: 900, organizationId: 10, jurisdictionId: 2, catalogItemId: 700 }],
+      [{ id: 901, organizationId: 10, branchId: 9, jurisdictionId: 2, productId: 900, quantityOnHand: "5" }],
+      [{ id: 700, organizationId: 10, jurisdictionId: 99, verificationStatus: "VERIFIED", category: "medicine" }],
+    ]);
+    getDbMock.mockResolvedValue(db);
+
+    const caller = appRouter.createCaller(contextFor());
+    await expect(caller.erp.pos.commitSale({
+      branchId: 9,
+      invoiceNumber: "INV-9002",
+      paymentMethod: "cash",
+      discountAmount: 0,
+      items: [{ productId: 900, batchId: 901, quantity: 1, unit: "box", unitPrice: 100 }],
+    })).rejects.toBeDefined();
+    expect(db.transaction).not.toHaveBeenCalled();
+  });
+
+  it("rejects a verified catalog item when required catalog evidence is missing", async () => {
+    const db = queuedDb([
+      [{ branchId: 9, jurisdictionId: 2, active: 1 }],
+      [{ branchId: 9 }],
+      [{ branchId: 9 }],
+      [{ branchId: 9, jurisdictionId: 2, active: 1 }],
+      [{ organizationId: 10 }],
+      [{ id: 2, countryCode: "EG", active: 1, legalAuthorityProfile: "EDA", language: "ar", defaultLocale: "ar-EG", currencyCode: "EGP", timezone: "Africa/Cairo", taxProfile: "EG-TAX", dateFormat: "YYYY-MM-DD", numberSystem: "latn" }],
+      [{ id: 50, jurisdictionId: 2, status: "approved", packVersion: "2026.1", effectiveFrom: new Date("2026-01-01"), reviewDueAt: null, rulesJson: JSON.stringify({ sale: true }), createdAt: new Date("2026-01-01") }],
+      [{ id: 501, packId: 50, jurisdictionId: 2, operation: "sale", verificationStatus: "verified" }],
+      [{ id: 900, organizationId: 10, jurisdictionId: 2, catalogItemId: 700 }],
+      [{ id: 901, organizationId: 10, branchId: 9, jurisdictionId: 2, productId: 900, quantityOnHand: "5" }],
+      [{ id: 700, organizationId: 10, jurisdictionId: 2, verificationStatus: "VERIFIED", category: "medicine" }],
+      [],
+    ]);
+    getDbMock.mockResolvedValue(db);
+
+    const caller = appRouter.createCaller(contextFor());
+    await expect(caller.erp.pos.commitSale({
+      branchId: 9,
+      invoiceNumber: "INV-9003",
+      paymentMethod: "cash",
+      discountAmount: 0,
+      items: [{ productId: 900, batchId: 901, quantity: 1, unit: "box", unitPrice: 100 }],
+    })).rejects.toBeDefined();
+    expect(db.transaction).not.toHaveBeenCalled();
+  });
 });
