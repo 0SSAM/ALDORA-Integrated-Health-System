@@ -307,8 +307,8 @@
 - [x] Add organization membership and scoped roles so each account sees only its organization, branches, facilities, and permitted modules; centralize the role-capability matrix and restrict member-directory reads to management/audit roles.
 - [ ] Add server-side organization isolation to queries and mutations, including explicit denial of cross-organization access.
 - [x] Add organization-specific workspace navigation and safe empty states without implying unsupported regulatory certification.
-- [ ] Add privacy/security controls for patient, prescription, diagnostic, imaging, insurance, and audit data, including least privilege and demo restrictions.
-- [ ] Add unit and integration-contract tests for organization isolation, role matrix, sensitive-data access, and cross-tenant denial.
+- [x] Add a reusable sensitive-data policy for patient, prescription, diagnostic, imaging, insurance, and audit categories with least-privilege role checks, organization scope, demo denial, and export denial; persistence-route integration remains tracked separately.
+- [ ] Add integration-contract tests for protected organization routers and database-backed cross-tenant denial; unit coverage now includes the role matrix, sensitive-data access, demo denial, export denial, and cross-organization policy checks.
 - [ ] Document official regulatory, interoperability, retention, and credential prerequisites per country and organization type.
 
 # Notification Organization Scope Bug
