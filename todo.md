@@ -554,3 +554,5 @@
 - [x] Add a jurisdiction-aware tax-calculation readiness policy requiring effective source evidence, rates, rounding rules, exemption handling, and audit metadata before activation; 2 policy tests and TypeScript passed.
 
 - [x] Add an invoice-numbering readiness policy requiring jurisdiction-bound sequence, fiscal-period validity, uniqueness, gap handling, and audit metadata before invoice persistence is enabled; 2 policy tests and TypeScript passed.
+
+- [x] Add a localization/timezone readiness policy requiring verified locale, RTL direction where applicable, timezone, currency, calendar/date formats, and effective source evidence before country activation; 2 policy tests and TypeScript passed.
