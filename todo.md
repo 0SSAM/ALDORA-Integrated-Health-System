@@ -538,3 +538,5 @@
 - [x] Add an insurance payer transport readiness policy requiring endpoint specification, credential configuration, claim/eligibility mappings, sandbox verification, and acceptance evidence before activation; 2 policy tests and TypeScript passed, with no payer transport activated.
 
 - [x] Add a pure prescription/dispensing product-consumption policy that rejects cross-scope, unapproved, and evidence-incomplete catalog links before any future persistence entry point; 2 policy tests and TypeScript passed.
+
+- [x] Add an authorized catalog-intake policy requiring role permission, organization/branch/jurisdiction scope, and source verification before new medicine, cosmetic, or medical-supply records are accepted; 2 policy tests and TypeScript passed.
