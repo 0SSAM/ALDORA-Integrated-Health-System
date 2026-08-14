@@ -69,7 +69,7 @@ export default function Home() {
     <div dir={localization.direction} data-country={localization.countryCode} className="min-h-screen bg-[#f4f7fb] text-slate-900">
       <aside className={cn("fixed inset-y-0 right-0 z-40 flex w-[286px] flex-col border-l border-slate-200 bg-[#0d1b2a] text-white transition-transform duration-200 lg:translate-x-0", mobileOpen ? "translate-x-0" : "translate-x-full")}>
         <div className="flex h-20 items-center justify-between border-b border-white/10 px-6">
-          <div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-2xl bg-cyan-400 text-[#0d1b2a]"><HeartPulse className="h-5 w-5" /></div><div><p className="font-bold tracking-tight">BDF Pharma ERP</p><p className="text-[11px] text-cyan-200/70">منصة الصيدليات العربية متعددة الدول</p></div></div>
+          <div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-2xl bg-cyan-400 text-[#0d1b2a]"><HeartPulse className="h-5 w-5" /></div><div><p className="font-bold tracking-tight">ALDO Health Care Eco System</p><p className="text-[11px] text-cyan-200/70">منصة الصيدليات العربية متعددة الدول</p></div></div>
           <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 lg:hidden" onClick={() => setMobileOpen(false)}><X className="h-5 w-5" /></Button>
         </div>
         <div className="px-4 py-5"><p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">مساحة العمل</p><p className="mb-3 px-3 text-xs text-cyan-200/70">{user ? `الدور: ${user.role}` : "الوضع العام: تسجيل الدخول مطلوب"}</p><nav className="space-y-1">{filteredModules.map(item => { const Icon = item.icon; const selected = active === item.id; return <button key={item.id} onClick={() => { setActive(item.id); setMobileOpen(false); }} className={cn("flex w-full items-center gap-3 rounded-xl px-3 py-3 text-right text-sm transition", selected ? "bg-cyan-400 font-semibold text-[#0d1b2a] shadow-lg shadow-cyan-950/20" : "text-slate-300 hover:bg-white/10 hover:text-white")}><Icon className="h-[18px] w-[18px]" /><span>{item.label}</span>{selected && <ChevronLeft className="mr-auto h-4 w-4" />}</button>; })}</nav></div>
@@ -192,7 +192,7 @@ function PrescriptionWorkspace() {
 function UploadIcon() { return <div className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-cyan-600 shadow-sm"><FileText className="h-6 w-6" /></div>; }
 
 function WorkspaceShell({ title, children }: { title: string; children: React.ReactNode }) {
-  return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardHeader><CardTitle className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-cyan-500" />{title}</CardTitle></CardHeader><CardContent>{children}</CardContent></Card>;
+  return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardHeader><CardTitle className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-cyan-500" />{title}</CardTitle></CardHeader><CardContent>{children}</CardContent><div className="border-t border-slate-100 px-6 py-2 text-[10px] text-slate-400">© 2026 ALDO Health Care Eco System</div></Card>;
 }
 
 function CustomerCareWorkspace() {

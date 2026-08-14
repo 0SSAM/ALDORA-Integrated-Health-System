@@ -276,3 +276,11 @@
 
 - [x] Scope customer-care and call-centre reads and writes to active branches assigned to the authenticated user; reject new unbound records for non-admin users.
 - [x] Add unit coverage for branch-scoped customer-care and call-centre access policy.
+
+# ALDO Ownership and Brand Protection
+
+- [x] Rename the product-facing system identity to ALDO Health Care Eco System across app metadata, title, and visible brand surfaces.
+- [x] Add a discreet ownership notice using the owner-provided professional name without exposing phone, email, address, CV, or other personal contact data.
+- [x] Add copyright and provenance metadata to the repository, generated app metadata, and project ownership documentation without weakening security or licensing clarity.
+- [x] Add a tamper-evident ownership manifest with a non-secret SHA-256 fingerprint and document the recovery/proof procedure.
+- [x] Add tests and production validation proving the new identity is present and sensitive CV contact data is absent from shipped UI assets.

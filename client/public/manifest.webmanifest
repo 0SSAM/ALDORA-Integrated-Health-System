@@ -1,7 +1,7 @@
 {
-  "name": "BDF Pharma ERP",
-  "short_name": "BDF ERP",
-  "description": "منصة إدارة الصيدلية والفروع للسوق المصري",
+  "name": "ALDO Health Care Eco System",
+  "short_name": "ALDO Health",
+  "description": "منصة رعاية صحية وصيدلية متعددة الدول",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f4f7fb",

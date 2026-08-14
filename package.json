@@ -1,8 +1,10 @@
 {
   "name": "bdf-pharma-erp",
   "version": "1.0.0",
+  "description": "ALDO Health Care Eco System — multi-country pharmacy and healthcare operations platform",
+  "author": "Hossam Naeim Osman",
   "type": "module",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
     "build": "vite build && esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
