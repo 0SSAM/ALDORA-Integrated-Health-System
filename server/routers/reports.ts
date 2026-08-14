@@ -46,7 +46,7 @@ async function assertReportRegulatoryScope(db: NonNullable<Awaited<ReturnType<ty
   const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
   const evidence = pack ? await db.select({ id: complianceEvidence.id }).from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
   if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved reporting compliance pack is required" });
-  try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "report"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+  try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "report"); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Reporting compliance policy rejected the request" }); }
 }
 
 export const reportsRouter = router({
@@ -63,7 +63,7 @@ export const reportsRouter = router({
       const jurisdictionIds = organizationId === undefined ? null : await accessibleJurisdictionIds(db, ctx.user.id, ctx.user.role, organizationId);
       if (input?.jurisdictionId !== undefined) {
         try { assertReportJurisdictionAccess(input.jurisdictionId, jurisdictionIds); }
-        catch (error) { throw new TRPCError({ code: "FORBIDDEN", message: String(error) }); }
+        catch { throw new TRPCError({ code: "FORBIDDEN", message: "Report jurisdiction is outside the active scope" }); }
       }
       const filters = [
         ids === null ? undefined : ids.length ? inArray(reportDefinitions.organizationId, ids) : eq(reportDefinitions.id, -1),

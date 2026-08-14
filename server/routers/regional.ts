@@ -120,7 +120,7 @@ export const regionalRouter = router({
     try {
       assertPackApprovalReady({ status: pack.status, rules, evidence, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt });
       transitionPackStatus(pack.status, "approved");
-    } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+    } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Compliance pack approval rejected" }); }
     await db.update(compliancePacks).set({ status: "approved", approvedByUserId: ctx.user.id }).where(eq(compliancePacks.id, pack.id));
     await db.insert(complianceRuleAudits).values({ packId: pack.id, action: "approved", actorUserId: ctx.user.id, reason: input.reason ?? "Approved after verified evidence review" });
     await db.insert(complianceRuleAudits).values({ packId: pack.id, action: "activated", actorUserId: ctx.user.id, reason: "Activated as current approved pack" });
@@ -133,7 +133,7 @@ export const regionalRouter = router({
     const pack = (await db.select().from(compliancePacks).where(eq(compliancePacks.id, input.packId)).limit(1))[0];
     if (!pack) throw new TRPCError({ code: "NOT_FOUND", message: "Compliance pack not found" });
     if (pack.status === "rolled_back") return { packId: pack.id, status: "rolled_back" as const, alreadyRolledBack: true };
-    try { transitionPackStatus(pack.status, "rolled_back"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+    try { transitionPackStatus(pack.status, "rolled_back"); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Compliance pack rollback rejected" }); }
     await db.update(compliancePacks).set({ status: "rolled_back", approvedByUserId: null }).where(eq(compliancePacks.id, pack.id));
     await db.insert(complianceRuleAudits).values({ packId: pack.id, action: "rolled_back", actorUserId: ctx.user.id, reason: input.reason });
     return { packId: pack.id, status: "rolled_back" as const, alreadyRolledBack: false };

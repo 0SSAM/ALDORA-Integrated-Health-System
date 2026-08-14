@@ -26,7 +26,7 @@ async function assertScope(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, u
   const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
   const evidence = pack ? await db.select({ id: complianceEvidence.id }).from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
   if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved insurance compliance pack is required" });
-  try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "insurance"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+  try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "insurance"); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Insurance compliance policy rejected the request" }); }
 }
 
 export const insuranceRouter = router({
@@ -47,7 +47,7 @@ export const insuranceRouter = router({
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       await assertScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId);
       const request = { requestType: input.requestType, organizationId: input.organizationId, jurisdictionId: input.jurisdictionId, payerCode: input.payerCode, memberReference: input.memberReference, serviceCode: input.serviceCode, status: "DRAFT" as const, credentialGate: "NOT_CONFIGURED" as const };
-      try { validateInsuranceRequest(request); } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
+      try { validateInsuranceRequest(request); } catch { throw new TRPCError({ code: "BAD_REQUEST", message: "Insurance request validation failed" }); }
       const existing = await db.select({ id: insuranceRequests.id }).from(insuranceRequests).where(eq(insuranceRequests.idempotencyKey, input.idempotencyKey)).limit(1);
       if (existing.length) return { requestId: existing[0].id, reused: true, credentialGate: "NOT_CONFIGURED" as const };
       const inserted = await db.insert(insuranceRequests).values({ organizationId: input.organizationId, jurisdictionId: input.jurisdictionId, requestType: input.requestType, payerCode: input.payerCode, memberReferenceHash: hashInsuranceMemberReference(input.memberReference), serviceCode: input.serviceCode, status: "DRAFT", credentialGate: "NOT_CONFIGURED", requestJson: buildInsuranceRequestPayload(input.serviceCode), idempotencyKey: input.idempotencyKey, createdByUserId: ctx.user.id });
@@ -65,7 +65,7 @@ export const insuranceRouter = router({
       try {
         assertInsuranceTransitionAuthorized(ctx.user.role, input.toStatus as InsuranceRequestStatus, input.externalReference);
         assertPersistedInsuranceTransition(row.status as InsuranceRequestStatus, input.toStatus as InsuranceRequestStatus, row.credentialGate);
-      } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+      } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Insurance state transition rejected" }); }
       const updated = await db.update(insuranceRequests).set({ status: input.toStatus, externalReference: input.externalReference }).where(and(eq(insuranceRequests.id, input.requestId), eq(insuranceRequests.organizationId, row.organizationId), eq(insuranceRequests.jurisdictionId, row.jurisdictionId)));
       const affectedRows = Number((updated[0] as { affectedRows?: number } | undefined)?.affectedRows ?? 0);
       if (affectedRows !== 1) throw new TRPCError({ code: "CONFLICT", message: "Insurance request changed before transition" });
