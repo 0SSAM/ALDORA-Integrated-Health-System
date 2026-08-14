@@ -10,6 +10,7 @@ import { invokeLLM } from "../_core/llm";
 import { protectedProcedure, router } from "../_core/trpc";
 import { enforceDiscount, selectFefoBatches, type AppRole } from "../domain/rules";
 import { assertPrescriptionConfirmed, preparePosSale, validatePrescriptionUpload } from "../domain/erp";
+import { generateInvoiceDocument } from "../domain/invoicing-policy";
 import { assertCompliancePackUsable, assertJurisdictionProfileReady } from "../domain/regional-engine";
 import { assertBranchAssignmentReady } from "../domain/branch-compliance";
 import { storageGetSignedUrl, storagePut } from "../storage";
@@ -106,6 +107,39 @@ export const erpRouter = router({
       .query(({ input }) => selectFefoBatches(input.batches, input.requestedQuantity)),
   }),
   pos: router({
+    generateInvoicePreview: protectedProcedure
+      .input(z.object({ branchId: z.number().int().positive(), invoiceNumber: z.string().min(3).max(80), currencyCode: z.string().length(3), subtotal: z.number().nonnegative(), discountAmount: z.number().nonnegative(), totalAmount: z.number().nonnegative(), items: z.array(z.object({ sku: z.string().min(1).max(80), quantity: z.number().positive(), unitPrice: z.number().nonnegative() })).min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
+        try {
+          assertBranchAssignmentReady(assignment);
+          await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
+          await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId);
+        } catch (error) {
+          throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: "Scoped branch access rejected" });
+        }
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
+        const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
+        const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
+        if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current invoice compliance pack required" });
+        const evidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.jurisdictionId, assignment.jurisdictionId), eq(complianceEvidence.operation, "catalog"), eq(complianceEvidence.verificationStatus, "verified")));
+        try {
+          assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "invoice");
+        } catch (error) {
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Invoice compliance validation rejected the request" });
+        }
+        for (const item of input.items) {
+          const catalogItem = (await db.select().from(catalogItems).where(and(eq(catalogItems.sku, item.sku), eq(catalogItems.organizationId, organizationId), eq(catalogItems.jurisdictionId, assignment.jurisdictionId))).limit(1))[0];
+          if (!catalogItem || catalogItem.verificationStatus !== "VERIFIED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Invoice catalog record is not verified for this scope" });
+        }
+        try {
+          return { ...generateInvoiceDocument({ document: input, catalogScope: { jurisdictionId: assignment.jurisdictionId, organizationId, catalogJurisdictionId: assignment.jurisdictionId, catalogOrganizationId: organizationId, catalogVerificationStatus: "approved", verifiedEvidenceCount: evidence.length } }), jurisdictionId: assignment.jurisdictionId, organizationId, persisted: false };
+        } catch (error) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Invoice validation rejected the request" });
+        }
+      }),
     prepareSale: protectedProcedure
       .input(z.object({ branchId: z.number().int().positive(), officialPrice: z.number().nonnegative(), quantity: z.number().positive(), discountAmount: z.number().nonnegative(), batches: z.array(z.object({ id: z.string(), jurisdictionId: z.number().int().positive(), expiryDate: z.coerce.date(), quantityOnHand: z.number().nonnegative() })) }))
       .mutation(async ({ ctx, input }) => {

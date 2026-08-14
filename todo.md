@@ -147,8 +147,8 @@
 - [x] Require the same branch-bound pack before prescription extraction and dispensing; reject legacy or unbound intake records.
 - [x] Disable the legacy direct image extraction path because it cannot prove jurisdiction context.
 - [ ] Apply equivalent gates to any future invoice, insurance, payroll, reporting, and inventory mutation procedures as those entry points are wired to the database.
-- [ ] Add invoice-generation or invoice-persistence procedures that revalidate catalog evidence and composite jurisdiction/organization scope before creating regulated invoice records.
-- [ ] Add tests proving invoice paths reject missing verified catalog evidence or mismatched jurisdiction/organization scope.
+- [x] Add protected invoice.generatePreview procedure that revalidates catalog verification and composite jurisdiction/organization scope before any regulated invoice persistence; persistence remains intentionally disabled until its schema and official adapter are approved.
+- [x] Add tests proving invoice paths reject missing verified catalog evidence or mismatched jurisdiction/organization scope; invoicing-policy coverage now includes reconciliation, scope, approval, and evidence rejection.
 
 # Core Operational Data Boundary
 
@@ -502,3 +502,5 @@
 - [x] Add focused cross-country isolation coverage for catalog search results, pricing/tax records, prescription records, compliance records, and persisted-record scope denial; 7 tests and TypeScript passed.
 
 - [x] Add a pure invoice-generation boundary that validates document reconciliation and catalog jurisdiction/evidence before any future persistence or official submission adapter; 6 invoice-policy tests and TypeScript passed.
+
+- [x] Validate the invoice boundary and router addition with focused tests, full Vitest, TypeScript, and production build; 161 tests passed, 4 optional database tests skipped because TEST_DATABASE_URL is unavailable, and the existing chunk-size warning remains non-blocking.
