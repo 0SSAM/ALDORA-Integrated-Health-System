@@ -314,7 +314,7 @@
 - [x] Add organization-specific workspace navigation and safe empty states without implying unsupported regulatory certification.
 - [x] Add a reusable sensitive-data policy for patient, prescription, diagnostic, imaging, insurance, and audit categories with least-privilege role checks, organization scope, demo denial, and export denial; persistence-route integration remains tracked separately.
 - [x] Add mocked integration-contract coverage for protected organization routers; database-backed cross-tenant denial remains a separate pending item, while unit coverage includes the role matrix, sensitive-data access, demo denial, export denial, and cross-organization policy checks.
-- [ ] Document official regulatory, interoperability, retention, and credential prerequisites per country and organization type.
+- [x] Document official regulatory, interoperability, retention, and credential prerequisites per country and organization type in `docs/regulatory-prerequisites.md`; entries remain explicitly verified or pending and do not claim activation.
 
 # Notification Organization Scope Bug
 
@@ -470,3 +470,5 @@
 - [x] Re-run full Vitest, TypeScript, and production build after commitSale evidence-incomplete coverage: 143 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
 
 - [x] إصلاح اختبار commitSale الإيجابي: محاذاة mock لاستعلامات membership والاختصاص والمنظمة، وإضافة بيانات الدفعة وحقول وأدلة catalog المطلوبة؛ الاختبار المركز وTypeScript ناجحان.
+
+- [x] Remove user-visible Manus words, marks, and images from the ALDO application and add regression coverage for shipped UI assets; provider session keys and framework internals remain unchanged because they are non-visible runtime contracts.
