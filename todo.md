@@ -402,3 +402,5 @@
 - [x] Add regression coverage for failed-run audit behavior and bounded error output.
 - [x] Enforce branch membership when listing and marking branch-scoped notifications, and stop filtering all branch notifications out of the list.
 - [x] Add regression coverage for cross-branch notification visibility and mark-read denial.
+- [x] Apply audience-role authorization consistently to listForOrganization and markRead, not only the general notification list.
+- [x] Add regression coverage for role-targeted notification read and mark-read denial.

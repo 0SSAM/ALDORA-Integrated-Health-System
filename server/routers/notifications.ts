@@ -83,12 +83,15 @@ export const notificationsRouter = router({
         id: notifications.id,
         organizationId: notifications.organizationId,
         branchId: notifications.branchId,
+        audienceRole: notifications.audienceRole,
       }).from(notifications).where(and(
         eq(notifications.id, input.notificationId),
         eq(notifications.active, 1),
       )).limit(1);
       if (!visible.length) throw new TRPCError({ code: "NOT_FOUND", message: "الإشعار غير متاح." });
       const notification = visible[0];
+      const audienceVisible = canViewNotification(notification.audienceRole, ctx.user.role);
+      if (!audienceVisible) throw new TRPCError({ code: "FORBIDDEN", message: "الإشعار غير موجه لدورك." });
       let hasActiveOrganizationMembership = notification.organizationId === null;
       if (notification.organizationId !== null && ctx.user.role !== "admin") {
         const membership = await db.select({ id: organizationMemberships.id }).from(organizationMemberships).where(and(
@@ -144,10 +147,11 @@ export const notificationsRouter = router({
         eq(branches.active, 1),
       ));
       const branchIds = branchMemberships.map(row => row.branchId);
-      return db.select().from(notifications).where(and(
+      const rows = await db.select().from(notifications).where(and(
         eq(notifications.organizationId, input.organizationId),
         eq(notifications.active, 1),
         ctx.user.role === "admin" ? undefined : or(isNull(notifications.branchId), branchIds.length ? inArray(notifications.branchId, branchIds) : eq(notifications.branchId, -1)),
       )).orderBy(desc(notifications.createdAt)).limit(100);
+      return rows.filter(row => canViewNotification(row.audienceRole, ctx.user.role));
     }),
 });

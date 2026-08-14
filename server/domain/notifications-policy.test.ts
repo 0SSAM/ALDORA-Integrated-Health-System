@@ -13,6 +13,7 @@ describe("notifications policy", () => {
   it("matches role-specific notifications exactly", () => {
     expect(canViewNotification("pharmacist", "pharmacist")).toBe(true);
     expect(canViewNotification("pharmacist", "cashier")).toBe(false);
+    expect(canViewNotification("admin", "admin")).toBe(true);
     expect(canViewNotification("admin", "manager")).toBe(false);
   });
 });
