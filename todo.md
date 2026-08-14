@@ -590,3 +590,5 @@
 - [x] Harden the optional database test harness so it requires an explicit isolated-test marker and refuses production-like TEST_DATABASE_URL values before opening a connection; 3 safety tests and TypeScript passed, while schema-boundary remains safely skipped without the isolated database URL.
 
 - [x] Document the isolated database lifecycle test runbook, required environment markers, cleanup expectations, and the fact that no production URL or real patient/customer data may be used; persisted lifecycle execution remains pending until an isolated TEST_DATABASE_URL is available.
+
+- [x] Document the trusted-device attestation contract and approved client options, explicitly excluding browser-only capabilities as security evidence; server and UI remain fail-closed until a provider is configured.
