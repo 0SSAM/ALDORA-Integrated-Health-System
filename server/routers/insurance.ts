@@ -66,7 +66,9 @@ export const insuranceRouter = router({
         assertInsuranceTransitionAuthorized(ctx.user.role, input.toStatus as InsuranceRequestStatus, input.externalReference);
         assertPersistedInsuranceTransition(row.status as InsuranceRequestStatus, input.toStatus as InsuranceRequestStatus, row.credentialGate);
       } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
-      await db.update(insuranceRequests).set({ status: input.toStatus, externalReference: input.externalReference }).where(eq(insuranceRequests.id, input.requestId));
+      const updated = await db.update(insuranceRequests).set({ status: input.toStatus, externalReference: input.externalReference }).where(and(eq(insuranceRequests.id, input.requestId), eq(insuranceRequests.organizationId, row.organizationId), eq(insuranceRequests.jurisdictionId, row.jurisdictionId)));
+      const affectedRows = Number((updated[0] as { affectedRows?: number } | undefined)?.affectedRows ?? 0);
+      if (affectedRows !== 1) throw new TRPCError({ code: "CONFLICT", message: "Insurance request changed before transition" });
       return { success: true, status: input.toStatus, networkSubmission: "disabled" as const };
     }),
 });
