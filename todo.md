@@ -594,3 +594,5 @@
 - [x] Document the trusted-device attestation contract and approved client options, explicitly excluding browser-only capabilities as security evidence; server and UI remain fail-closed until a provider is configured.
 
 - [x] Add a source-level regulated-entrypoint contract test covering the currently implemented POS invoice preview, sale preparation/commit, and prescription upload/extract/confirm/dispense gates, while explicitly documenting absent invoice persistence and product-matching paths; 2 tests and TypeScript passed.
+
+- [x] Consolidate the remaining blocked prerequisites into a dated audit index that separates implementable code gaps from missing database, regulatory source, credential, and trusted-device dependencies; saved as docs/audits/open-prerequisites-index-2026-08-15.md.
