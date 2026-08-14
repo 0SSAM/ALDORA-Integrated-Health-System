@@ -498,3 +498,5 @@
 - [x] Replace remaining application-owned BDF Service Worker cache/header/message identifiers with ALDO names, update Home messaging, and extend branding regression coverage; 4 branding tests and TypeScript passed. Internal provider proxy paths and offline database migration identifiers remain unchanged for compatibility.
 
 - [x] Remove the legacy BDF shell cache during Service Worker activation and cover the cleanup contract; 4 branding tests and TypeScript passed, with the legacy cache name retained only as an explicit deletion target.
+
+- [x] Add focused cross-country isolation coverage for catalog search results, pricing/tax records, prescription records, compliance records, and persisted-record scope denial; 7 tests and TypeScript passed.
