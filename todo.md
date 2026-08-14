@@ -530,3 +530,5 @@
 - [x] Run regression validation after country-pack and source-safe workbook work; 172 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing non-blocking chunk-size warning.
 
 - [x] Create an implementation-readiness note that maps remaining blocked items to the exact prerequisite needed, without treating blockers as completed features; created docs/audits/implementation-readiness-2026-08-15.md.
+
+- [x] Add a machine-readable country-pack source manifest for Egypt, Jordan, Qatar, and Morocco with review status and explicit activation blockers only; 1 manifest test and TypeScript passed.
