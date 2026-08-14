@@ -586,3 +586,5 @@
 - [x] Run full regression and production build after the latest readiness changes; 68 test files passed with 215 tests passing and 5 optional database tests skipped because TEST_DATABASE_URL is unavailable, and the production build completed successfully.
 
 - [x] Align the offline replay UI with server Device-Trust gating: show the blocked state and reason when no trusted client attestation is available instead of presenting a misleading actionable replay button; TypeScript and 7 focused tests passed.
+
+- [x] Harden the optional database test harness so it requires an explicit isolated-test marker and refuses production-like TEST_DATABASE_URL values before opening a connection; 3 safety tests and TypeScript passed, while schema-boundary remains safely skipped without the isolated database URL.
