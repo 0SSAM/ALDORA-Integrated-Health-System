@@ -36,6 +36,11 @@ export function validateReportDefinition(definition: ReportDefinition): true {
   return true;
 }
 
+export function assertReportJurisdictionAccess(jurisdictionId: number, allowedJurisdictionIds: readonly number[] | null): true {
+  if (allowedJurisdictionIds !== null && !allowedJurisdictionIds.includes(jurisdictionId)) throw new Error("Cross-country report access denied");
+  return true;
+}
+
 export function assertReportScope(definition: ReportDefinition, context: RecordScopeContext): true {
   if (definition.organizationId !== context.organizationId) throw new Error("Cross-organization report access denied");
   if (definition.jurisdictionId !== context.jurisdictionId) throw new Error("Cross-country report access denied");

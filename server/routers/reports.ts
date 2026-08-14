@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { branches, branchJurisdictions, complianceEvidence, compliancePacks, jurisdictionProfiles, organizationMemberships, reportDefinitions, reportRuns } from "../../drizzle/schema";
+import { branches, branchJurisdictions, branchUsers, complianceEvidence, compliancePacks, jurisdictionProfiles, organizationMemberships, reportDefinitions, reportRuns } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
@@ -8,6 +8,7 @@ import { parse as parseCookie } from "cookie";
 import { COOKIE_NAME } from "@shared/const";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { assertCompliancePackUsable } from "../domain/regional-engine";
+import { assertReportJurisdictionAccess } from "../domain/reporting-policy";
 
 const REPORT_CATALOG = {
   "inventory.alerts": { name: "Inventory alerts", queryKey: "inventory.alerts.v1" },
@@ -18,6 +19,16 @@ const REPORT_CATALOG = {
 
 const reportKey = z.enum(["inventory.alerts", "sales.daily", "compliance.expiry", "operations.summary"]);
 const recipientRole = z.enum(["owner", "org_admin", "compliance_officer", "clinical_lead", "operations_manager", "staff", "auditor"]);
+
+async function accessibleJurisdictionIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string, organizationId: number) {
+  if (role === "admin") return null;
+  const rows = await db.select({ jurisdictionId: branchJurisdictions.jurisdictionId })
+    .from(branchUsers)
+    .innerJoin(branches, eq(branches.id, branchUsers.branchId))
+    .innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, branchUsers.branchId))
+    .where(and(eq(branchUsers.userId, userId), eq(branchUsers.active, 1), eq(branches.organizationId, organizationId)));
+  return Array.from(new Set(rows.map(row => row.jurisdictionId)));
+}
 
 async function accessibleOrganizationIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
   if (role === "admin") return null;
@@ -49,9 +60,15 @@ export const reportsRouter = router({
       const ids = await accessibleOrganizationIds(db, ctx.user.id, ctx.user.role);
       const organizationId = input?.organizationId;
       if (organizationId !== undefined) await assertOrganizationAccess(db, ctx.user.id, ctx.user.role, organizationId);
+      const jurisdictionIds = organizationId === undefined ? null : await accessibleJurisdictionIds(db, ctx.user.id, ctx.user.role, organizationId);
+      if (input?.jurisdictionId !== undefined) {
+        try { assertReportJurisdictionAccess(input.jurisdictionId, jurisdictionIds); }
+        catch (error) { throw new TRPCError({ code: "FORBIDDEN", message: String(error) }); }
+      }
       const filters = [
         ids === null ? undefined : ids.length ? inArray(reportDefinitions.organizationId, ids) : eq(reportDefinitions.id, -1),
         organizationId === undefined ? undefined : eq(reportDefinitions.organizationId, organizationId),
+        jurisdictionIds === null ? undefined : jurisdictionIds.length ? inArray(reportDefinitions.jurisdictionId, jurisdictionIds) : eq(reportDefinitions.id, -1),
         input?.jurisdictionId === undefined ? undefined : eq(reportDefinitions.jurisdictionId, input.jurisdictionId),
       ].filter(Boolean) as any[];
       return db.select().from(reportDefinitions).where(filters.length ? and(...filters) : undefined).orderBy(desc(reportDefinitions.updatedAt)).limit(100);
@@ -106,7 +123,8 @@ export const reportsRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       await assertOrganizationAccess(db, ctx.user.id, ctx.user.role, input.organizationId);
-      const filters = [eq(reportRuns.organizationId, input.organizationId), input.definitionId === undefined ? undefined : eq(reportRuns.definitionId, input.definitionId)].filter(Boolean) as any[];
+      const jurisdictionIds = await accessibleJurisdictionIds(db, ctx.user.id, ctx.user.role, input.organizationId);
+      const filters = [eq(reportRuns.organizationId, input.organizationId), jurisdictionIds === null ? undefined : jurisdictionIds.length ? inArray(reportRuns.jurisdictionId, jurisdictionIds) : eq(reportRuns.id, -1), input.definitionId === undefined ? undefined : eq(reportRuns.definitionId, input.definitionId)].filter(Boolean) as any[];
       return db.select().from(reportRuns).where(and(...filters)).orderBy(desc(reportRuns.createdAt)).limit(100);
     }),
 });

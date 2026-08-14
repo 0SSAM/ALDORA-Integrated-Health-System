@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { authorizeReportRecipient, buildIdempotencyKey, validateReportDefinition } from "./reporting-policy";
+import { assertReportJurisdictionAccess, authorizeReportRecipient, buildIdempotencyKey, validateReportDefinition } from "./reporting-policy";
 import { assertInsuranceRequestScope, assertInsuranceTransition, insuranceIntegrationReadiness, validateInsuranceRequest, type InsuranceRequest } from "./insurance-policy";
 
 const report = {
@@ -27,6 +27,11 @@ const insurance: InsuranceRequest = {
 };
 
 describe("reporting policy", () => {
+  it("accepts assigned jurisdictions and rejects cross-jurisdiction reads", () => {
+    expect(() => assertReportJurisdictionAccess(20, [20, 21])).not.toThrow();
+    expect(() => assertReportJurisdictionAccess(22, [20, 21])).toThrow("Cross-country report access denied");
+    expect(() => assertReportJurisdictionAccess(22, null)).not.toThrow();
+  });
   it("accepts a server-owned scoped report and creates a stable idempotency key", () => {
     expect(validateReportDefinition(report)).toBe(true);
     const first = buildIdempotencyKey({ reportCode: report.code, organizationId: 10, jurisdictionId: 20, scheduledForUtc: "2026-08-14T09:00:00Z" });

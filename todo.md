@@ -396,3 +396,5 @@
 - [x] Add regression coverage for cross-organization and cross-branch assignment rejection.
 - [x] Enforce branch authorization when enqueueing offline Customer Care and Call Centre drafts, not only during replay.
 - [x] Add regression coverage for unauthorized offline enqueue attempts.
+- [x] Restrict report definition and run reads to jurisdictions assigned to the authenticated user’s active branches, while preserving administrator visibility and organization scope.
+- [x] Add regression coverage for cross-jurisdiction report read denial/filtering.
