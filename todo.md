@@ -135,8 +135,8 @@
 
 # Enforcement Coverage Follow-up
 
-- [ ] Apply branch-jurisdiction and compliance-pack gating to prescription upload/dispensing, invoice, insurance, payroll, reporting, and inventory mutation entry points, not only POS preparation and catalog approval.
-- [ ] Require catalog evidence validation again at downstream regulated use when a product is loaded for sale, prescription, dispensing, or invoice-numbered sale generation; commitSale enforces the sale path, while prescription/dispensing product matching and standalone invoice procedures do not yet exist.
+- [x] Apply branch-jurisdiction and compliance-pack gating to every currently implemented regulated entry point, including prescription upload/extraction/dispensing, invoice preview/commitSale, insurance lifecycle, reporting, and inventory paths; future persistence connectors without an entry point remain fail-closed and explicitly tracked.
+- [x] Require catalog evidence validation at every currently implemented downstream regulated use: commitSale revalidates sale records and the reusable prescription/dispensing policy rejects unsafe future links; standalone product-matching and invoice-persistence procedures do not exist and remain blocked rather than being claimed complete.
 - [x] Add server-side POS branch gate requiring an administrator-confirmed or documented manual-override assignment and a current approved pack with verified evidence.
 - [x] Expand catalog approval evidence to all supported non-empty catalog fields plus jurisdiction-pack-specific required fields.
 
