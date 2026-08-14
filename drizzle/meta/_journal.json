@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1786714238874,
+      "tag": "0000_known_phantom_reporter",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1786714578907,
+      "tag": "0001_bumpy_captain_britain",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1786714816551,
+      "tag": "0002_strong_loki",
+      "breakpoints": true
+    }
+  ]
 }

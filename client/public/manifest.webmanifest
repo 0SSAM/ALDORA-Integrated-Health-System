@@ -1,0 +1,12 @@
+{
+  "name": "BDF Pharma ERP",
+  "short_name": "BDF ERP",
+  "description": "منصة إدارة الصيدلية والفروع للسوق المصري",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#0d1b2a",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": []
+}
