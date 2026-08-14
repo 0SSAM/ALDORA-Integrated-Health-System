@@ -41,3 +41,8 @@ ALDO may provide configuration, evidence tracking, authorization gates, audit re
 | Qatar | The official MoPH service URL was opened but presented a human-verification challenge in this session: [pharmaceutical-facility service](https://www.moph.gov.qa/english/OurServices/advancedsearch/Pages/servicesdetails.aspx?serviceId=228). | Qatar remains `PENDING_REVIEW`; no detailed requirement is inferred from the blocked page or third-party summaries. Obtain and verify the current official service details, licences, privacy/hosting requirements, fiscal interfaces, and acceptance credentials before activation. |
 
 These entries expand source discovery only. They do not represent legal advice, licensing approval, or a claim that ALDO is compliant in Jordan or Qatar.
+
+
+| Morocco | [Ministry of Health and Social Protection — health-product regulations](https://www.sante.gov.ma/Reglementation/Pages/REGLEMENTATION-APPLICABLE-AU-PRODUITS-DE-SANTE.aspx) | Official page listing primary laws and decrees for medicines/pharmacy, in-vitro diagnostic reagents, medical devices, poisonous substances, generic bioequivalence, and human-medicine marketing authorization. | The page is not a complete facility-licensing, privacy, tax/e-invoicing, insurance, payroll, or integration-credential specification and does not authorize an ALDO production activation. |
+
+Morocco remains `PENDING_REVIEW` until the applicable authority, effective legal versions, organization-specific licences, product evidence, privacy/hosting requirements, fiscal interfaces, and acceptance credentials are independently recorded in a country pack.

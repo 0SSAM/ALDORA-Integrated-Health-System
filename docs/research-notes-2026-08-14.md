@@ -25,3 +25,11 @@ Source attempted: https://www.moph.gov.qa/english/OurServices/advancedsearch/Pag
 The official page presented a human-verification challenge in the current browsing session, so its detailed service content was not independently verified. Search discovery identified the page as a Ministry of Public Health service concerning final assessment for pharmaceutical-facility licensing and registration/renewal of pharmaceutical-facility licences, but this discovery is not treated as sufficient legal evidence.
 
 Implementation implication: keep Qatar licensing and facility-service activation disabled until the official service content, applicable requirements, current forms, credentials, and acceptance process are verified through an accessible official channel. Do not infer requirements from the blocked page or from third-party summaries.
+
+## Morocco Ministry of Health and Social Protection
+
+Source: https://www.sante.gov.ma/Reglementation/Pages/REGLEMENTATION-APPLICABLE-AU-PRODUITS-DE-SANTE.aspx
+
+The official Ministry page titled “Reglementation appliqué au produits de santé” lists primary legal and regulatory materials for health products. It links, among others, to Law 11-08 on in-vitro diagnostic reagents, rules on poisonous substances, Law 84-12 on medical devices, Law 17-04 establishing the medicines and pharmacy code, and decrees concerning generic bioequivalence and marketing authorization for human medicines. The page also links to the Directorate of Medicines and Pharmacy / AMMPS portal.
+
+Implementation implication: Morocco requires separate evidence domains for medicines and pharmacy, in-vitro diagnostics, medical devices, poisonous/controlled substances, and marketing authorization. The official page is a source register, not proof of a facility licence, product authorization, privacy compliance, tax/e-invoicing readiness, or production credential for ALDO. A Morocco pack must retain the specific law/decree version, applicability, effective date, local authority evidence, reviewer, and acceptance criteria before activation.
