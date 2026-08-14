@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { reportExecutionSkipReason } from "./reports";
+import { boundedReportErrorCode, reportExecutionSkipReason } from "./reports";
 
 describe("report execution lifecycle policy", () => {
   const base = { id: 7, status: "active", jurisdictionId: 3, queryKey: "sales.daily.v1" };
@@ -15,5 +15,9 @@ describe("report execution lifecycle policy", () => {
 
   it("skips unsupported query keys", () => {
     expect(reportExecutionSkipReason({ ...base, queryKey: "select * from sales" })).toBe("unsupported_query");
+  });
+
+  it("bounds execution failures without exposing raw database errors", () => {
+    expect(boundedReportErrorCode(new Error("password=secret; ER_ACCESS_DENIED"))).toBe("REPORT_QUERY_FAILED");
   });
 });

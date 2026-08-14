@@ -6,6 +6,10 @@ import { sdk } from "../_core/sdk";
 
 export type ReportExecutionDefinition = { id: number; status: string; jurisdictionId: number | null; queryKey: string };
 
+export function boundedReportErrorCode(_error: unknown): "REPORT_QUERY_FAILED" {
+  return "REPORT_QUERY_FAILED";
+}
+
 export function reportExecutionSkipReason(definition: ReportExecutionDefinition): "inactive" | "missing_scope" | "unsupported_query" | undefined {
   if (definition.status !== "active") return "inactive";
   if (definition.jurisdictionId === null) return "missing_scope";
@@ -44,7 +48,25 @@ export async function reportExecutionHandler(req: Request, res: Response) {
     const existing = (await db.select({ id: reportRuns.id, status: reportRuns.status }).from(reportRuns).where(eq(reportRuns.idempotencyKey, idempotencyKey)).limit(1))[0];
     if (existing) return res.json({ ok: true, skipped: "duplicate", runId: existing.id, status: existing.status });
 
-    const output = await executeAllowlistedQuery(db, definition, periodStart, periodEnd);
+    let output: Record<string, unknown>;
+    try {
+      output = await executeAllowlistedQuery(db, definition, periodStart, periodEnd);
+    } catch (error) {
+      const errorCode = boundedReportErrorCode(error);
+      const failed = await db.insert(reportRuns).values({
+        definitionId: definition.id,
+        organizationId: definition.organizationId,
+        jurisdictionId: definition.jurisdictionId,
+        idempotencyKey,
+        periodStart,
+        periodEnd,
+        status: "failed",
+        errorCode,
+        startedAt: periodEnd,
+        finishedAt: new Date(),
+      });
+      return res.status(500).json({ ok: false, error: "report-execution-failed", errorCode, runId: Number(failed[0].insertId) });
+    }
     const inserted = await db.insert(reportRuns).values({
       definitionId: definition.id,
       organizationId: definition.organizationId,

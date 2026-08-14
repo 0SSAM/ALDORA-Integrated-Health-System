@@ -398,3 +398,5 @@
 - [x] Add regression coverage for unauthorized offline enqueue attempts.
 - [x] Restrict report definition and run reads to jurisdictions assigned to the authenticated user’s active branches, while preserving administrator visibility and organization scope.
 - [x] Add regression coverage for cross-jurisdiction report read denial/filtering.
+- [x] Persist a scoped failed report run with a bounded error code when an allowlisted report query fails, without exposing raw sensitive errors or enabling delivery.
+- [x] Add regression coverage for failed-run audit behavior and bounded error output.
