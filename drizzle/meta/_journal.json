@@ -64,6 +64,13 @@
       "when": 1786717956452,
       "tag": "0008_chubby_steel_serpent",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1786718643379,
+      "tag": "0009_colossal_banshee",
+      "breakpoints": true
     }
   ]
 }

@@ -139,3 +139,11 @@
 - [ ] Require catalog evidence validation again at downstream regulated use when a product is loaded for sale, prescription, dispensing, or invoice generation.
 - [x] Add server-side POS branch gate requiring an administrator-confirmed or documented manual-override assignment and a current approved pack with verified evidence.
 - [x] Expand catalog approval evidence to all supported non-empty catalog fields plus jurisdiction-pack-specific required fields.
+
+# Prescription Jurisdiction Enforcement
+
+- [x] Add nullable branchId and jurisdictionId to prescription_intakes through non-destructive migration 0009.
+- [x] Require a branch identifier and approved current prescription compliance pack before prescription upload.
+- [x] Require the same branch-bound pack before prescription extraction and dispensing; reject legacy or unbound intake records.
+- [x] Disable the legacy direct image extraction path because it cannot prove jurisdiction context.
+- [ ] Apply equivalent gates to any future invoice, insurance, payroll, reporting, and inventory mutation procedures as those entry points are wired to the database.

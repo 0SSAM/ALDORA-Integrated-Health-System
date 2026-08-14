@@ -110,6 +110,8 @@ export const branchAlerts = mysqlTable("branch_alerts", {
 
 export const prescriptionIntakes = mysqlTable("prescription_intakes", {
   id: int("id").autoincrement().primaryKey(),
+  branchId: int("branchId"),
+  jurisdictionId: int("jurisdictionId"),
   createdByUserId: int("createdByUserId").notNull(),
   imageKey: varchar("imageKey", { length: 255 }).notNull(),
   imageMimeType: varchar("imageMimeType", { length: 80 }).notNull(),

@@ -111,6 +111,7 @@ function RegionalComplianceWorkspace() {
 
 function PrescriptionWorkspace() {
   const [intakeId, setIntakeId] = useState<number | null>(null);
+  const [branchId, setBranchId] = useState("");
   const [status, setStatus] = useState("لم تُرفع صورة بعد");
   const [resultText, setResultText] = useState("");
   const upload = trpc.erp.prescription.upload.useMutation();
@@ -124,7 +125,9 @@ function PrescriptionWorkspace() {
       const dataUrl = String(reader.result);
       setStatus("جارٍ رفع الصورة بأمان…");
       try {
-        const uploaded = await upload.mutateAsync({ fileName: file.name, mimeType: file.type as "image/jpeg" | "image/png" | "image/webp", dataUrl });
+        const selectedBranchId = Number(branchId);
+        if (!Number.isInteger(selectedBranchId) || selectedBranchId <= 0) { setStatus("أدخل رقم فرع مرتبطاً باختصاص مؤكد قبل رفع الوصفة"); return; }
+        const uploaded = await upload.mutateAsync({ branchId: selectedBranchId, fileName: file.name, mimeType: file.type as "image/jpeg" | "image/png" | "image/webp", dataUrl });
         setIntakeId(uploaded.intakeId);
         setStatus("تم الرفع. يمكنك بدء الاستخراج الآن.");
       } catch (error) { setStatus(error instanceof Error ? error.message : "تعذر رفع الصورة"); }
@@ -143,6 +146,7 @@ function PrescriptionWorkspace() {
   };
 
   return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardHeader><CardTitle className="flex items-center gap-2"><BrainCircuit className="h-5 w-5 text-cyan-600" />استقبال الوصفة الذكية</CardTitle><p className="text-sm text-slate-500">ارفع صورة واضحة؛ النتيجة تظل قيد مراجعة صيدلي ولا تنشئ بيعاً تلقائياً.</p></CardHeader><CardContent className="space-y-4">
+    <label className="block text-sm font-medium text-slate-700">رقم الفرع المرتبط بالاختصاص المؤكد<input className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2" type="number" min="1" value={branchId} onChange={event => setBranchId(event.target.value)} placeholder="أدخل رقم الفرع" /></label>
     <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-cyan-200 bg-cyan-50/50 px-6 py-10 text-center hover:bg-cyan-50"><UploadIcon /><span className="mt-3 font-semibold text-slate-700">اختر صورة الوصفة</span><span className="mt-1 text-xs text-slate-500">JPG أو PNG أو WEBP، بحد أقصى 8MB</span><input className="hidden" type="file" accept="image/jpeg,image/png,image/webp" onChange={event => { const file = event.target.files?.[0]; if (file) handleFile(file); }} /></label>
     <div className="flex flex-wrap items-center gap-3"><Badge variant="outline">{status}</Badge>{intakeId && <Button onClick={runExtraction} disabled={extract.isPending}>{extract.isPending ? "جارٍ التحليل…" : "تحليل الوصفة"}</Button>}</div>
     {resultText && <pre className="max-h-72 overflow-auto rounded-xl bg-slate-950 p-4 text-left text-xs text-cyan-100" dir="ltr">{resultText}</pre>}
