@@ -457,3 +457,5 @@
 - [x] Re-run full Vitest, TypeScript, and production build after exact-one-row inventory update enforcement: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
 - [x] Add prescription.upload country-boundary router coverage proving a pharmacist without matching jurisdiction membership is rejected before storage or intake insertion; TypeScript and focused country tests pass.
 - [x] Re-run full Vitest, TypeScript, and production build after prescription country-boundary coverage: 139 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
+- [x] Add insurance organization-scope router-contract coverage proving an out-of-scope organization is rejected before compliance lookup or insert; focused insurance/organization tests pass and TypeScript passes.
+- [x] Re-run full Vitest, TypeScript, and production build after insurance organization-scope coverage: 140 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
