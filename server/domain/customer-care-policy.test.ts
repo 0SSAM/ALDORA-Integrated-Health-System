@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertCustomerTicketScope, buildCallTicketUpdate } from "./customer-care-policy";
+import { assertAssigneeScope, assertCustomerTicketScope, buildCallTicketUpdate } from "./customer-care-policy";
 
 describe("customer and call-ticket scope policy", () => {
   it("accepts matching organization and branch scope", () => {
@@ -10,6 +10,13 @@ describe("customer and call-ticket scope policy", () => {
     expect(() => assertCustomerTicketScope({ ticketOrganizationId: 10, ticketBranchId: 3, customerOrganizationId: 11, customerBranchId: 3 })).toThrow(/organization/);
     expect(() => assertCustomerTicketScope({ ticketOrganizationId: 10, ticketBranchId: 3, customerOrganizationId: 10, customerBranchId: 4 })).toThrow(/branch/);
     expect(() => assertCustomerTicketScope({ ticketOrganizationId: 10, ticketBranchId: 3, customerOrganizationId: null, customerBranchId: 3 })).toThrow(/required/);
+  });
+
+  it("accepts only an assignee in the same organization and branch", () => {
+    expect(assertAssigneeScope({ ticketOrganizationId: 10, ticketBranchId: 3, assigneeOrganizationId: 10, assigneeBranchId: 3 })).toBe(true);
+    expect(() => assertAssigneeScope({ ticketOrganizationId: 10, ticketBranchId: 3, assigneeOrganizationId: 11, assigneeBranchId: 3 })).toThrow(/organization/);
+    expect(() => assertAssigneeScope({ ticketOrganizationId: 10, ticketBranchId: 3, assigneeOrganizationId: 10, assigneeBranchId: 4 })).toThrow(/branch/);
+    expect(() => assertAssigneeScope({ ticketOrganizationId: 10, ticketBranchId: 3 })).toThrow(/required/);
   });
 
   it("builds an update payload from persisted ticket fields only", () => {

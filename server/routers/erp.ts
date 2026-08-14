@@ -17,7 +17,7 @@ import { activeCatalogFields, assertCatalogEvidence, assertConsumableCatalogCont
 import { assertRecordBelongsToJurisdiction, assertRecordBelongsToScope } from "../domain/data-boundary";
 import { canAccessJurisdiction } from "../domain/jurisdiction-access";
 import { canAccessBranch } from "../domain/branch-access";
-import { assertCustomerTicketScope, buildCallTicketUpdate } from "../domain/customer-care-policy";
+import { assertAssigneeScope, assertCustomerTicketScope, buildCallTicketUpdate } from "../domain/customer-care-policy";
 
 async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
   if (role === "admin") return null;
@@ -354,6 +354,15 @@ export const erpRouter = router({
         if (!ticket.organizationId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(ticket.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Call ticket is outside the active organization scope" });
         if (ticket.branchId === null) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Call ticket has no branch assignment" });
         await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, ticket.branchId);
+        if (input.assignedUserId !== undefined) {
+          const assigneeMembership = (await db.select({ organizationId: organizationMemberships.organizationId }).from(organizationMemberships).where(and(eq(organizationMemberships.userId, input.assignedUserId), eq(organizationMemberships.organizationId, ticket.organizationId), eq(organizationMemberships.active, 1))).limit(1))[0];
+          const assigneeBranch = (await db.select({ branchId: branchUsers.branchId }).from(branchUsers).where(and(eq(branchUsers.userId, input.assignedUserId), eq(branchUsers.branchId, ticket.branchId), eq(branchUsers.active, 1))).limit(1))[0];
+          try {
+            assertAssigneeScope({ ticketOrganizationId: ticket.organizationId, ticketBranchId: ticket.branchId, assigneeOrganizationId: assigneeMembership?.organizationId, assigneeBranchId: assigneeBranch?.branchId });
+          } catch (error) {
+            throw new TRPCError({ code: "FORBIDDEN", message: String(error) });
+          }
+        }
         const { ticketId, ...changes } = input;
         await db.update(callTickets).set(buildCallTicketUpdate(changes)).where(eq(callTickets.id, ticketId));
         return { success: true } as const;
