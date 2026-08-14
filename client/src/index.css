@@ -180,8 +180,9 @@
 @layer components {
   .aldo-app-shell {
     background:
-      linear-gradient(135deg, rgba(244, 250, 251, 0.96), rgba(248, 247, 255, 0.92)),
-      url('/manus-storage/aldo-background_9cf02ecd.png') center top / cover fixed;
+      radial-gradient(circle at 10% 8%, rgba(25, 197, 209, 0.18), transparent 28%),
+      radial-gradient(circle at 88% 18%, rgba(124, 92, 252, 0.12), transparent 24%),
+      linear-gradient(135deg, rgba(244, 250, 251, 0.98), rgba(248, 247, 255, 0.96));
     position: relative;
     isolation: isolate;
   }

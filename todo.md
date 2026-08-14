@@ -476,3 +476,5 @@
 - [x] Create ALDO Health Care Eco System logo, icon, backgrounds, visual effects, and replace visible/configurable bdf pharma erp branding throughout the project; updated Home, HTML metadata, PWA icon/manifest, package/template branding, and added branding regression tests.
 
 - [x] Harden scheduled inventory-alert transport errors: replace raw error, URL, and task UID response data with a fixed error code and add `inventory-policy.test.ts`; focused tests and TypeScript passed.
+
+- [x] Remove visible `manus-storage` branding paths from client HTML, CSS, and Home logo usage; use the local ALDO PWA icon, CSS background gradients, and inline ALDO SVG. Branding tests and TypeScript passed.
