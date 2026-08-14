@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
-import { and, desc, eq, inArray, like } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, like, lt, or, sql } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, sales, saleItems, branches, organizationMemberships } from "../../drizzle/schema";
+import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -18,6 +18,7 @@ import { assertRecordBelongsToJurisdiction, assertRecordBelongsToScope } from ".
 import { canAccessJurisdiction } from "../domain/jurisdiction-access";
 import { canAccessBranch } from "../domain/branch-access";
 import { assertAssigneeScope, assertCustomerTicketScope, buildCallTicketUpdate } from "../domain/customer-care-policy";
+import { evaluatePromotion } from "../domain/promotion-policy";
 
 async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
   if (role === "admin") return null;
@@ -124,7 +125,7 @@ export const erpRouter = router({
         try { return { ...preparePosSale(input), jurisdictionId: assignment.jurisdictionId }; } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
       }),
     commitSale: protectedProcedure
-      .input(z.object({ branchId: z.number().int().positive(), invoiceNumber: z.string().min(3).max(80), paymentMethod: z.enum(["cash", "meeza", "instapay", "insurance"]), discountAmount: z.number().nonnegative(), items: z.array(z.object({ productId: z.number().int().positive(), batchId: z.number().int().positive(), quantity: z.number().positive(), unit: z.string().min(1).max(24), unitPrice: z.number().nonnegative() })).min(1) }))
+      .input(z.object({ branchId: z.number().int().positive(), invoiceNumber: z.string().min(3).max(80), paymentMethod: z.enum(["cash", "meeza", "instapay", "insurance"]), discountAmount: z.number().nonnegative(), promotionCode: z.string().regex(/^[A-Z0-9_-]{3,48}$/).optional(), items: z.array(z.object({ productId: z.number().int().positive(), batchId: z.number().int().positive(), quantity: z.number().positive(), unit: z.string().min(1).max(24), unitPrice: z.number().nonnegative() })).min(1) }))
       .mutation(async ({ ctx, input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
@@ -137,6 +138,16 @@ export const erpRouter = router({
         if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current sale compliance pack required" });
         try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "sale"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
         const subtotal = input.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+        let appliedPromotionId: number | null = null;
+        if (input.promotionCode) {
+          const promotion = (await db.select().from(promotions).where(and(eq(promotions.organizationId, organizationId), eq(promotions.jurisdictionId, assignment.jurisdictionId), eq(promotions.code, input.promotionCode), eq(promotions.status, "active"))).limit(1))[0];
+          if (!promotion) throw new TRPCError({ code: "BAD_REQUEST", message: "Promotion is not available in this scope" });
+          try {
+            const evaluated = evaluatePromotion({ status: promotion.status, discountType: promotion.discountType, discountValue: Number(promotion.discountValue), startsAt: promotion.startsAt, endsAt: promotion.endsAt, usageLimit: promotion.usageLimit, usageCount: promotion.usageCount, now: new Date(), subtotal });
+            if (Math.abs(evaluated.discountAmount - input.discountAmount) > 0.01) throw new Error("Promotion discount does not match the requested discount");
+            appliedPromotionId = promotion.id;
+          } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
+        }
         const discount = enforceDiscount(subtotal, input.discountAmount);
         if (!discount.allowed) throw new TRPCError({ code: "BAD_REQUEST", message: discount.reason });
         const checkedItems: Array<{ productId: number; batchId: number; quantity: number; unit: string; unitPrice: number; remaining: number }> = [];
@@ -159,6 +170,10 @@ export const erpRouter = router({
             const saleId = Number(inserted[0].insertId);
             await tx.insert(saleItems).values(checkedItems.map((item) => ({ saleId, productId: item.productId, batchId: item.batchId, unit: item.unit, quantity: item.quantity.toFixed(3), unitPrice: item.unitPrice.toFixed(2) })));
             for (const item of checkedItems) await tx.update(inventoryBatches).set({ quantityOnHand: (item.remaining - item.quantity).toFixed(3) }).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId), eq(inventoryBatches.branchId, input.branchId)));
+            if (appliedPromotionId !== null) {
+              const updated = await tx.update(promotions).set({ usageCount: sql`${promotions.usageCount} + 1` }).where(and(eq(promotions.id, appliedPromotionId), eq(promotions.status, "active"), or(isNull(promotions.usageLimit), lt(promotions.usageCount, promotions.usageLimit)))).execute();
+              if (!updated) throw new Error("Promotion usage could not be reserved");
+            }
             return saleId;
           });
           return { saleId: result, jurisdictionId: assignment.jurisdictionId, status: "COMMITTED" as const };
