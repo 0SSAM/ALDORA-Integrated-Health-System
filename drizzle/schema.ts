@@ -91,6 +91,28 @@ export const sales = mysqlTable("sales", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, table => ({ invoiceIdx: uniqueIndex("sales_invoice_idx").on(table.invoiceNumber), branchDateIdx: index("sales_branch_date_idx").on(table.branchId, table.createdAt) }));
 
+export const promotions = mysqlTable("promotions", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId"),
+  code: varchar("code", { length: 48 }).notNull(),
+  name: varchar("name", { length: 180 }).notNull(),
+  description: text("description"),
+  discountType: mysqlEnum("discountType", ["percent", "fixed"]).notNull(),
+  discountValue: decimal("discountValue", { precision: 12, scale: 2 }).notNull(),
+  startsAt: timestamp("startsAt").notNull(),
+  endsAt: timestamp("endsAt").notNull(),
+  usageLimit: int("usageLimit"),
+  usageCount: int("usageCount").default(0).notNull(),
+  status: mysqlEnum("status", ["draft", "active", "paused", "expired", "archived"]).default("draft").notNull(),
+  approvedByUserId: int("approvedByUserId"),
+  approvedAt: timestamp("approvedAt"),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ codeScopeIdx: uniqueIndex("promotions_scope_code_idx").on(table.organizationId, table.jurisdictionId, table.code), activeIdx: index("promotions_active_idx").on(table.organizationId, table.jurisdictionId, table.status, table.startsAt, table.endsAt) }));
+
 export const saleItems = mysqlTable("sale_items", {
   id: int("id").autoincrement().primaryKey(),
   saleId: int("saleId").notNull(),

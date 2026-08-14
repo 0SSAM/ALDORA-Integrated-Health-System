@@ -435,3 +435,4 @@
 - [x] Persist report delivery attempts and create scoped in-app notification audit records while keeping external channels disabled (migration 0020; TypeScript and focused tests passed)
 - [x] Verify report delivery migration exists in the project database; full disposable protected-router lifecycle remains blocked because TEST_DATABASE_URL is not a valid MySQL URI
 - [x] Run final validation after report delivery audit (130 passed, 4 optional skipped; TypeScript and production build passed)
+- [x] Implement a scoped promotion/coupon foundation with server-side eligibility, immutable discount-cap enforcement, approval state, and audit metadata; no fabricated campaign usage or customer claims (migration 0021; router and policy tests pass; sale application remains a tracked integration step)
