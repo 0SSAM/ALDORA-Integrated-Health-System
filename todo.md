@@ -266,3 +266,8 @@
 
 - [x] Require non-admin catalog and regulated branch operations to match an active branch membership before reading or writing jurisdiction-scoped records.
 - [x] Add unit coverage for rejecting a jurisdiction request that is not assigned to the authenticated user.
+
+# Prescription Membership Boundary Extension
+
+- [x] Require active authenticated branch membership for prescription upload, extraction, confirmation, and dispensing paths.
+- [ ] Add equivalent membership and pack gates to invoice, insurance, payroll, and reporting persistence paths when implemented.
