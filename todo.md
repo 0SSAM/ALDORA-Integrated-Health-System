@@ -445,3 +445,5 @@
 - [x] Validate the static-audit addition with the full suite, TypeScript, and production build: 135 tests passed, 4 optional database tests skipped, TypeScript passed, and the production build passed with only the existing chunk-size warning.
 - [x] Add a router-contract test proving catalog.create rejects an unassigned jurisdiction before organization lookup or insert; focused catalog, POS, and report isolation tests pass.
 - [x] Re-run full Vitest and TypeScript after catalog.create isolation coverage: 136 tests passed, 4 optional database tests skipped, and TypeScript passed.
+- [x] Add compliance router-contract coverage proving non-admin users cannot create packs or read pack audit history before database access; end-to-end persisted lifecycle remains pending.
+- [x] Re-run full Vitest, TypeScript, and production build after compliance router-contract coverage: 138 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
