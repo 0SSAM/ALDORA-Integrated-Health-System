@@ -492,3 +492,5 @@
 - [x] Create `docs/medicine-data-methodology-2026-08-14.md` documenting the required workbook fields, provenance checks, source limitations, and activation gate; medicine workbook delivery remains open because no verified source file is available.
 
 - [x] Replace the raw regional-rules JSON parser exception with a fixed message and extend `regional-rules.test.ts`; 4 focused tests and TypeScript passed.
+
+- [x] Run a focused scan for dynamic TRPC error messages after the router hardening; no remaining outward message template using raw error, input, URL, or task identifiers was found in the inspected server files.
