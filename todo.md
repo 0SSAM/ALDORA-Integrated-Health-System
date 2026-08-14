@@ -461,3 +461,6 @@
 - [x] Re-run full Vitest, TypeScript, and production build after insurance organization-scope coverage: 140 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
 - [x] Harden insurance.transition with organization/jurisdiction predicates and exact-one-row affectedRows validation to prevent stale-scope updates; focused insurance policy/router tests and TypeScript pass.
 - [x] Re-run full Vitest, TypeScript, and production build after insurance.transition scope and affectedRows hardening: 140 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
+- [ ] Add commitSale router-contract coverage for approved, unapproved, cross-scope, and evidence-incomplete catalog-linked products before any sale transaction begins.
+- [x] Add commitSale contract coverage for the unverified catalog state; the test proves PRECONDITION_FAILED before transaction start and TypeScript passes. Approved, cross-scope, and evidence-incomplete variants remain pending.
+- [x] Re-run full Vitest, TypeScript, and production build after commitSale unverified-catalog coverage: 141 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
