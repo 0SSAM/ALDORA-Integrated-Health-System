@@ -172,3 +172,9 @@
 - [x] Require an active complete jurisdiction profile for catalog creation.
 - [x] Require an active complete jurisdiction profile plus current approved pack and verified evidence for catalog approval.
 - [ ] Re-check catalog jurisdiction and evidence when a catalog item is consumed by sale, prescription, dispensing, or invoice workflows.
+
+# Batch Boundary Enforcement
+
+- [x] Require jurisdictionId on FEFO batch inputs.
+- [x] Reject any POS batch whose jurisdiction differs from the confirmed branch jurisdiction.
+- [ ] Add and gate a persisted inventory/sale write transaction that stores the branch jurisdictionId rather than returning only a prepared sale preview.
