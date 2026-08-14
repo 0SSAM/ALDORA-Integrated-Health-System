@@ -439,3 +439,4 @@
 - [x] Wire approved promotion eligibility into POS preparation/commitSale with revalidation, scope checks, and atomic usage reservation after successful sale writes (134 tests and TypeScript passed)
 - [x] Add a router-contract test proving catalog.search rejects an unassigned jurisdiction before product reads; combined catalog, POS, and report country-contract tests pass.
 - [x] Fix the debug collector's remaining XHR responseText read so sensitive response bodies are never read or retained; privacy regression test, TypeScript, and production build pass.
+- [x] Re-run the full regression suite after the debug-collector privacy fix; 135 tests passed and 4 optional database tests were skipped because the configured test database URL is not a valid MySQL lifecycle target.
