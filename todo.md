@@ -329,3 +329,5 @@
 - [ ] Run the protected-router integration harness against a disposable test database and add rollback/cleanup assertions before marking database-backed isolation complete.
 - [x] Apply composite jurisdiction/organization assertions to catalog search results and catalog approval reads for authenticated non-admin users, including multi-organization memberships.
 - [ ] Extend composite query assertions to every remaining regulated read/write path and add persisted cross-tenant denial coverage.
+- [x] Add an opt-in transaction/rollback probe proving a persisted jurisdiction-plus-organization predicate excludes a second organization and leaves no temporary data behind.
+- [ ] Execute the actual protected tRPC router lifecycle against a disposable database with authenticated organization memberships, cross-tenant denial, and cleanup assertions.
