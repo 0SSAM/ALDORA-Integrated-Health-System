@@ -310,3 +310,8 @@
 - [ ] Add privacy/security controls for patient, prescription, diagnostic, imaging, insurance, and audit data, including least privilege and demo restrictions.
 - [ ] Add unit and integration-contract tests for organization isolation, role matrix, sensitive-data access, and cross-tenant denial.
 - [ ] Document official regulatory, interoperability, retention, and credential prerequisites per country and organization type.
+
+# Notification Organization Scope Bug
+
+- [x] Resolve the stale COOKIE_NAME import error reported by the development server by restarting the stale HMR process; TypeScript, 72 tests, and production build are passing.
+- [ ] Verify organization-scoped notifications are filtered by active membership and preserve global notifications for authorized users.

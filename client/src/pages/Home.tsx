@@ -45,10 +45,10 @@ export default function Home() {
   const [offlineDrafts, setOfflineDrafts] = useState<OfflineDraft[]>([]);
   const serverDrafts = trpc.erp.offlineDrafts.listMine.useQuery(undefined, { enabled: Boolean(user && !isDemo) });
   const organizationsQuery = trpc.organizations.mine.useQuery(undefined, { enabled: Boolean(user && !isDemo) });
-  const notificationsQuery = trpc.notifications.list.useQuery(undefined, { enabled: Boolean(user && !isDemo) });
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<number | null>(null);
+  const notificationsQuery = trpc.notifications.list.useQuery({ organizationId: selectedOrganizationId }, { enabled: Boolean(user && !isDemo) });
   const markNotificationRead = trpc.notifications.markRead.useMutation({ onSuccess: () => { void notificationsQuery.refetch(); } });
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState<number | null>(null);
   const organizationTypeLabels: Record<string, string> = { government: "جهة حكومية", pharmacy: "صيدلية فردية", pharmacy_chain: "سلسلة صيدليات", distributor: "شركة توزيع دواء", insurer: "شركة تأمين طبي", rehabilitation: "مركز تأهيل وعلاج طبيعي", hospital: "مستشفى", laboratory: "معمل تحاليل", radiology: "مركز أشعة" };
   const activeOrganizationType = organizationsQuery.data?.find(item => item.id === selectedOrganizationId)?.organizationType;
   const replayDraft = trpc.erp.offlineDrafts.replay.useMutation({ onSuccess: () => { void serverDrafts.refetch(); } });

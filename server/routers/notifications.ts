@@ -18,12 +18,20 @@ const notificationInput = z.object({
 });
 
 export const notificationsRouter = router({
-  list: protectedProcedure.query(async ({ ctx }) => {
+  list: protectedProcedure.input(z.object({ organizationId: z.number().int().positive().nullable().optional() }).optional()).query(async ({ ctx, input }) => {
     const db = await getDb();
     if (!db) return { items: [], unreadCount: 0 };
 
     const now = new Date();
     const visibleRole = ctx.user.role;
+    if (input?.organizationId && ctx.user.role !== "admin") {
+      const membership = await db.select({ id: organizationMemberships.id }).from(organizationMemberships).where(and(
+        eq(organizationMemberships.organizationId, input.organizationId),
+        eq(organizationMemberships.userId, ctx.user.id),
+        eq(organizationMemberships.active, 1),
+      )).limit(1);
+      if (!membership.length) throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك عضوية في هذه المؤسسة." });
+    }
     const rows = await db.select({
       notification: notifications,
       read: notificationReads.id,
@@ -36,7 +44,7 @@ export const notificationsRouter = router({
       .where(and(
         eq(notifications.active, 1),
         or(isNull(notifications.expiresAt), gt(notifications.expiresAt, now)),
-        isNull(notifications.organizationId),
+        or(isNull(notifications.organizationId), input?.organizationId ? eq(notifications.organizationId, input.organizationId) : isNull(notifications.organizationId)),
         isNull(notifications.branchId),
         or(eq(notifications.audienceRole, "all"), eq(notifications.audienceRole, visibleRole as typeof notifications.audienceRole.enumValues[number])),
       ))
