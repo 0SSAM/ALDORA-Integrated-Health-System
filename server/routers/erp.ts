@@ -21,6 +21,7 @@ import { canAccessBranch } from "../domain/branch-access";
 import { assertAssigneeScope, assertCustomerTicketScope, buildCallTicketUpdate } from "../domain/customer-care-policy";
 import { evaluatePromotion } from "../domain/promotion-policy";
 import { assertCatalogIntakeReady } from "../domain/catalog-intake-policy";
+import { assertDeviceTrustReady } from "../domain/device-trust-policy";
 
 async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
   if (role === "admin") return null;
@@ -440,8 +441,19 @@ export const erpRouter = router({
         return { draftId: Number(inserted[0].insertId), status: "queued" as const, duplicate: false };
       }),
     replay: customerCareProcedure
-      .input(z.object({ draftId: z.number().int().positive() }))
+      .input(z.object({
+        draftId: z.number().int().positive(),
+        deviceTrust: z.object({
+          deviceIdentityVerified: z.boolean(),
+          localStorageEncrypted: z.boolean(),
+          supportedAppVersion: z.boolean(),
+          screenLockAssured: z.boolean(),
+          deviceRevocationChecked: z.boolean(),
+          sessionScopeVerified: z.boolean(),
+        }).optional(),
+      }))
       .mutation(async ({ ctx, input }) => {
+        try { assertDeviceTrustReady(input.deviceTrust ?? null); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Trusted device required for offline replay" }); }
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const draft = (await db.select().from(offlineDrafts).where(and(eq(offlineDrafts.id, input.draftId), eq(offlineDrafts.createdByUserId, ctx.user.id))).limit(1))[0];

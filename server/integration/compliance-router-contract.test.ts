@@ -34,6 +34,12 @@ function contextFor(user: TestUser): TrpcContext {
 describe("regional compliance protected router contracts", () => {
   beforeEach(() => getDbMock.mockReset());
 
+  it("denies offline replay before opening the database when device trust is missing", async () => {
+    const caller = appRouter.createCaller(contextFor(staffUser));
+    await expect(caller.erp.offlineDrafts.replay({ draftId: 7 })).rejects.toMatchObject({ code: "PRECONDITION_FAILED" });
+    expect(getDbMock).not.toHaveBeenCalled();
+  });
+
   it("denies non-admin pack creation before opening the database", async () => {
     const caller = appRouter.createCaller(contextFor(staffUser));
     await expect(caller.regional.createPack({

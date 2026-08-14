@@ -576,3 +576,7 @@
 - [x] Persist or model per-country required-domain coverage explicitly in compliance pack rules without activating any unverified country; rulesJson now requires the full matrix and manifest remains blocked for all reviewed countries.
 
 - [x] Check the official EDA registered-drug search endpoint for a reproducible bulk/API source; the endpoint was reachable by URL but exposed no usable export or interactive data in the test environment, so the catalog remains safely blocked pending an authorized source.
+
+- [ ] Enforce Device-Trust readiness at offline draft replay and pass an explicit trusted-device context from the authorized client path.
+
+- [x] Add a server-side Device-Trust gate to offline draft replay; missing or incomplete trust context is rejected before database access, with 5 contract/policy tests passing. Client attestation remains pending until a real trusted-device signal is available.
