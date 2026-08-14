@@ -518,3 +518,5 @@
 - [x] Add a reusable external-adapter readiness gate that blocks government/e-invoicing submission until verified specifications, credentials, organization registration, and human acceptance are present; 2 tests and TypeScript passed.
 
 - [x] Record a primary-source review for EDA Egypt and JFDA Jordan with source URLs and explicit limitations; no unverified regulatory rows or automatic submission were enabled.
+
+- [x] Review official Qatar MOPH and Morocco AMMPS portals as source leads and record CAPTCHA/content limitations; detailed country-pack activation remains pending primary-source extraction, effective dates, credentials, and acceptance tests.
