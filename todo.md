@@ -506,3 +506,5 @@
 - [x] Validate the invoice boundary and router addition with focused tests, full Vitest, TypeScript, and production build; 161 tests passed, 4 optional database tests skipped because TEST_DATABASE_URL is unavailable, and the existing chunk-size warning remains non-blocking.
 
 - [x] Expand compliance lifecycle coverage across evidence verification, approval readiness, stale blocking, rollback, and audit visibility contract; 4 lifecycle tests and TypeScript passed.
+
+- [x] Add protected-router contract coverage for invoice.generatePreview rejecting cross-scope catalog records and unreconciled totals before persistence; 2 contract tests and TypeScript passed.
