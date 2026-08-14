@@ -59,7 +59,7 @@ describe("insurance policy", () => {
   });
 });
 
-import { assertPersistedInsuranceTransition, buildInsuranceRequestPayload, hashInsuranceMemberReference } from "./insurance-persistence-policy";
+import { assertInsuranceTransitionAuthorized, assertPersistedInsuranceTransition, buildInsuranceRequestPayload, hashInsuranceMemberReference } from "./insurance-persistence-policy";
 
 describe("persisted insurance policy", () => {
   it("hashes member references deterministically and stores only a sanitized service payload", () => {
@@ -73,5 +73,15 @@ describe("persisted insurance policy", () => {
     expect(assertPersistedInsuranceTransition("DRAFT", "READY_FOR_SUBMISSION", "NOT_CONFIGURED")).toBe(true);
     expect(() => assertPersistedInsuranceTransition("READY_FOR_SUBMISSION", "SUBMITTED", "TEST_READY")).toThrow(/production credentials/);
     expect(assertPersistedInsuranceTransition("READY_FOR_SUBMISSION", "SUBMITTED", "PRODUCTION_READY")).toBe(true);
+  });
+
+  it("requires elevated organization access for lifecycle transitions", () => {
+    expect(() => assertInsuranceTransitionAuthorized("staff", "CANCELLED")).toThrow(/elevated organization access/);
+    expect(assertInsuranceTransitionAuthorized("operations_manager", "CANCELLED")).toBe(true);
+  });
+
+  it("restricts external references to payer submission or decision states", () => {
+    expect(() => assertInsuranceTransitionAuthorized("org_admin", "READY_FOR_SUBMISSION", "payer-ref-1")).toThrow(/External reference/);
+    expect(assertInsuranceTransitionAuthorized("org_admin", "APPROVED", "payer-ref-1")).toBe(true);
   });
 });

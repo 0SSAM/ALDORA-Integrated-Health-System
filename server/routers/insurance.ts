@@ -5,7 +5,7 @@ import { getDb } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { validateInsuranceRequest, type InsuranceRequestStatus } from "../domain/insurance-policy";
-import { assertPersistedInsuranceTransition, buildInsuranceRequestPayload, hashInsuranceMemberReference } from "../domain/insurance-persistence-policy";
+import { assertInsuranceTransitionAuthorized, assertPersistedInsuranceTransition, buildInsuranceRequestPayload, hashInsuranceMemberReference } from "../domain/insurance-persistence-policy";
 import { assertCompliancePackUsable } from "../domain/regional-engine";
 
 const requestType = z.enum(["ELIGIBILITY", "PREAUTHORIZATION"]);
@@ -62,7 +62,10 @@ export const insuranceRouter = router({
       const row = (await db.select().from(insuranceRequests).where(eq(insuranceRequests.id, input.requestId)).limit(1))[0];
       if (!row) throw new TRPCError({ code: "NOT_FOUND", message: "Insurance request not found" });
       await assertScope(db, ctx.user.id, ctx.user.role, row.organizationId, row.jurisdictionId);
-      try { assertPersistedInsuranceTransition(row.status as InsuranceRequestStatus, input.toStatus as InsuranceRequestStatus, row.credentialGate); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+      try {
+        assertInsuranceTransitionAuthorized(ctx.user.role, input.toStatus as InsuranceRequestStatus, input.externalReference);
+        assertPersistedInsuranceTransition(row.status as InsuranceRequestStatus, input.toStatus as InsuranceRequestStatus, row.credentialGate);
+      } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
       await db.update(insuranceRequests).set({ status: input.toStatus, externalReference: input.externalReference }).where(eq(insuranceRequests.id, input.requestId));
       return { success: true, status: input.toStatus, networkSubmission: "disabled" as const };
     }),

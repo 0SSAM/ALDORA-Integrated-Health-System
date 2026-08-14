@@ -387,3 +387,5 @@
 - [x] Refresh operations documentation for persisted reporting, insurance requests, compliance gates, and the current validation count.
 - [x] Implement reviewed allowlisted report execution for inventory alerts, daily sales, expiry review, and operations summary with organization/jurisdiction predicates and no user SQL.
 - [x] Harden report scheduling against malformed cron expressions, null jurisdiction scope, and stale compliance-pack approval before creating a Heartbeat task.
+- [x] Restrict insurance lifecycle transitions to authorized organization roles and reject external references on non-submission states; retain the production credential gate for SUBMITTED.
+- [x] Add regression coverage for insurance transition authorization and external-reference rules.
