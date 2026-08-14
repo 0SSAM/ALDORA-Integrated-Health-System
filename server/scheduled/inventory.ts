@@ -4,6 +4,10 @@ import { branchAlerts, branchUsers, inventoryBatches, scheduledJobs, users } fro
 import { getDb } from "../db";
 import { sdk } from "../_core/sdk";
 
+export function safeInventoryTransportError(_error: unknown) {
+  return { error: "inventory-alert-execution-failed" } as const;
+}
+
 export async function inventoryAlertHandler(req: Request, res: Response) {
   let taskUid: string | undefined;
   try {
@@ -32,6 +36,6 @@ export async function inventoryAlertHandler(req: Request, res: Response) {
     await db.update(scheduledJobs).set({ lastRunAt: now }).where(eq(scheduledJobs.id, job.id));
     return res.json({ ok: true, taskUid, batchesEvaluated: batches.length, managerAlertsQueued: queued, delivery: "branch_alert_queue" });
   } catch (error) {
-    return res.status(500).json({ error: String(error), context: { url: req.originalUrl, taskUid }, timestamp: new Date().toISOString() });
+    return res.status(500).json(safeInventoryTransportError(error));
   }
 }
