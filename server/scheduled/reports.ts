@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { and, eq, gte, lte } from "drizzle-orm";
-import { branchJurisdictions, inventoryBatches, reportDefinitions, reportRuns, sales } from "../../drizzle/schema";
+import { branchJurisdictions, inventoryBatches, notifications, reportDefinitions, reportDeliveryAttempts, reportRuns, sales } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { sdk } from "../_core/sdk";
 
@@ -15,6 +15,27 @@ export function reportExecutionSkipReason(definition: ReportExecutionDefinition)
   if (definition.jurisdictionId === null) return "missing_scope";
   if (!new Set(["inventory.alerts.v1", "sales.daily.v1", "compliance.expiry.v1", "operations.summary.v1"]).has(definition.queryKey)) return "unsupported_query";
   return undefined;
+}
+
+async function recordInAppDelivery(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, definition: typeof reportDefinitions.$inferSelect, reportRunId: number) {
+  const base = { reportRunId, definitionId: definition.id, organizationId: definition.organizationId, jurisdictionId: definition.jurisdictionId, recipientRole: definition.recipientRole, recipientUserId: definition.recipientUserId, channel: "in_app" as const };
+  if (definition.recipientUserId !== null) {
+    await db.insert(reportDeliveryAttempts).values({ ...base, status: "skipped", errorCode: "RECIPIENT_USER_TARGET_UNSUPPORTED", completedAt: new Date() });
+    return { status: "skipped" as const, reason: "recipient_user_target_unsupported" as const };
+  }
+  const audienceRole = definition.recipientRole === "owner" || definition.recipientRole === "compliance_officer" ? "org_admin" : definition.recipientRole ?? "all";
+  const created = await db.insert(notifications).values({
+    organizationId: definition.organizationId,
+    branchId: null,
+    audienceRole,
+    severity: "info",
+    title: `Report ready: ${definition.name}`.slice(0, 160),
+    body: "A scoped scheduled report completed. Open Reports to review the authorized summary.",
+    createdByUserId: null,
+  }).$returningId();
+  const notificationId = created[0]?.id ?? null;
+  await db.insert(reportDeliveryAttempts).values({ ...base, status: "delivered", notificationId, completedAt: new Date() });
+  return { status: "delivered" as const, notificationId };
 }
 
 async function executeAllowlistedQuery(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, definition: typeof reportDefinitions.$inferSelect, periodStart: Date, periodEnd: Date) {
@@ -80,7 +101,9 @@ export async function reportExecutionHandler(req: Request, res: Response) {
       finishedAt: new Date(),
     });
 
-    return res.json({ ok: true, runId: Number(inserted[0].insertId), status: "succeeded", output, delivery: "disabled" });
+    const runId = Number(inserted[0].insertId);
+    const delivery = await recordInAppDelivery(db, definition, runId);
+    return res.json({ ok: true, runId, status: "succeeded", output, delivery });
   } catch (error) {
     return res.status(500).json({ error: String(error), context: { url: req.originalUrl, taskUid }, timestamp: new Date().toISOString() });
   }

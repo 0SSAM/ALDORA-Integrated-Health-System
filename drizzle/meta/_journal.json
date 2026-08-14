@@ -141,6 +141,13 @@
       "when": 1786731097303,
       "tag": "0019_foamy_puppet_master",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1786734566256,
+      "tag": "0020_lovely_eddie_brock",
+      "breakpoints": true
     }
   ]
 }

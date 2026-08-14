@@ -407,8 +407,22 @@ export const reportRuns = mysqlTable("report_runs", {
 
 export type ReportDefinition = typeof reportDefinitions.$inferSelect;
 export type ReportRun = typeof reportRuns.$inferSelect;
-
-
+export const reportDeliveryAttempts = mysqlTable("report_delivery_attempts", {
+  id: int("id").autoincrement().primaryKey(),
+  reportRunId: int("reportRunId").notNull(),
+  definitionId: int("definitionId").notNull(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId"),
+  recipientRole: mysqlEnum("recipientRole", ["owner", "org_admin", "compliance_officer", "clinical_lead", "operations_manager", "staff", "auditor"]),
+  recipientUserId: int("recipientUserId"),
+  channel: mysqlEnum("channel", ["in_app", "email", "sms", "webhook"]).default("in_app").notNull(),
+  status: mysqlEnum("status", ["queued", "delivered", "skipped", "failed"]).default("queued").notNull(),
+  notificationId: int("notificationId"),
+  errorCode: varchar("errorCode", { length: 100 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+}, table => ({ scopeTimeIdx: index("report_delivery_scope_time_idx").on(table.organizationId, table.jurisdictionId, table.createdAt) }));
+export type ReportDeliveryAttempt = typeof reportDeliveryAttempts.$inferSelect;
 export const insuranceRequests = mysqlTable("insurance_requests", {
   id: int("id").autoincrement().primaryKey(),
   organizationId: int("organizationId").notNull(),

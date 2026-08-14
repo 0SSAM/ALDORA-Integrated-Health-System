@@ -431,3 +431,7 @@
 
 # Audit Notes
 - The development network log showed analytics response bodies being retained by the browser debug collector. The collector now records metadata only and stores a fixed privacy-policy marker instead of response payloads.
+- [x] Add router-contract regression coverage for cross-country catalog and report access denial; persisted disposable-database lifecycle remains pending
+- [x] Persist report delivery attempts and create scoped in-app notification audit records while keeping external channels disabled (migration 0020; TypeScript and focused tests passed)
+- [x] Verify report delivery migration exists in the project database; full disposable protected-router lifecycle remains blocked because TEST_DATABASE_URL is not a valid MySQL URI
+- [x] Run final validation after report delivery audit (130 passed, 4 optional skipped; TypeScript and production build passed)

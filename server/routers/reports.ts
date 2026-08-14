@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
-import { branches, branchJurisdictions, branchUsers, complianceEvidence, compliancePacks, jurisdictionProfiles, organizationMemberships, reportDefinitions, reportRuns } from "../../drizzle/schema";
+import { branches, branchJurisdictions, branchUsers, complianceEvidence, compliancePacks, jurisdictionProfiles, organizationMemberships, reportDefinitions, reportDeliveryAttempts, reportRuns } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
@@ -126,5 +126,16 @@ export const reportsRouter = router({
       const jurisdictionIds = await accessibleJurisdictionIds(db, ctx.user.id, ctx.user.role, input.organizationId);
       const filters = [eq(reportRuns.organizationId, input.organizationId), jurisdictionIds === null ? undefined : jurisdictionIds.length ? inArray(reportRuns.jurisdictionId, jurisdictionIds) : eq(reportRuns.id, -1), input.definitionId === undefined ? undefined : eq(reportRuns.definitionId, input.definitionId)].filter(Boolean) as any[];
       return db.select().from(reportRuns).where(and(...filters)).orderBy(desc(reportRuns.createdAt)).limit(100);
+    }),
+
+  deliveryAttempts: protectedProcedure
+    .input(z.object({ organizationId: z.number().int().positive(), definitionId: z.number().int().positive().optional() }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      await assertOrganizationAccess(db, ctx.user.id, ctx.user.role, input.organizationId);
+      const jurisdictionIds = await accessibleJurisdictionIds(db, ctx.user.id, ctx.user.role, input.organizationId);
+      const filters = [eq(reportDeliveryAttempts.organizationId, input.organizationId), jurisdictionIds === null ? undefined : jurisdictionIds.length ? inArray(reportDeliveryAttempts.jurisdictionId, jurisdictionIds) : eq(reportDeliveryAttempts.id, -1), input.definitionId === undefined ? undefined : eq(reportDeliveryAttempts.definitionId, input.definitionId)].filter(Boolean) as any[];
+      return db.select().from(reportDeliveryAttempts).where(and(...filters)).orderBy(desc(reportDeliveryAttempts.createdAt)).limit(100);
     }),
 });
