@@ -279,6 +279,7 @@ export const complianceEvidence = mysqlTable("compliance_evidence", {
   reviewDueAt: timestamp("reviewDueAt"),
   verificationStatus: mysqlEnum("verificationStatus", ["unverified", "review", "verified", "rejected"]).default("unverified").notNull(),
   verifiedByUserId: int("verifiedByUserId"),
+  verifiedAt: timestamp("verifiedAt"),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, table => ({ sourceIdx: index("compliance_evidence_source_idx").on(table.jurisdictionId, table.packId, table.operation) }));

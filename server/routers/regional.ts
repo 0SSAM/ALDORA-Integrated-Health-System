@@ -1,10 +1,11 @@
 import { and, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { branchJurisdictions, branches, complianceEvidence, compliancePacks, jurisdictionProfiles } from "../../drizzle/schema";
+import { branchJurisdictions, branches, complianceEvidence, compliancePacks, complianceRuleAudits, jurisdictionProfiles } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { adminProcedure, protectedProcedure, router } from "../_core/trpc";
 import { ARAB_COUNTRY_REGISTRY, normalizeCountryCode } from "../domain/regional-engine";
+import { assertPackApprovalReady, transitionPackStatus } from "../domain/compliance-lifecycle";
 
 const profileInput = z.object({
   countryCode: z.string().length(2),
@@ -84,10 +85,45 @@ export const regionalRouter = router({
     return { packId: Number(inserted[0].insertId), status: "draft" as const, requiresEvidenceAndApproval: true };
   }),
 
+  approvePack: adminProcedure.input(z.object({ packId: z.number().int().positive(), reason: z.string().min(5).max(1000).optional() })).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    const pack = (await db.select().from(compliancePacks).where(eq(compliancePacks.id, input.packId)).limit(1))[0];
+    if (!pack) throw new TRPCError({ code: "NOT_FOUND", message: "Compliance pack not found" });
+    const rules = JSON.parse(pack.rulesJson || "{}") as Record<string, boolean>;
+    const evidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified")));
+    try {
+      assertPackApprovalReady({ status: pack.status, rules, evidence, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt });
+      transitionPackStatus(pack.status, "approved");
+    } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+    await db.update(compliancePacks).set({ status: "approved", approvedByUserId: ctx.user.id }).where(eq(compliancePacks.id, pack.id));
+    await db.insert(complianceRuleAudits).values({ packId: pack.id, action: "approved", actorUserId: ctx.user.id, reason: input.reason ?? "Approved after verified evidence review" });
+    await db.insert(complianceRuleAudits).values({ packId: pack.id, action: "activated", actorUserId: ctx.user.id, reason: "Activated as current approved pack" });
+    return { packId: pack.id, status: "approved" as const, approvedBy: ctx.user.id };
+  }),
+
+  rollbackPack: adminProcedure.input(z.object({ packId: z.number().int().positive(), reason: z.string().min(5).max(1000) })).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    const pack = (await db.select().from(compliancePacks).where(eq(compliancePacks.id, input.packId)).limit(1))[0];
+    if (!pack) throw new TRPCError({ code: "NOT_FOUND", message: "Compliance pack not found" });
+    if (pack.status === "rolled_back") return { packId: pack.id, status: "rolled_back" as const, alreadyRolledBack: true };
+    try { transitionPackStatus(pack.status, "rolled_back"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+    await db.update(compliancePacks).set({ status: "rolled_back", approvedByUserId: null }).where(eq(compliancePacks.id, pack.id));
+    await db.insert(complianceRuleAudits).values({ packId: pack.id, action: "rolled_back", actorUserId: ctx.user.id, reason: input.reason });
+    return { packId: pack.id, status: "rolled_back" as const, alreadyRolledBack: false };
+  }),
+
   listPacks: protectedProcedure.input(z.object({ jurisdictionId: z.number().int().positive() })).query(async ({ input }) => {
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
     return db.select().from(compliancePacks).where(eq(compliancePacks.jurisdictionId, input.jurisdictionId)).orderBy(desc(compliancePacks.createdAt));
+  }),
+
+  listPackAudits: adminProcedure.input(z.object({ packId: z.number().int().positive() })).query(async ({ input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    return db.select().from(complianceRuleAudits).where(eq(complianceRuleAudits.packId, input.packId)).orderBy(desc(complianceRuleAudits.createdAt));
   }),
 
   addEvidence: adminProcedure.input(z.object({ jurisdictionId: z.number().int().positive(), packId: z.number().int().positive(),   operation: z.string().min(2).max(40),
@@ -100,5 +136,15 @@ export const regionalRouter = router({
     if (!pack) throw new TRPCError({ code: "NOT_FOUND", message: "Compliance pack not found for jurisdiction" });
     const inserted = await db.insert(complianceEvidence).values({ ...input, ruleKey: input.ruleKey ?? null, catalogField: input.catalogField ?? null, sourceRecordId: input.sourceRecordId ?? null, effectiveFrom: input.effectiveFrom ?? null, reviewDueAt: input.reviewDueAt ?? null, verificationStatus: "review", verifiedByUserId: null, createdAt: new Date() });
     return { evidenceId: Number(inserted[0].insertId), status: "review" as const, createdBy: ctx.user.id };
+  }),
+
+  verifyEvidence: adminProcedure.input(z.object({ evidenceId: z.number().int().positive(), decision: z.enum(["verified", "rejected"]), notes: z.string().max(4000).optional() })).mutation(async ({ ctx, input }) => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    const evidence = (await db.select().from(complianceEvidence).where(eq(complianceEvidence.id, input.evidenceId)).limit(1))[0];
+    if (!evidence) throw new TRPCError({ code: "NOT_FOUND", message: "Compliance evidence not found" });
+    const verifiedAt = new Date();
+    await db.update(complianceEvidence).set({ verificationStatus: input.decision, verifiedByUserId: ctx.user.id, verifiedAt, notes: input.notes ?? evidence.notes }).where(eq(complianceEvidence.id, evidence.id));
+    return { evidenceId: evidence.id, status: input.decision, verifiedBy: ctx.user.id, verifiedAt };
   }),
 });
