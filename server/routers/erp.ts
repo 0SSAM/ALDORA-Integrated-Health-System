@@ -14,7 +14,7 @@ import { assertCompliancePackUsable, assertJurisdictionProfileReady } from "../d
 import { assertBranchAssignmentReady } from "../domain/branch-compliance";
 import { storageGetSignedUrl, storagePut } from "../storage";
 import { activeCatalogFields, assertCatalogEvidence, assertConsumableCatalogContext } from "../domain/catalog-policy";
-import { assertRecordBelongsToJurisdiction } from "../domain/data-boundary";
+import { assertRecordBelongsToJurisdiction, assertRecordBelongsToScope } from "../domain/data-boundary";
 import { canAccessJurisdiction } from "../domain/jurisdiction-access";
 import { canAccessBranch } from "../domain/branch-access";
 
@@ -419,7 +419,15 @@ export const erpRouter = router({
           const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
           filters.push(organizationIds.length ? inArray(catalogItems.organizationId, organizationIds) : eq(catalogItems.id, -1));
         }
-        return db.select().from(catalogItems).where(and(...filters)).orderBy(desc(catalogItems.updatedAt)).limit(100);
+        const rows = await db.select().from(catalogItems).where(and(...filters)).orderBy(desc(catalogItems.updatedAt)).limit(100);
+        if (ctx.user.role !== "admin") {
+          const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
+          rows.forEach(row => {
+            if (!row.organizationId || !organizationIds.includes(row.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item is outside the active organization scope" });
+            try { assertRecordBelongsToScope({ entityType: "catalog_item", jurisdictionId: row.jurisdictionId, organizationId: row.organizationId }, { jurisdictionId: input.jurisdictionId, organizationId: row.organizationId }); } catch (error) { throw new TRPCError({ code: "FORBIDDEN", message: String(error) }); }
+          });
+        }
+        return rows;
       }),
     createItem: catalogEditorProcedure
       .input(z.object({ jurisdictionId: z.number().int().positive(), organizationId: z.number().int().positive().optional(), category: z.enum(["medicine", "cosmetic", "medical_supply"]), sku: z.string().min(2).max(80), barcode: z.string().max(80).optional(), nameAr: z.string().min(2).max(240), nameEn: z.string().max(240).optional(), genericName: z.string().max(240).optional(), manufacturer: z.string().max(220).optional(), registrationNumber: z.string().max(120).optional(), sourceAuthority: z.string().min(2).max(40), sourceRecordId: z.string().max(160).optional(), sourceUrl: z.string().url().max(500).optional() }))
@@ -446,6 +454,11 @@ export const erpRouter = router({
         const item = (await db.select().from(catalogItems).where(eq(catalogItems.id, input.itemId)).limit(1))[0];
         if (!item) throw new TRPCError({ code: "NOT_FOUND", message: "Catalog item not found" });
         if (!item.jurisdictionId || !item.organizationId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog item has no complete organization/jurisdiction scope" });
+        if (ctx.user.role !== "admin") {
+          const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
+          if (!organizationIds.includes(item.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item is outside the active organization scope" });
+          try { assertRecordBelongsToScope({ entityType: "catalog_item", jurisdictionId: item.jurisdictionId, organizationId: item.organizationId }, { jurisdictionId: item.jurisdictionId, organizationId: item.organizationId }); } catch (error) { throw new TRPCError({ code: "FORBIDDEN", message: String(error) }); }
+        }
         if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(item.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item is outside the active organization scope" });
         try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, item.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: String(error) }); }
         if (input.approved) {

@@ -327,3 +327,5 @@
 - [ ] Expand the source-linked register to every requested country and organization type only after current primary sources, effective dates, local licences, credentials, and acceptance criteria are verified.
 - [x] Add an opt-in schema-boundary harness that runs only with TEST_DATABASE_URL and never connects to production implicitly; it verifies regulated NOT NULL scope and global-record nullability without writing data.
 - [ ] Run the protected-router integration harness against a disposable test database and add rollback/cleanup assertions before marking database-backed isolation complete.
+- [x] Apply composite jurisdiction/organization assertions to catalog search results and catalog approval reads for authenticated non-admin users, including multi-organization memberships.
+- [ ] Extend composite query assertions to every remaining regulated read/write path and add persisted cross-tenant denial coverage.
