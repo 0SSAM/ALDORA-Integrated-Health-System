@@ -574,3 +574,5 @@
 - [x] Integrate REQUIRED_COUNTRY_PACK_DOMAINS into the regional registry and approval readiness path so a country cannot appear enabled without complete source-linked verified coverage; 9 focused tests and TypeScript passed.
 - [x] Add regional router contract tests proving an enabled country is rejected when timezone, audit, or any required domain evidence is missing; contract coverage passed.
 - [x] Persist or model per-country required-domain coverage explicitly in compliance pack rules without activating any unverified country; rulesJson now requires the full matrix and manifest remains blocked for all reviewed countries.
+
+- [x] Check the official EDA registered-drug search endpoint for a reproducible bulk/API source; the endpoint was reachable by URL but exposed no usable export or interactive data in the test environment, so the catalog remains safely blocked pending an authorized source.
