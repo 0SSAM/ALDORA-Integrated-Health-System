@@ -482,3 +482,5 @@
 - [x] Recheck the ALDO workspace after auth.me settles: desktop RTL dashboard, ALDO inline mark, CSS background, navigation, and scoped workspace messaging render successfully; the earlier loading screenshot was captured before the request completed.
 
 - [x] Harden router policy-error responses in insurance, regional, and reports: removed `String(error)` from outward TRPC messages and replaced it with fixed non-sensitive messages; 150 tests passed, 4 optional database tests were skipped, TypeScript passed, and the production build passed.
+
+- [x] Re-run full regression after ERP error-surface hardening: 150 tests passed, 4 optional live-database tests skipped, TypeScript passed, production build passed, and the server-wide raw error interpolation scan returned no matches.

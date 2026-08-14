@@ -112,8 +112,8 @@ export const erpRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
-        try { assertBranchAssignmentReady(assignment); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
-        try { input.batches.forEach((batch) => assertRecordBelongsToJurisdiction({ entityType: "inventory_batch", jurisdictionId: batch.jurisdictionId }, assignment.jurisdictionId)); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertBranchAssignmentReady(assignment); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
+        try { input.batches.forEach((batch) => assertRecordBelongsToJurisdiction({ entityType: "inventory_batch", jurisdictionId: batch.jurisdictionId }, assignment.jurisdictionId)); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" }); }
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
         if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Branch jurisdiction or approved compliance pack is unavailable" });
@@ -121,8 +121,8 @@ export const erpRouter = router({
         const rules = JSON.parse(pack.rulesJson) as Record<string, boolean>;
         try {
           assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules, evidenceCount: evidence.length }, "sale");
-        } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
-        try { return { ...preparePosSale(input), jurisdictionId: assignment.jurisdictionId }; } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
+        } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" }); }
+        try { return { ...preparePosSale(input), jurisdictionId: assignment.jurisdictionId }; } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: "ERP policy validation rejected the request" }); }
       }),
     commitSale: protectedProcedure
       .input(z.object({ branchId: z.number().int().positive(), invoiceNumber: z.string().min(3).max(80), paymentMethod: z.enum(["cash", "meeza", "instapay", "insurance"]), discountAmount: z.number().nonnegative(), promotionCode: z.string().regex(/^[A-Z0-9_-]{3,48}$/).optional(), items: z.array(z.object({ productId: z.number().int().positive(), batchId: z.number().int().positive(), quantity: z.number().positive(), unit: z.string().min(1).max(24), unitPrice: z.number().nonnegative() })).min(1) }))
@@ -130,13 +130,13 @@ export const erpRouter = router({
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
-        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
         const organizationId = await getBranchOrganizationId(db, input.branchId);
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
         const evidence = pack ? await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
         if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current sale compliance pack required" });
-        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "sale"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "sale"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" }); }
         const subtotal = input.items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
         let appliedPromotionId: number | null = null;
         if (input.promotionCode) {
@@ -146,7 +146,7 @@ export const erpRouter = router({
             const evaluated = evaluatePromotion({ status: promotion.status, discountType: promotion.discountType, discountValue: Number(promotion.discountValue), startsAt: promotion.startsAt, endsAt: promotion.endsAt, usageLimit: promotion.usageLimit, usageCount: promotion.usageCount, now: new Date(), subtotal });
             if (Math.abs(evaluated.discountAmount - input.discountAmount) > 0.01) throw new Error("Promotion discount does not match the requested discount");
             appliedPromotionId = promotion.id;
-          } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
+          } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: "ERP policy validation rejected the request" }); }
         }
         const discount = enforceDiscount(subtotal, input.discountAmount);
         if (!discount.allowed) throw new TRPCError({ code: "BAD_REQUEST", message: discount.reason });
@@ -159,7 +159,7 @@ export const erpRouter = router({
           const catalogItem = (await db.select().from(catalogItems).where(and(eq(catalogItems.id, product.catalogItemId), eq(catalogItems.jurisdictionId, assignment.jurisdictionId), eq(catalogItems.organizationId, organizationId))).limit(1))[0];
           if (!catalogItem || catalogItem.verificationStatus !== "VERIFIED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog record is not verified for this jurisdiction" });
           const catalogEvidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.jurisdictionId, assignment.jurisdictionId), eq(complianceEvidence.operation, "catalog"), eq(complianceEvidence.verificationStatus, "verified")));
-          try { assertConsumableCatalogContext({ productCatalogItemId: product.catalogItemId, catalogItemId: catalogItem.id, productJurisdictionId: product.jurisdictionId, catalogJurisdictionId: catalogItem.jurisdictionId!, catalogStatus: catalogItem.verificationStatus === "VERIFIED" ? "approved" : catalogItem.verificationStatus === "REJECTED" ? "rejected" : "pending", category: catalogItem.category, item: catalogItem, evidence: catalogEvidence }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+          try { assertConsumableCatalogContext({ productCatalogItemId: product.catalogItemId, catalogItemId: catalogItem.id, productJurisdictionId: product.jurisdictionId, catalogJurisdictionId: catalogItem.jurisdictionId!, catalogStatus: catalogItem.verificationStatus === "VERIFIED" ? "approved" : catalogItem.verificationStatus === "REJECTED" ? "rejected" : "pending", category: catalogItem.category, item: catalogItem, evidence: catalogEvidence }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" }); }
           const remaining = Number(batch.quantityOnHand);
           if (!Number.isFinite(remaining) || remaining < item.quantity) throw new TRPCError({ code: "BAD_REQUEST", message: "Insufficient stock" });
           checkedItems.push({ ...item, remaining });
@@ -177,7 +177,7 @@ export const erpRouter = router({
             return saleId;
           });
           return { saleId: result, jurisdictionId: assignment.jurisdictionId, status: "COMMITTED" as const };
-        } catch (error) { throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Sale commit failed: ${String(error)}` }); }
+        } catch { throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Sale could not be completed safely" }); }
       }),
   }),
   schedule: router({
@@ -203,17 +203,17 @@ export const erpRouter = router({
       .mutation(async ({ ctx, input }) => {
         const raw = input.dataUrl.split(",", 2)[1] ?? "";
         const bytes = Buffer.from(raw, "base64");
-        try { validatePrescriptionUpload({ mimeType: input.mimeType, byteLength: bytes.length }); } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: String(error) }); }
+        try { validatePrescriptionUpload({ mimeType: input.mimeType, byteLength: bytes.length }); } catch (error) { throw new TRPCError({ code: "BAD_REQUEST", message: "ERP policy validation rejected the request" }); }
         const db = await getDb();
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
-        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
         const organizationId = await getBranchOrganizationId(db, input.branchId);
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
         if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Branch requires an approved current jurisdiction pack" });
         const evidence = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified")));
-        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "prescription"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "prescription"); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription compliance policy rejected the request" }); }
         const stored = await storagePut(`prescriptions/${ctx.user.id}/${input.fileName}`, bytes, input.mimeType);
         const inserted = await db.insert(prescriptionIntakes).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, createdByUserId: ctx.user.id, imageKey: stored.key, imageMimeType: input.mimeType, status: "UPLOADED" });
         return { intakeId: Number(inserted[0].insertId), key: stored.key, status: "UPLOADED" as const };
@@ -227,13 +227,13 @@ export const erpRouter = router({
         if (!intake) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription intake not found" });
         const assignment = intake.branchId ? (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, intake.branchId)).limit(1))[0] : undefined;
         if (!intake.organizationId || !intake.branchId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(intake.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Prescription intake is outside the active organization scope" });
-        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
-        try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
+        try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription jurisdiction mismatch" }); }
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
         const evidence = pack ? await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
         if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current prescription pack required" });
-        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "prescription"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "prescription"); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription compliance policy rejected the request" }); }
         const imageUrl = await storageGetSignedUrl(intake.imageKey);
         const result = await invokeLLM({
           model: "gemini-3-flash-preview",
@@ -260,13 +260,13 @@ export const erpRouter = router({
         if (!intake) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription intake not found" });
         const assignment = intake.branchId ? (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, intake.branchId)).limit(1))[0] : undefined;
         if (!intake.organizationId || !intake.branchId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(intake.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Prescription intake is outside the active organization scope" });
-        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
-        try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
+        try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription jurisdiction mismatch" }); }
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
         const evidence = pack ? await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
         if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current prescription review pack required" });
-        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "prescription"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "prescription"); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription compliance policy rejected the request" }); }
         const status = input.approved ? "CONFIRMED" : "REJECTED";
         await db.update(prescriptionIntakes).set({ status }).where(and(eq(prescriptionIntakes.id, intake.id), eq(prescriptionIntakes.jurisdictionId, assignment.jurisdictionId)));
         return { intakeId: intake.id, status, confirmedBy: ctx.user.id };
@@ -280,14 +280,14 @@ export const erpRouter = router({
         if (!intake) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription intake not found" });
         const assignment = intake.branchId ? (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, intake.branchId)).limit(1))[0] : undefined;
         if (!intake.organizationId || !intake.branchId || (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(intake.organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Prescription intake is outside the active organization scope" });
-        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: String(error) }); }
-        try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, intake.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
+        try { assertRecordBelongsToJurisdiction({ entityType: "prescription", jurisdictionId: intake.jurisdictionId }, assignment.jurisdictionId); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription jurisdiction mismatch" }); }
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
         const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, assignment.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
         const evidence = pack ? await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified"))) : [];
         if (!profile || !pack) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current dispensing pack required" });
-        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "dispensing"); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
-        try { assertPrescriptionConfirmed(intake.status); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { assertCompliancePackUsable({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }, { jurisdictionId: pack.jurisdictionId, packVersion: pack.packVersion, status: pack.status, effectiveFrom: pack.effectiveFrom, reviewDueAt: pack.reviewDueAt, rules: JSON.parse(pack.rulesJson) as Record<string, boolean>, evidenceCount: evidence.length }, "dispensing"); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Dispensing compliance policy rejected the request" }); }
+        try { assertPrescriptionConfirmed(intake.status); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription must be confirmed before dispensing" }); }
         return { allowed: true, intakeId: intake.id, nextStep: "CREATE_SALE_WITH_FEFO" as const };
       }),
     extract: pharmacistProcedure
@@ -353,7 +353,7 @@ export const erpRouter = router({
           try {
             assertCustomerTicketScope({ ticketOrganizationId: organizationId, ticketBranchId: input.branchId, customerOrganizationId: customer.organizationId, customerBranchId: customer.branchId });
           } catch (error) {
-            throw new TRPCError({ code: "FORBIDDEN", message: String(error) });
+            throw new TRPCError({ code: "FORBIDDEN", message: "ERP policy validation rejected the request" });
           }
         }
         const inserted = await db.insert(callTickets).values({ ...input, organizationId, createdByUserId: ctx.user.id });
@@ -375,7 +375,7 @@ export const erpRouter = router({
           try {
             assertAssigneeScope({ ticketOrganizationId: ticket.organizationId, ticketBranchId: ticket.branchId, assigneeOrganizationId: assigneeMembership?.organizationId, assigneeBranchId: assigneeBranch?.branchId });
           } catch (error) {
-            throw new TRPCError({ code: "FORBIDDEN", message: String(error) });
+            throw new TRPCError({ code: "FORBIDDEN", message: "ERP policy validation rejected the request" });
           }
         }
         const { ticketId, ...changes } = input;
@@ -438,7 +438,7 @@ export const erpRouter = router({
           return { draftId: draft.id, status: "replayed" as const, entityId, duplicate: false };
         } catch (error) {
           await db.update(offlineDrafts).set({ status: "failed", errorCode: "REPLAY_VALIDATION_FAILED" }).where(eq(offlineDrafts.id, draft.id));
-          throw new TRPCError({ code: "BAD_REQUEST", message: String(error) });
+          throw new TRPCError({ code: "BAD_REQUEST", message: "ERP policy validation rejected the request" });
         }
       }),
   }),
@@ -450,8 +450,8 @@ export const erpRouter = router({
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, input.jurisdictionId)).limit(1))[0];
         if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "Jurisdiction not found" });
-        try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: String(error) }); }
-        try { assertJurisdictionProfileReady({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: "ERP policy validation rejected the request" }); }
+        try { assertJurisdictionProfileReady({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" }); }
         const filters = [];
         if (input.query) filters.push(like(catalogItems.nameAr, `%${input.query}%`));
         filters.push(eq(catalogItems.jurisdictionId, input.jurisdictionId));
@@ -465,7 +465,7 @@ export const erpRouter = router({
           const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
           rows.forEach(row => {
             if (!row.organizationId || !organizationIds.includes(row.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item is outside the active organization scope" });
-            try { assertRecordBelongsToScope({ entityType: "catalog_item", jurisdictionId: row.jurisdictionId, organizationId: row.organizationId }, { jurisdictionId: input.jurisdictionId, organizationId: row.organizationId }); } catch (error) { throw new TRPCError({ code: "FORBIDDEN", message: String(error) }); }
+            try { assertRecordBelongsToScope({ entityType: "catalog_item", jurisdictionId: row.jurisdictionId, organizationId: row.organizationId }, { jurisdictionId: input.jurisdictionId, organizationId: row.organizationId }); } catch (error) { throw new TRPCError({ code: "FORBIDDEN", message: "ERP policy validation rejected the request" }); }
           });
         }
         return rows;
@@ -477,8 +477,8 @@ export const erpRouter = router({
         if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
         const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, input.jurisdictionId)).limit(1))[0];
         if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "Jurisdiction not found" });
-        try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: String(error) }); }
-        try { assertJurisdictionProfileReady({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+        try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: "ERP policy validation rejected the request" }); }
+        try { assertJurisdictionProfileReady({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" }); }
         const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
         const organizationId = input.organizationId ?? (organizationIds.length === 1 ? organizationIds[0] : null);
         if (!organizationId || (ctx.user.role !== "admin" && !organizationIds.includes(organizationId))) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item requires an authorized organization scope" });
@@ -498,22 +498,22 @@ export const erpRouter = router({
         if (ctx.user.role !== "admin") {
           const organizationIds = await getUserOrganizationIds(db, ctx.user.id);
           if (!organizationIds.includes(item.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item is outside the active organization scope" });
-          try { assertRecordBelongsToScope({ entityType: "catalog_item", jurisdictionId: item.jurisdictionId, organizationId: item.organizationId }, { jurisdictionId: item.jurisdictionId, organizationId: item.organizationId }); } catch (error) { throw new TRPCError({ code: "FORBIDDEN", message: String(error) }); }
+          try { assertRecordBelongsToScope({ entityType: "catalog_item", jurisdictionId: item.jurisdictionId, organizationId: item.organizationId }, { jurisdictionId: item.jurisdictionId, organizationId: item.organizationId }); } catch (error) { throw new TRPCError({ code: "FORBIDDEN", message: "ERP policy validation rejected the request" }); }
         }
         if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(item.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Catalog item is outside the active organization scope" });
-        try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, item.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: String(error) }); }
+        try { await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, item.jurisdictionId); } catch (error) { throw new TRPCError({ code: error instanceof TRPCError ? error.code : "FORBIDDEN", message: "ERP policy validation rejected the request" }); }
         if (input.approved) {
           if (!item.jurisdictionId) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Catalog item has no jurisdiction" });
           const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, item.jurisdictionId)).limit(1))[0];
           if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "Jurisdiction not found" });
-          try { assertJurisdictionProfileReady({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+          try { assertJurisdictionProfileReady({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" }); }
           const pack = (await db.select().from(compliancePacks).where(and(eq(compliancePacks.jurisdictionId, item.jurisdictionId), eq(compliancePacks.status, "approved"))).orderBy(desc(compliancePacks.createdAt)).limit(1))[0];
           if (!pack || pack.effectiveFrom > new Date() || (pack.reviewDueAt && pack.reviewDueAt < new Date())) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Approved current compliance pack required" });
           const verified = await db.select().from(complianceEvidence).where(and(eq(complianceEvidence.packId, pack.id), eq(complianceEvidence.verificationStatus, "verified")));
           const parsedRules = JSON.parse(pack.rulesJson) as Record<string, unknown>;
           const packFields = Array.isArray(parsedRules.catalogRequiredFields) ? parsedRules.catalogRequiredFields.filter((field): field is string => typeof field === "string") : [];
           const activeFields = activeCatalogFields(item, item.category);
-          try { assertCatalogEvidence(item.category, verified, [...activeFields, ...packFields]); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: String(error) }); }
+          try { assertCatalogEvidence(item.category, verified, [...activeFields, ...packFields]); } catch (error) { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "ERP policy validation rejected the request" }); }
         }
         await db.update(catalogItems).set({ verificationStatus: input.approved ? "VERIFIED" : "REJECTED", approvedByUserId: ctx.user.id }).where(eq(catalogItems.id, input.itemId));
         return { itemId: input.itemId, status: input.approved ? "VERIFIED" as const : "REJECTED" as const };
