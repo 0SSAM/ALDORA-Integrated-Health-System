@@ -558,3 +558,5 @@
 - [x] Add a localization/timezone readiness policy requiring verified locale, RTL direction where applicable, timezone, currency, calendar/date formats, and effective source evidence before country activation; 2 policy tests and TypeScript passed.
 
 - [x] Add an audit-event integrity readiness policy requiring actor identity, organization/branch/jurisdiction scope, event classification, UTC timestamp, and tamper-evidence metadata for regulated actions; 2 policy tests and TypeScript passed.
+
+- [x] Add a notification-delivery readiness policy requiring recipient scope, consent/preferences, allowed channel, quiet-hours handling, localized content, and audit metadata before delivery; 2 policy tests and TypeScript passed.
