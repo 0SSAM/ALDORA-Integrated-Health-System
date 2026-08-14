@@ -468,3 +468,5 @@
 - [x] Re-run full Vitest, TypeScript, and production build after cross-jurisdiction commitSale coverage: 142 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
 - [x] Add commitSale contract coverage for verified catalog items with missing required evidence; unverified, cross-jurisdiction, and evidence-incomplete cases now reject before transaction. A positive approved-sale transaction test remains pending.
 - [x] Re-run full Vitest, TypeScript, and production build after commitSale evidence-incomplete coverage: 143 tests passed, 4 optional database tests skipped, TypeScript passed, and production build passed with the existing chunk-size warning.
+
+- [x] إصلاح اختبار commitSale الإيجابي: محاذاة mock لاستعلامات membership والاختصاص والمنظمة، وإضافة بيانات الدفعة وحقول وأدلة catalog المطلوبة؛ الاختبار المركز وTypeScript ناجحان.
