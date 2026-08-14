@@ -52,3 +52,7 @@ The static boundary inventory now emits a bounded summary in addition to per-fil
 ## Frontend audit slice
 
 The reviewed workspace routes use the shared dashboard shell and expose loading, error, or empty states for the inspected data panels. The current Arabic-first UI maintains RTL layout, labeled inputs, visible status text, responsive grid behavior, and an escape path through the persistent navigation. The desktop preview was checked after the ALDO branding update. This is a focused implementation audit, not a substitute for a full assistive-technology test matrix.
+
+## Server-router audit slice
+
+The implemented server slice was reviewed through the static inventory and protected router-contract suite. The current inventory scans 67 server files, including 41 protected-procedure markers, 345 organization-scope markers, and 303 jurisdiction-scope markers; the configured raw-error-string heuristic reports zero matches. Focused router contracts cover organization and jurisdiction denial before sensitive reads/inserts in the implemented catalog, POS, prescription, insurance, reporting, and compliance paths. These results document the inspected slice only; persisted lifecycle isolation and semantic review of every future procedure remain open until a disposable database and additional entry points are available.
