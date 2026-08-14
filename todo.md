@@ -370,13 +370,15 @@
 # ALDO Health Care Eco System — Intelligent Reporting and Integration Hardening
 
 - [x] Convert the current capability-gap findings into an explicit implementation boundary for intelligent reports, insurer workflows, HR/payroll, promotions, and government connectors.
-- [ ] Add a generalized report-definition and report-run model only if it can preserve organization/jurisdiction scope, recipient authorization, idempotency, and auditability.
+- [x] Add a generalized report-definition and report-run model only if it can preserve organization/jurisdiction scope, recipient authorization, idempotency, and auditability.
 - [x] Add deterministic scheduled-report policy helpers and tests; do not claim delivery until a configured channel and delivery audit exist.
 - [x] Add an insurance eligibility/preauthorization boundary with policy-first request/response states and no live payer calls without credentials.
 - [x] Review official regulatory and payer source notes; keep every country integration disabled until source, credentials, registration, and human approval gates are satisfied.
 - [x] Run TypeScript, Vitest, production build, and focused browser verification for the new boundary work.
 - [x] Update capability-gap and operations documentation with precise implemented, policy-only, and integration-gated statuses.
-- [ ] Save a checkpoint only after all completed items are marked [x].
+- [x] Save a checkpoint only after all completed items are marked [x].
 - [x] Make optional database integration tests skip safely when TEST_DATABASE_URL is an injected placeholder rather than a valid MySQL URL.
 - [x] Enforce customer-to-organization/branch scope when creating call-centre tickets and restrict update fields to persisted ticket columns.
 - [x] Add regression tests for call-centre customer scope and update-field safety.
+- [x] Add persisted insurance request records for eligibility and preauthorization using hashed references, composite scope, lifecycle states, idempotency, and explicit credential readiness.
+- [x] Add scoped insurance request procedures and regression tests without enabling live payer transport.

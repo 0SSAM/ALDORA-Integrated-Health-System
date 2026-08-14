@@ -127,6 +127,20 @@
       "when": 1786727152175,
       "tag": "0017_exotic_prodigy",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1786730930560,
+      "tag": "0018_brave_pestilence",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1786731097303,
+      "tag": "0019_foamy_puppet_master",
+      "breakpoints": true
     }
   ]
 }

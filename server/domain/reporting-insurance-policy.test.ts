@@ -58,3 +58,20 @@ describe("insurance policy", () => {
     expect(insuranceIntegrationReadiness({ credentialsConfigured: true, endpointConfigured: true, organizationRegistered: true, humanApproved: true })).toBe("PRODUCTION_READY");
   });
 });
+
+import { assertPersistedInsuranceTransition, buildInsuranceRequestPayload, hashInsuranceMemberReference } from "./insurance-persistence-policy";
+
+describe("persisted insurance policy", () => {
+  it("hashes member references deterministically and stores only a sanitized service payload", () => {
+    const hash = hashInsuranceMemberReference(" member-token ");
+    expect(hash).toHaveLength(64);
+    expect(hash).not.toContain("member-token");
+    expect(buildInsuranceRequestPayload(" RX-001 ")).toBe(JSON.stringify({ serviceCode: "RX-001" }));
+  });
+
+  it("blocks persisted live submission until production credentials are ready", () => {
+    expect(assertPersistedInsuranceTransition("DRAFT", "READY_FOR_SUBMISSION", "NOT_CONFIGURED")).toBe(true);
+    expect(() => assertPersistedInsuranceTransition("READY_FOR_SUBMISSION", "SUBMITTED", "TEST_READY")).toThrow(/production credentials/);
+    expect(assertPersistedInsuranceTransition("READY_FOR_SUBMISSION", "SUBMITTED", "PRODUCTION_READY")).toBe(true);
+  });
+});

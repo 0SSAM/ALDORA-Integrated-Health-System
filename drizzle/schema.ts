@@ -360,3 +360,75 @@ export const offlineDrafts = mysqlTable("offline_drafts", {
 }, table => ({ idempotencyIdx: uniqueIndex("offline_drafts_idempotency_idx").on(table.idempotencyKey), ownerStatusIdx: index("offline_drafts_owner_status_idx").on(table.createdByUserId, table.status) }));
 
 export type OfflineDraft = typeof offlineDrafts.$inferSelect;
+
+
+export const reportDefinitions = mysqlTable("report_definitions", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId"),
+  reportKey: varchar("reportKey", { length: 100 }).notNull(),
+  name: varchar("name", { length: 180 }).notNull(),
+  description: text("description"),
+  scheduleCronTaskUid: varchar("schedule_cron_task_uid", { length: 65 }),
+  cronExpression: varchar("cronExpression", { length: 40 }),
+  status: mysqlEnum("status", ["draft", "active", "paused", "archived"]).default("draft").notNull(),
+  queryKey: varchar("queryKey", { length: 120 }).notNull(),
+  recipientUserId: int("recipientUserId"),
+  recipientRole: mysqlEnum("recipientRole", ["owner", "org_admin", "compliance_officer", "clinical_lead", "operations_manager", "staff", "auditor"]),
+  deliveryChannel: mysqlEnum("deliveryChannel", ["in_app", "email", "webhook"]).default("in_app").notNull(),
+  deliveryEnabled: int("deliveryEnabled").default(0).notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  scopeKeyIdx: uniqueIndex("report_definitions_scope_key_idx").on(table.organizationId, table.jurisdictionId, table.reportKey),
+  taskUidIdx: uniqueIndex("report_definitions_task_uid_idx").on(table.scheduleCronTaskUid),
+  statusIdx: index("report_definitions_status_idx").on(table.organizationId, table.status),
+}));
+
+export const reportRuns = mysqlTable("report_runs", {
+  id: int("id").autoincrement().primaryKey(),
+  definitionId: int("definitionId").notNull(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId"),
+  idempotencyKey: varchar("idempotencyKey", { length: 180 }).notNull(),
+  periodStart: timestamp("periodStart").notNull(),
+  periodEnd: timestamp("periodEnd").notNull(),
+  status: mysqlEnum("status", ["queued", "running", "succeeded", "failed", "skipped"]).default("queued").notNull(),
+  outputRef: varchar("outputRef", { length: 500 }),
+  errorCode: varchar("errorCode", { length: 100 }),
+  startedAt: timestamp("startedAt"),
+  finishedAt: timestamp("finishedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({
+  idempotencyIdx: uniqueIndex("report_runs_idempotency_idx").on(table.idempotencyKey),
+  scopeTimeIdx: index("report_runs_scope_time_idx").on(table.organizationId, table.jurisdictionId, table.createdAt),
+}));
+
+export type ReportDefinition = typeof reportDefinitions.$inferSelect;
+export type ReportRun = typeof reportRuns.$inferSelect;
+
+
+export const insuranceRequests = mysqlTable("insurance_requests", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  requestType: mysqlEnum("requestType", ["ELIGIBILITY", "PREAUTHORIZATION"]).notNull(),
+  payerCode: varchar("payerCode", { length: 80 }).notNull(),
+  memberReferenceHash: varchar("memberReferenceHash", { length: 128 }).notNull(),
+  serviceCode: varchar("serviceCode", { length: 120 }).notNull(),
+  status: mysqlEnum("status", ["DRAFT", "READY_FOR_SUBMISSION", "SUBMITTED", "APPROVED", "PARTIALLY_APPROVED", "REJECTED", "CANCELLED"]).default("DRAFT").notNull(),
+  externalReference: varchar("externalReference", { length: 160 }),
+  credentialGate: mysqlEnum("credentialGate", ["NOT_CONFIGURED", "TEST_READY", "PRODUCTION_READY"]).default("NOT_CONFIGURED").notNull(),
+  requestJson: text("requestJson"),
+  responseJson: text("responseJson"),
+  idempotencyKey: varchar("idempotencyKey", { length: 180 }).notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({
+  idempotencyIdx: uniqueIndex("insurance_requests_idempotency_idx").on(table.idempotencyKey),
+  scopeStatusIdx: index("insurance_requests_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.status, table.updatedAt),
+}));
+
+export type InsuranceRequestRecord = typeof insuranceRequests.$inferSelect;
