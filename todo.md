@@ -592,3 +592,5 @@
 - [x] Document the isolated database lifecycle test runbook, required environment markers, cleanup expectations, and the fact that no production URL or real patient/customer data may be used; persisted lifecycle execution remains pending until an isolated TEST_DATABASE_URL is available.
 
 - [x] Document the trusted-device attestation contract and approved client options, explicitly excluding browser-only capabilities as security evidence; server and UI remain fail-closed until a provider is configured.
+
+- [x] Add a source-level regulated-entrypoint contract test covering the currently implemented POS invoice preview, sale preparation/commit, and prescription upload/extract/confirm/dispense gates, while explicitly documenting absent invoice persistence and product-matching paths; 2 tests and TypeScript passed.
