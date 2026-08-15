@@ -1175,3 +1175,8 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Inventory the nine high-severity production dependency findings and map each to its parent package and transitive path.
 - [x] Apply the smallest safe dependency updates or overrides and regenerate the lockfile.
 - [x] Re-run production audit, TypeScript, tests, build, and smoke check; document any residual advisory with a reason and remediation path.
+
+# Dependabot Security Updates Skill — 2026-08-15
+- [x] Verify repository, branch, existing Dependabot configuration, and GitHub security-update availability.
+- [x] Enable Dependabot security updates and configure safe dependency update grouping/scheduling without auto-merging major changes.
+- [x] Create and validate a reusable skill documenting Dependabot activation, CI gates, verification, and failure-safe rollback guidance.
