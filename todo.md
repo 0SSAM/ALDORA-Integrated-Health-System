@@ -1003,3 +1003,16 @@
 - [x] Add visible bilingual alert center and summary indicators to the connector dashboard with loading, empty, error, unread, and acknowledged states.
 - [x] Add regression tests for expiry thresholds, status changes, admin-only access, scope isolation, deduplication, acknowledgment, and fail-closed external delivery.
 - [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.
+
+
+# Egyptian Healthcare Catalog Research Expansion 2026-08-15
+
+- [x] Establish a source register and provenance policy for Egyptian medicines, cosmetics, medical cosmetics, medical equipment, and medical supplies.
+- [x] Search official and public commercial sources for Egyptian medicines, capturing Arabic/English names, price when available, barcode/GTIN, manufacturer, source URL, extraction date, and regulatory status.
+- [x] Search official and public commercial sources for cosmetics and medical cosmetics with the same provenance and field requirements.
+- [x] Search official and public commercial sources for medical equipment and medical supplies, including model/catalog identifiers, manufacturer, price, barcode/GTIN, and source metadata when available.
+- [x] Cross-check duplicates, normalize Arabic/English names, validate barcode/GTIN formats, separate product categories, and mark unverified fields as missing rather than inferring them.
+- [x] Verify licensing, terms of use, source reliability, price-date limitations, and whether automated collection or redistribution is permitted.
+- [x] Produce source-safe CSV/XLSX datasets and an Arabic/English research report with coverage, limitations, provenance, and import instructions; do not insert unverified records into production catalogs.
+- [x] Add or update a controlled catalog-intake path for reviewed records, preserving jurisdiction, organization scope, source evidence, and approval status.
+- [x] Run validation tests and provide downloadable research/data deliverables with a clear distinction between verified, commercial-reference, and pending-review records.
