@@ -50,7 +50,7 @@ async function imageDataFromUrl(url: string) {
   } catch { return null; }
 }
 
-export function TaxInvoiceWorkspace({ branchId, jurisdictionId }: { branchId: number | null; jurisdictionId: number | null }) {
+export function TaxInvoiceWorkspace({ branchId, jurisdictionId, isShowcase = false }: { branchId: number | null; jurisdictionId: number | null; isShowcase?: boolean }) {
   const [saleId, setSaleId] = useState("");
   const [returnQuantity, setReturnQuantity] = useState("1");
   const [returnAmount, setReturnAmount] = useState("0");
@@ -95,6 +95,15 @@ export function TaxInvoiceWorkspace({ branchId, jurisdictionId }: { branchId: nu
   const handleReturnPreview = () => { if (!selectedBranchId || !parsePositive(saleId) || !parsePositive(returnQuantity) || !Number.isFinite(Number(returnAmount))) return; previewReturn.mutate({ branchId: selectedBranchId, saleId: Number(saleId), quantity: Number(returnQuantity), amount: Number(returnAmount), taxAmount: Number(returnTax) || 0, reason: returnReason, daysSinceSale: Number(daysSinceSale) || 0, itemSealed, itemDispensed, invoiceReferencePresent, evidencePresent, notes: notes.trim() || undefined }); };
   const handleIssueInvoice = () => { if (!selectedBranchId || invoiceNumber.trim().length < 3 || !parsedLine.sku || !parsePositive(invoiceQuantity) || !Number.isFinite(parsedLine.unitPrice)) return; issueInvoice.mutate({ branchId: selectedBranchId, saleId: parsePositive(saleId) ? Number(saleId) : undefined, returnId: invoiceType === "credit_note" ? returnId ?? undefined : undefined, invoiceNumber: invoiceNumber.trim(), invoiceType, currencyCode: currencyCode.trim().toUpperCase(), lines: [parsedLine] }); };
   const saveCurrentTemplate = () => { if (!selectedBranchId) return; saveTemplate.mutate({ branchId: selectedBranchId, ...templateValues }); };
+  const loadShowcaseInvoice = (scenario: { invoiceNumber: string; sku: string; quantity: string; unitPrice: string; discount: string; vat: string }) => {
+    setInvoiceNumber(scenario.invoiceNumber);
+    setSku(scenario.sku);
+    setInvoiceQuantity(scenario.quantity);
+    setUnitPrice(scenario.unitPrice);
+    setDiscountAmount(scenario.discount);
+    setVatRate(scenario.vat);
+    setInvoiceType("sales");
+  };
 
   const buildInvoicePdf = async (requestedPaperSize: PaperSize) => {
     if (!invoiceResult || !canExportLocalInvoice(invoiceResult)) return null;

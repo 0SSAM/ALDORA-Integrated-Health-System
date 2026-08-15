@@ -56,6 +56,14 @@ const showcaseModuleIds = new Set([
   "customerCare", "callCentre", "catalog", "icd10", "hardware", "security", "operationsHub",
 ]);
 
+const SHOWCASE_TOUR_STORAGE_KEY = "aldora-showcase-tour-seen-v1";
+const showcaseTourSteps = [
+  { module: "overview", title: "مرحباً بك في مساحة العرض", body: "هذه بيئة استكشاف معزولة. تنقّل بين الوحدات بحرية، لكن لا يتم حفظ أي عملية أو ربط أي جهة خارجية." },
+  { module: "pos", title: "استكشف الفواتير ونقطة البيع", body: "ستجد سيناريوهات فواتير تجريبية وتفاصيل الضريبة والمرتجعات. الأزرار التشغيلية مقفلة في العرض لحماية البيانات." },
+  { module: "inventory", title: "راجع المخزون وFEFO", body: "اعرض أرصدة تجريبية وتشغيلات وتواريخ صلاحية ومستويات إعادة الطلب دون الوصول إلى سجلات مؤسسة فعلية." },
+  { module: "supplyChain", title: "تابع بقية الوحدات", body: "استخدم القائمة الجانبية أو بطاقات الاستكشاف للانتقال بين السلاسل والتقارير والكتالوج والواجهات الأخرى." },
+] as const;
+
 const coreShortcuts: ReadonlyArray<{ key: string; label: string; description: string; module: string; roles: readonly string[] }> = [
   { key: "F2", label: "فاتورة بيع جديدة", description: "فتح نقطة البيع لبدء معاملة جديدة", module: "pos", roles: ["admin", "manager", "pharmacist", "cashier"] },
   { key: "F4", label: "المرتجعات", description: "فتح نقطة البيع لمراجعة المرتجع وفق الصلاحيات والسياسة", module: "pos", roles: ["admin", "manager", "pharmacist", "cashier"] },
@@ -90,6 +98,8 @@ export default function Home() {
   const markNotificationRead = trpc.notifications.markRead.useMutation({ onSuccess: () => { void notificationsQuery.refetch(); } });
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [showcaseTourStep, setShowcaseTourStep] = useState(0);
+  const [showcaseTourOpen, setShowcaseTourOpen] = useState(false);
   const organizationTypeLabels: Record<string, string> = { government: "جهة حكومية", pharmacy: "صيدلية فردية", pharmacy_chain: "سلسلة صيدليات", distributor: "شركة توزيع دواء", insurer: "شركة تأمين طبي", rehabilitation: "مركز تأهيل وعلاج طبيعي", hospital: "مستشفى", laboratory: "معمل تحاليل", radiology: "مركز أشعة" };
   const activeOrganizationType = organizationsQuery.data?.find(item => item.id === selectedOrganizationId)?.organizationType;
   const replayDraft = trpc.erp.offlineDrafts.replay.useMutation({ onSuccess: () => { void serverDrafts.refetch(); } });
@@ -120,6 +130,30 @@ export default function Home() {
   useEffect(() => {
     if (!loading && !user) setLocation("/login", { replace: true });
   }, [loading, setLocation, user]);
+
+  useEffect(() => {
+    if (!isShowcaseSession) { setShowcaseTourOpen(false); return; }
+    if (sessionStorage.getItem(SHOWCASE_TOUR_STORAGE_KEY) !== "seen") setShowcaseTourOpen(true);
+  }, [isShowcaseSession]);
+
+  const finishShowcaseTour = () => {
+    sessionStorage.setItem(SHOWCASE_TOUR_STORAGE_KEY, "seen");
+    setShowcaseTourOpen(false);
+    setShowcaseTourStep(0);
+  };
+  const restartShowcaseTour = () => {
+    sessionStorage.removeItem(SHOWCASE_TOUR_STORAGE_KEY);
+    setShowcaseTourStep(0);
+    setActive("overview");
+    setShowcaseTourOpen(true);
+  };
+  const advanceShowcaseTour = () => {
+    const next = showcaseTourSteps[showcaseTourStep + 1];
+    if (!next) { finishShowcaseTour(); return; }
+    setActive(next.module);
+    setMobileOpen(false);
+    setShowcaseTourStep(current => current + 1);
+  };
 
   const availableShortcuts = useMemo(() => coreShortcuts.filter(shortcut => !role || shortcut.roles.includes(role)), [role]);
   const activateShortcut = (module: string) => {
@@ -221,11 +255,14 @@ export default function Home() {
           {isShowcaseSession && <Card className="border-amber-200 bg-amber-50/80 shadow-sm" role="status"><CardContent className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-bold text-amber-950">مساحة عرض استثمارية · Investor Showcase</p><p className="mt-1 text-sm leading-6 text-amber-900">أنت تعمل داخل مؤسسة عرض معزولة. البيانات اصطناعية، والعمليات التجريبية لا تغيّر أرصدة الإنتاج ولا تتصل بجهات خارجية.</p></div><Badge variant="outline" className="w-fit border-amber-300 bg-white text-amber-900">محاكاة غير إنتاجية</Badge></CardContent></Card>}
           {isShowcaseSession && active === "overview" && <Card className="border-cyan-100 bg-gradient-to-bl from-cyan-50 to-white shadow-sm"><CardHeader><CardTitle className="flex items-center gap-2 text-lg"><LayoutDashboard className="h-5 w-5 text-cyan-700" />ابدأ الاستكشاف</CardTitle><p className="mt-1 text-sm leading-6 text-slate-600">اختر أي وحدة لعرض تدفق العمل والواجهات. البيانات المعروضة معزولة وغير إنتاجية، ولا يمكن من هذا الحساب حفظ عملية أو تصدير بيانات أو الوصول إلى الإعدادات الإدارية الحساسة.</p></CardHeader><CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{allowedModules.filter(module => module.id !== "overview").map(module => { const Icon = module.icon; return <button key={module.id} type="button" onClick={() => setActive(module.id)} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 text-right transition hover:border-cyan-300 hover:bg-cyan-50"><span className="grid h-9 w-9 place-items-center rounded-lg bg-cyan-50 text-cyan-800"><Icon className="h-4 w-4" /></span><span className="text-sm font-semibold text-slate-800">{module.label}</span><ChevronLeft className="mr-auto h-4 w-4 text-slate-400" /></button>; })}</CardContent></Card>}
           <IntegrationStatusStrip />
+          {isShowcaseSession && active === "pos" && <ShowcaseInvoiceScenarios />}
           <OfflineStatusIndicator online={online} drafts={offlineDrafts} serverPendingCount={serverDrafts.data?.length ?? 0} onRefresh={async () => { await serverDrafts.refetch(); const latest = await listDurableOfflineDrafts(); setOfflineDrafts(latest); }} onRetryConflict={async () => { const latest = await listDurableOfflineDrafts(); setOfflineDrafts(latest); }} />
+          {isShowcaseSession && <div className="flex justify-end"><Button variant="outline" size="sm" onClick={restartShowcaseTour}>إعادة جولة الاستكشاف</Button></div>}
+          {isShowcaseSession && showcaseTourOpen && <Card className="border-cyan-200 bg-gradient-to-l from-cyan-50 to-white shadow-md" role="dialog" aria-modal="false" aria-labelledby="showcase-tour-title"><CardContent className="p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="max-w-2xl"><p className="text-xs font-semibold text-cyan-700">خطوة {showcaseTourStep + 1} من {showcaseTourSteps.length}</p><h2 id="showcase-tour-title" className="mt-1 text-xl font-bold text-slate-900">{showcaseTourSteps[showcaseTourStep].title}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{showcaseTourSteps[showcaseTourStep].body}</p></div><div className="flex shrink-0 gap-2"><Button variant="ghost" size="sm" onClick={finishShowcaseTour}>تخطي</Button><Button size="sm" onClick={advanceShowcaseTour}>{showcaseTourStep + 1 === showcaseTourSteps.length ? "إنهاء الجولة" : "التالي"}<ChevronLeft className="mr-1 h-4 w-4" /></Button></div></div><div className="mt-4 flex gap-1.5" aria-hidden="true">{showcaseTourSteps.map((_, index) => <span key={index} className={cn("h-1.5 flex-1 rounded-full", index <= showcaseTourStep ? "bg-cyan-500" : "bg-slate-200")} />)}</div></CardContent></Card>}
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{metrics.map(metric => { const Icon = metric.icon; return <Card key={metric.label} className="border-0 shadow-sm shadow-slate-200/60"><CardContent className="p-5"><div className="mb-5 flex items-start justify-between"><div className={cn("grid h-11 w-11 place-items-center rounded-2xl", metric.tone)}><Icon className="h-5 w-5" /></div><span className="text-xs font-medium text-slate-400">اليوم</span></div><p className="text-sm text-slate-500">{metric.label}</p><p className="mt-1 text-3xl font-bold tracking-tight">{metric.value}</p><p className="mt-2 text-xs text-slate-400">{metric.hint}</p></CardContent></Card>; })}</section>
           {shortcutsOpen && <Card className="border-cyan-100 bg-white shadow-sm shadow-slate-200/60" role="dialog" aria-modal="false" aria-labelledby="shortcuts-title"><CardHeader className="flex-row items-center justify-between space-y-0"><div><CardTitle id="shortcuts-title" className="flex items-center gap-2 text-lg"><Keyboard className="h-5 w-5 text-cyan-700" />الاختصارات الأساسية</CardTitle><p className="mt-1 text-sm text-slate-500">تعمل داخل التطبيق فقط، وتتوقف تلقائياً أثناء الكتابة في الحقول.</p></div><Button variant="ghost" size="sm" onClick={() => setShortcutsOpen(false)}>إغلاق</Button></CardHeader><CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{availableShortcuts.map(shortcut => <button key={shortcut.key} onClick={() => { activateShortcut(shortcut.module); setShortcutsOpen(false); }} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-right transition hover:border-cyan-300 hover:bg-cyan-50"><kbd className="min-w-10 rounded-lg border border-slate-300 bg-white px-2 py-1 text-center text-xs font-bold text-slate-700">{shortcut.key}</kbd><span><span className="block text-sm font-semibold text-slate-900">{shortcut.label}</span><span className="mt-1 block text-xs leading-5 text-slate-500">{shortcut.description}</span></span></button>)}</CardContent></Card>}
           {user && <Card className="border-cyan-100 bg-white shadow-sm shadow-slate-200/60"><CardHeader className="flex-row items-center justify-between space-y-0"><div><CardTitle className="text-lg">مساحة المؤسسة</CardTitle><p className="mt-1 text-sm text-slate-500">يعرض هذا النطاق المؤسسات المرتبطة بحسابك فقط. اختيار النطاق لا يمنح صلاحيات إضافية.</p></div><Badge variant="outline" className="border-cyan-200 bg-cyan-50 text-cyan-800">عزل مؤسسي</Badge></CardHeader><CardContent>{organizationsQuery.isLoading ? <p className="text-sm text-slate-500">جارٍ تحميل المؤسسات المصرح بها…</p> : organizationsQuery.data?.length ? <div className="flex flex-wrap items-center gap-3"><select value={selectedOrganizationId ?? ""} onChange={event => setSelectedOrganizationId(Number(event.target.value))} aria-label="اختيار المؤسسة" className="h-10 min-w-64 rounded-xl border border-slate-200 bg-white px-3 text-sm"><option value="" disabled>اختر المؤسسة</option>{organizationsQuery.data.map(organization => <option key={organization.id} value={organization.id}>{organization.displayName} · {organizationTypeLabels[organization.organizationType] ?? organization.organizationType}</option>)}</select><div className="rounded-xl bg-slate-50 px-4 py-2 text-xs text-slate-600">{organizationsQuery.data.find(item => item.id === selectedOrganizationId)?.countryCode ?? "—"} · الصلاحية خادمية</div></div> : <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">لا توجد مؤسسة نشطة مرتبطة بهذا الحساب حتى الآن. لا يتم إنشاء نطاق افتراضي أو منح وصول تلقائي.</div>}</CardContent></Card>}
-          {user && <ModulePanel active={active} organizationId={selectedOrganizationId} branchId={activeBranchId} jurisdictionId={activeJurisdictionId} />}
+          {user && <ModulePanel active={active} organizationId={selectedOrganizationId} branchId={activeBranchId} jurisdictionId={activeJurisdictionId} isShowcase={isShowcaseSession} />}
           {offlineDrafts.length > 0 && <Card className="border-amber-200 bg-amber-50/60 shadow-sm"><CardHeader className="flex-row items-center justify-between space-y-0"><div><CardTitle className="text-lg text-amber-950">الوضع المحدود والمسودات المحلية</CardTitle><p className="mt-1 text-sm text-amber-800">يُسمح بالمسودات غير المنظمة فقط. البيع والوصفات والفوترة وإعادة التشغيل تبقى محجوبة حتى عودة الاتصال والتحقق من الصلاحيات والجهاز.</p></div><Badge variant="outline" className="border-amber-300 bg-white text-amber-800">{offlineDrafts.length} مسودة</Badge></CardHeader><CardContent className="space-y-2">{offlineDrafts.slice(0, 4).map(draft => <div key={draft.id} className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-white px-3 py-2 text-sm"><div><span className="font-medium text-slate-800">{draft.module}</span><span className="mr-2 text-xs text-slate-500">{draft.status === "conflict" ? "تعارض يحتاج مراجعة" : "في الانتظار"}</span></div><Button variant="ghost" size="sm" className="text-amber-800" onClick={() => { removeOfflineDraft(draft.id); setOfflineDrafts(current => current.filter(item => item.id !== draft.id)); }}>إزالة</Button></div>)}</CardContent></Card>}
           {user && (serverDrafts.data?.length ?? 0) > 0 && <Card className="border-cyan-200 bg-cyan-50/50 shadow-sm"><CardHeader className="flex-row items-center justify-between space-y-0"><div><CardTitle className="text-lg text-cyan-950">مسودات الخادم القابلة لإعادة التشغيل</CardTitle><p className="mt-1 text-sm text-cyan-800">هذه المسودات تخص خدمة العملاء ومركز الاتصال فقط، ولا تشمل البيع أو الوصفات أو الفوترة. إعادة التشغيل تتطلب اتصالاً وجهازاً موثوقاً.</p></div><Badge variant="outline" className="border-cyan-300 bg-white text-cyan-800">{serverDrafts.data?.length} محفوظة</Badge></CardHeader><CardContent className="space-y-2">{serverDrafts.data?.slice(0, 6).map(draft => <div key={draft.id} className="flex items-center justify-between gap-3 rounded-xl border border-cyan-200 bg-white px-3 py-2 text-sm"><div><span className="font-medium text-slate-800">{draft.module === "customerCare" ? "خدمة العملاء" : "مركز الاتصال"}</span><span className="mr-2 text-xs text-slate-500">{draft.status === "queued" ? "جاهزة للمراجعة وإعادة التشغيل" : draft.status === "replayed" ? "أعيد تشغيلها" : "تحتاج مراجعة"}</span></div>{draft.status === "queued" && <span title="يتطلب جهازاً موثوقاً قبل إعادة التشغيل" className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">محجوبة: تحقق الجهاز مطلوب</span>}</div>)}</CardContent></Card>}
           <section className="grid gap-6 xl:grid-cols-[1.45fr_1fr]">
@@ -239,7 +276,7 @@ export default function Home() {
   );
 }
 
-function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { active: string; organizationId: number | null; branchId: number | null; jurisdictionId: number | null }) {
+function ModulePanel({ active, organizationId, branchId, jurisdictionId, isShowcase }: { active: string; organizationId: number | null; branchId: number | null; jurisdictionId: number | null; isShowcase: boolean }) {
   const panels: Record<string, { title: string; description: string; items: string[] }> = {
     overview: { title: "ملخص التشغيل", description: "نظرة آمنة لا تعرض أرقاماً غير موجودة في قاعدة البيانات.", items: ["مؤشرات الفروع", "التنبيهات الحرجة", "حالة التكاملات"] },
     pos: { title: "نقطة البيع", description: "العمليات الحساسة ستُنفذ على الخادم مع خصم أقصى ٧٪ وFEFO.", items: ["صرف كسري للوحدات", "تحقق MOH قبل الإتمام", "حالة إيصال ETA"] },
@@ -261,7 +298,8 @@ function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { act
   };
   const panel = panels[active] ?? panels.overview;
   if (active === "compliance") return <RegionalComplianceWorkspace />;
-  if (active === "pos") return <SalesFinanceWorkspace branchId={branchId} jurisdictionId={jurisdictionId} />;
+  if (active === "pos") return <SalesFinanceWorkspace branchId={branchId} jurisdictionId={jurisdictionId} isShowcase={isShowcase} />;
+  if (active === "inventory" && isShowcase) return <ShowcaseInventoryWorkspace />;
   if (active === "prescriptions") return <PrescriptionWorkspace />;
   if (active === "customerCare") return <CustomerCareWorkspace />;
   if (active === "callCentre") return <CallCentreWorkspace />;
@@ -281,8 +319,27 @@ function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { act
   return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardContent className="p-0"><div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div><div className="mb-2 flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-cyan-500" /><span className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700">مساحة عمل</span></div><h2 className="text-xl font-bold tracking-tight">{panel.title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{panel.description}</p></div><div className="grid grid-cols-1 gap-2 sm:min-w-[300px] sm:grid-cols-3">{panel.items.map(item => <div key={item} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-xs font-medium text-slate-600">{item}</div>)}</div></div></CardContent></Card>;
 }
 
-function SalesFinanceWorkspace({ branchId, jurisdictionId }: { branchId: number | null; jurisdictionId: number | null }) {
-  return <TaxInvoiceWorkspace branchId={branchId} jurisdictionId={jurisdictionId} />;
+function SalesFinanceWorkspace({ branchId, jurisdictionId, isShowcase }: { branchId: number | null; jurisdictionId: number | null; isShowcase: boolean }) {
+  return <TaxInvoiceWorkspace branchId={branchId} jurisdictionId={jurisdictionId} isShowcase={isShowcase} />;
+}
+
+function ShowcaseInventoryWorkspace() {
+  const stock = [
+    { name: "باراسيتامول 500mg", sku: "DEMO-PAR-500", batch: "PAR-24A17", expiry: "2027-03", available: "1,248 علبة", reorder: "240", status: "متاح" },
+    { name: "محلول ملحي 0.9% / 500ml", sku: "DEMO-NS-500", batch: "NS-2409", expiry: "2026-11", available: "186 وحدة", reorder: "90", status: "متابعة" },
+    { name: "كمامات طبية ثلاثية الطبقات", sku: "DEMO-MSK-3P", batch: "MSK-2502", expiry: "2029-02", available: "3,600 قطعة", reorder: "1,000", status: "متاح" },
+    { name: "فيتامين C 1000mg", sku: "DEMO-VC-1000", batch: "VC-25C04", expiry: "2026-09", available: "72 علبة", reorder: "120", status: "نقطة إعادة الطلب" },
+  ];
+  return <div className="space-y-5"><Card className="border-cyan-200 bg-gradient-to-l from-cyan-50 to-white"><CardHeader><CardTitle className="flex items-center gap-2"><Boxes className="h-5 w-5 text-cyan-700" />مخزون تجريبي · FEFO</CardTitle><p className="text-sm leading-6 text-slate-600">هذه سجلات عرض اصطناعية ومعلّمة، لتوضيح التشغيلات والصلاحية وإعادة الطلب. لا تُقرأ من أي مؤسسة حقيقية ولا تقبل التعديل أو الحفظ.</p></CardHeader></Card><div className="grid gap-4 md:grid-cols-2">{stock.map(item => <Card key={item.sku} className="border-0 shadow-sm"><CardContent className="p-5"><div className="flex items-start justify-between gap-3"><div><p className="font-bold text-slate-900">{item.name}</p><p className="mt-1 font-mono text-xs text-slate-500">{item.sku} · تشغيلة {item.batch}</p></div><Badge variant="outline" className={cn(item.status === "نقطة إعادة الطلب" ? "border-amber-300 bg-amber-50 text-amber-800" : "border-emerald-200 bg-emerald-50 text-emerald-800")}>{item.status}</Badge></div><div className="mt-5 grid grid-cols-3 gap-2 text-center text-xs"><div className="rounded-xl bg-slate-50 p-2"><p className="text-slate-500">المتاح</p><p className="mt-1 font-bold text-slate-800">{item.available}</p></div><div className="rounded-xl bg-slate-50 p-2"><p className="text-slate-500">الانتهاء</p><p className="mt-1 font-bold text-slate-800">{item.expiry}</p></div><div className="rounded-xl bg-slate-50 p-2"><p className="text-slate-500">إعادة الطلب</p><p className="mt-1 font-bold text-slate-800">{item.reorder}</p></div></div><p className="mt-4 text-xs leading-5 text-cyan-800">ترتيب FEFO: سيتم اقتراح هذه التشغيلة قبل أي تشغيلة لاحقة الانتهاء عند تشغيل النظام الفعلي.</p></CardContent></Card>)}</div></div>;
+}
+
+function ShowcaseInvoiceScenarios() {
+  const invoices = [
+    { title: "وصفة مزمنة", id: "DEMO-INV-2026-1042", item: "Amlodipine 5mg", total: "192.28 ج.م", detail: "2 علبة · خصم 5.00 · VAT 14%" },
+    { title: "مستلزمات عيادة", id: "DEMO-INV-2026-1088", item: "قفازات طبية / 100", total: "451.44 ج.م", detail: "3 عبوات · VAT 14%" },
+    { title: "عناية جلدية", id: "DEMO-INV-2026-1119", item: "Dermal Repair 30ml", total: "262.20 ج.م", detail: "خصم 15.00 · VAT 14%" },
+  ];
+  return <Card className="border-cyan-200 bg-gradient-to-l from-cyan-50 to-white"><CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 text-lg"><Receipt className="h-5 w-5 text-cyan-700" />سيناريوهات فواتير تجريبية</CardTitle><p className="text-sm leading-6 text-slate-600">نماذج مُعلّمة لشرح الضريبة والخصم ودورة البيع. لا تمثل مبيعات حقيقية، ولا يمكن إصدارها أو طباعتها أو تصديرها من حساب العرض.</p></CardHeader><CardContent className="grid gap-3 md:grid-cols-3">{invoices.map(invoice => <div key={invoice.id} className="rounded-2xl border border-cyan-100 bg-white p-4"><p className="font-bold text-slate-900">{invoice.title}</p><p className="mt-1 font-mono text-[11px] text-slate-500">{invoice.id}</p><p className="mt-4 text-sm text-slate-700">{invoice.item}</p><p className="mt-1 text-xs text-slate-500">{invoice.detail}</p><p className="mt-4 text-lg font-bold text-cyan-800">{invoice.total}</p><Badge variant="outline" className="mt-3 border-cyan-200 bg-cyan-50 text-cyan-800">عرض فقط</Badge></div>)}</CardContent></Card>;
 }
 
 function RegionalComplianceWorkspace() {

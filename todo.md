@@ -1307,6 +1307,14 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Run TypeScript, Vitest, production build, and responsive login verification before the next checkpoint.
 - [x] Create and verify the production Heartbeat job after the deployed callback is confirmed reachable. Task UID: `i2xXRmbB233gsrfeuEqS68`; enabled schedule: `0 */5 * * * *` UTC.
 
+# First-Run Tour and Rich Showcase Data — 2026-08-16
+
+- [x] Add a bounded first-run onboarding tour to the isolated showcase session with restart and dismiss controls stored only in the browser session.
+- [x] Provide an Arabic-first walkthrough of workspace navigation, POS, inventory/FEFO, and the isolated demo safety boundary.
+- [x] Add labelled, non-persistent invoice demonstration scenarios for prescription, clinic supplies, and skincare sales flows.
+- [x] Add labelled, non-persistent inventory demonstration data covering items, batches, expiry, FEFO sequence, available quantity, and reorder levels.
+- [x] Validate the work with TypeScript, 347 passing Vitest tests (9 safely skipped), and a production build; existing server-side showcase mutation blocking remains in force.
+
 # Showcase Exploration Access Repair — 2026-08-16
 
 - [x] Diagnose why the isolated showcase account exposes only the overview route on the mobile sidebar: the captured page was a non-authenticated workspace shell rather than an active showcase session.
@@ -1314,3 +1322,11 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Make the mobile sidebar show the permitted showcase modules with clear Arabic labels and a visible read-only/demo notice; add an overview exploration launcher.
 - [x] Add focused regression coverage proving the showcase account can view permitted modules but cannot reach destructive, export, administration, or production-data paths.
 - [x] Verify the repaired exploration flow at a mobile viewport, run TypeScript/Vitest/build, and save a checkpoint.
+
+# First-Run Tour and Rich Showcase Data — 2026-08-16
+
+- [x] Define a bounded first-run onboarding tour for the isolated showcase session, including restart and dismiss controls without tracking production users.
+- [x] Implement an accessible Arabic-first walkthrough that introduces the workspace, navigation, POS invoices, inventory, and the demo safety boundary.
+- [x] Add rich, clearly labelled sample invoice data to the showcase POS workspace without persisting any transaction or inventory movement.
+- [x] Add rich, clearly labelled sample stock, batches, expiry, FEFO, and reorder data to the showcase inventory workspace without querying production records.
+- [x] Add regression tests for tour isolation, restart behaviour, rich showcase content, and mutation blocking; run TypeScript, Vitest, production build, and mobile verification.
