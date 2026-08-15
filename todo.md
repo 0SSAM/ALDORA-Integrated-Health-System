@@ -745,3 +745,13 @@
 - [x] Document real supplier/API/EDI/GS1/regulatory integration prerequisites and fail-closed boundaries.
 - [x] Run full Vitest, TypeScript, production build, visual verification, and package the complete project, documentation, and tests into one downloadable ZIP archive.
 - [x] Save and publish the supply-chain checkpoint.
+
+# Demand Forecasting and Automatic Reorder Dashboard 2026-08-15
+
+- [x] Define an explainable demand-forecasting policy using only supplied or persisted sales/usage history, with minimum-history and no-data states.
+- [x] Add automatic reorder-point and suggested-order-quantity calculations with lead time, service level, safety stock, current stock, open orders, expiry/FEFO, and supplier constraints.
+- [x] Enforce organization, branch, jurisdiction, product, and authorization scope on forecasting inputs and recommendations.
+- [x] Add a supply-chain dashboard with forecast horizon, confidence/data-quality status, reorder alerts, calculation explanations, filters, and RTL/LTR states.
+- [x] Add tests for forecast boundaries, seasonality/data gaps, lead-time and safety-stock calculations, expiry/FEFO constraints, scope isolation, and no-data fail-closed behavior.
+- [x] Document that recommendations are decision support, require authorized review, and do not create purchase orders automatically without approval.
+- [x] Run full Vitest, TypeScript, production build, and responsive visual verification, then save and publish the checkpoint.
