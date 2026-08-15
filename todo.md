@@ -1262,3 +1262,4 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [ ] Package and integrity-check the final local-ready ALDORA archive after CI verification.
 - [ ] Resolve CI compatibility blockers revealed by the migrated repository: TypeScript 6 rejecting deprecated baseUrl and dependency-review unsupported on the current private repository plan, while retaining visible security evidence.
 - [ ] Add an explicit post-migration schema assertion/repair in the isolated test runner so CI fails with the missing table/column name and never proceeds with a partially compatible disposable schema.
+- [ ] Add the remaining missing jurisdictionId columns discovered by schema comparison for customer_profiles and call_tickets, generate/apply the next MySQL migration, and rerun isolated CI.
