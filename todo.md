@@ -619,3 +619,4 @@
 - [x] Create and integrate a simple ALDO system icon and favicon assets without changing the secure brand identity; asset bound to /manus-storage/aldo-system-icon_1c63a72c.png in HTML and PWA manifest.
 - [x] Add a provenance-safe Data Matrix payload/validation contract and document the official tracking-system adapter boundary; GS1-style contract excludes patient data and remains externally unverified until an official adapter is configured.
 - [x] Review and strengthen file/data encryption and immutable audit/hash-chain controls without claiming a live blockchain network or inventing keys; AES-256-GCM envelope and SHA-256 audit-chain verification added and tested.
+- [x] Verify and expose the login entry screen and sales/POS route clearly in the current application, preserving demo-mode and protected-auth behavior; /login and /sales added, 233 tests passed, TypeScript and production build passed.
