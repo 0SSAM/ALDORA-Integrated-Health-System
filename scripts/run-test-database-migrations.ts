@@ -33,9 +33,6 @@ if (result.status !== 0) process.exit(result.status ?? 1);
 // gate above; production migrations never execute this repair.
 const connection = await createConnection(testDatabaseUrl);
 try {
-  await connection.query(
-    "ALTER TABLE `branches` ADD COLUMN IF NOT EXISTS `jurisdictionId` int"
-  );
   const [rows] = await connection.query(
     `SELECT COUNT(*) AS count
      FROM INFORMATION_SCHEMA.COLUMNS
@@ -44,7 +41,21 @@ try {
        AND COLUMN_NAME = 'jurisdictionId'`
   );
   const count = Number((rows as Array<{ count: number }>)[0]?.count ?? 0);
-  if (count !== 1) {
+  if (count === 0) {
+    await connection.query("ALTER TABLE `branches` ADD `jurisdictionId` int");
+  }
+
+  const [verifiedRows] = await connection.query(
+    `SELECT COUNT(*) AS count
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'branches'
+       AND COLUMN_NAME = 'jurisdictionId'`
+  );
+  const verifiedCount = Number(
+    (verifiedRows as Array<{ count: number }>)[0]?.count ?? 0
+  );
+  if (verifiedCount !== 1) {
     throw new Error(
       "Isolated schema verification failed: branches.jurisdictionId is missing after migrations."
     );
