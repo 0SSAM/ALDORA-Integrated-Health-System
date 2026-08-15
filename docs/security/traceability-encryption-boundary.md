@@ -15,3 +15,9 @@ The system does **not** claim a live connection to an Egyptian, Jordanian, Qatar
 ## Blockchain boundary
 
 No blockchain network, wallet, smart contract, token, or third-party ledger is activated by this change. A permissioned ledger may be evaluated later only if a specific business and regulatory requirement justifies it. Until then, the internal hash chain is the safer, lower-complexity audit foundation and must not be marketed as blockchain.
+
+## Limited-device operating mode
+
+When a device cannot present trusted native attestation, ALDO remains usable in a restricted mode. The client may display the approved interface and retain non-regulated drafts locally for user review. It must not queue regulated sales, prescriptions, invoices, controlled-substance actions, or government submissions for offline replay. Server-side replay and submission remain subject to organization scope, jurisdiction readiness, authorization, connectivity, and trusted-device verification. This is an operational compromise, not a bypass of security controls.
+
+The UI labels this state as a limited mode so staff can distinguish local drafting from a completed transaction. No local draft is treated as an authoritative record until the server accepts it and writes the applicable audit event.

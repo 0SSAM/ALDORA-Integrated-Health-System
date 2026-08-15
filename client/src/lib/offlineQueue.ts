@@ -27,7 +27,12 @@ function openDb(): Promise<IDBDatabase> {
   });
 }
 
+export function canQueueOfflineDraft(draft: Pick<OfflineDraft, "regulated">): boolean {
+  return draft.regulated === false;
+}
+
 export function enqueueOfflineDraft(draft: Omit<OfflineDraft, "id" | "createdAt">): OfflineDraft {
+  if (!canQueueOfflineDraft(draft)) throw new Error("regulated-offline-draft-blocked");
   const idempotencyKey = draft.idempotencyKey || makeKey();
   const item: OfflineDraft = { ...draft, id: idempotencyKey, idempotencyKey, createdAt: Date.now(), status: "queued" };
   const current = JSON.parse(localStorage.getItem(KEY) ?? "[]") as OfflineDraft[];
