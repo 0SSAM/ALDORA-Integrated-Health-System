@@ -1131,3 +1131,8 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Identify and implement remaining feasible gaps in offline/online operation, backup/restore, migration, weak-network resilience, performance, platform support, and module integration.
 - [x] Reconcile documentation, archives, reusable skills, and delivery artifacts with the requirement matrix.
 - [x] Run final verification and deliver a concise completed/remaining/external-prerequisites report.
+
+# ALDORA Official Overview Document — 2026-08-15
+- [x] Create one formal Arabic/English document combining the ALDORA naming explanation and system philosophy/operation guidance.
+- [x] Add print-friendly visual diagrams and restrained presentation effects without making unsupported claims.
+- [x] Validate and deliver the single downloadable document file.

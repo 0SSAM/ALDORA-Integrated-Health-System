@@ -1,0 +1,10 @@
+{
+  "entry": "main.typ",
+  "metadata": {
+    "author": "ALDORA Product Documentation",
+    "subtitle": "Philosophy, Meaning, and Cross-Platform Operation",
+    "title": "ALDORA | Official Overview"
+  },
+  "mode": "report",
+  "theme": "report-theme.typ"
+}
