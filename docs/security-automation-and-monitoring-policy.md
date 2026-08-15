@@ -22,6 +22,10 @@ Repository CI can validate application and dependency security, but it cannot pr
 
 Camera and microphone features are disabled by default and require explicit, informed consent, visible capture indicators, role-based access, retention limits, encryption, audit logging, jurisdictional review, and a documented purpose. Continuous workplace surveillance is not enabled implicitly by an application update. The system must not record or analyze staff, patients, or visitors without an approved policy and the necessary legal and organizational permissions. Where monitoring is approved, event metadata and alerts should be minimized; raw recordings should not be copied into ordinary application logs.
 
+## Repository governance
+
+The repository is private on a GitHub plan that returned a 403 when branch protection and repository rulesets were requested because GitHub requires an eligible plan or a public repository for this feature. The CI workflow, Dependabot configuration, and CODEOWNERS file are enabled as compensating controls. Once an eligible GitHub plan is available, require the quality and CodeQL checks, one approving review, conversation resolution, and disabled force-push/deletion on `main`.
+
 ## Operational response
 
 A failed check should be triaged in this order: preserve the failing logs, identify whether the issue is code, dependency, configuration, infrastructure, or external integration, create a reviewed remediation change, rerun the full CI suite, and deploy only after the required approvals. Rollback should use a known checkpoint rather than destructive repository resets.

@@ -1166,7 +1166,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Validate the workflow locally, save the project checkpoint, and confirm synchronization with GitHub.
 
 # ALDORA CI Security and Maintenance Guardrails — 2026-08-15
-- [ ] Add lint/format validation, dependency security audit, CodeQL analysis, and dependency review to CI.
-- [ ] Add a post-build smoke check that validates the application responds without modifying data.
-- [ ] Configure main-branch protection requiring the CI check when GitHub permissions allow it.
-- [ ] Document safe auto-maintenance boundaries: report and propose fixes automatically, but require review for security, data, permissions, or regulated changes; camera/microphone monitoring remains consent-gated and disabled by default.
+- [x] Add lint/format validation, dependency security audit, CodeQL analysis, and dependency review to CI. (Dependency audit is visible as a non-blocking warning until the existing high-severity baseline is remediated.)
+- [x] Add a post-build smoke check that validates the application responds without modifying data.
+- [x] Configure main-branch protection requiring the CI check when GitHub permissions allow it. (Attempted via GitHub API; private-repository plan returned 403, so the limitation and compensating controls are documented.)
+- [x] Document safe auto-maintenance boundaries: report and propose fixes automatically, but require review for security, data, permissions, or regulated changes; camera/microphone monitoring remains consent-gated and disabled by default.
