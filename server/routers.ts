@@ -30,6 +30,10 @@ const connectorReadinessRegistry = [
     readinessPercent: 0,
     prerequisites: ["مواصفة endpoint رسمية", "اعتماد وبيانات تسجيل المؤسسة", "اعتمادات سرية عبر مدير الأسرار", "بيئة sandbox واختبار قبول موثق"],
     lastReviewedAt: "2026-08-15T00:00:00.000Z",
+    accreditationExpiresAt: "2026-09-13T00:00:00.000Z",
+    lastStatusChangedAt: "2026-08-10T00:00:00.000Z",
+    previousState: "deferred" as const,
+    statusChangeReason: "تثبيت الإغلاق الآمن بعد مراجعة حدود الاعتماد الخارجي",
     note: "لا توجد أي مكالمات خارجية أو إرسال بيانات قبل استيفاء بوابة الجاهزية والقبول البشري.",
   },
   {
@@ -44,6 +48,10 @@ const connectorReadinessRegistry = [
     readinessPercent: 0,
     prerequisites: ["عقد API وخرائط الأهلية والمطالبات", "اعتمادات الجهة الدافعة", "بيئة اختبار sandbox", "اختبارات قبول ومطابقة التسويات"],
     lastReviewedAt: "2026-08-15T00:00:00.000Z",
+    accreditationExpiresAt: "2026-08-20T00:00:00.000Z",
+    lastStatusChangedAt: "2026-08-13T00:00:00.000Z",
+    previousState: "deferred" as const,
+    statusChangeReason: "تحديث سياسة الجاهزية مع إبقاء النقل الخارجي مغلقًا",
     note: "تظل الأهلية والموافقات والمطالبات في نطاق داخلي غير مرسل حتى الاعتماد الرسمي.",
   },
 ] as const;
@@ -73,6 +81,33 @@ export const appRouter = router({
         && (filters.provider === "ALL" || (connector.providers as readonly string[]).includes(filters.provider)),
       );
       const reviewedAt = new Date().toISOString();
+      const now = Date.now();
+      const alerts = connectors.flatMap(connector => {
+        const daysUntilExpiry = Math.ceil((Date.parse(connector.accreditationExpiresAt) - now) / 86_400_000);
+        const expiryAlert = daysUntilExpiry <= 30 ? [{
+          id: `${connector.id}:expiry`,
+          connectorId: connector.id,
+          kind: daysUntilExpiry < 0 ? "expired" as const : "expiry" as const,
+          severity: daysUntilExpiry <= 7 ? "critical" as const : "warning" as const,
+          daysUntilExpiry,
+          occurredAt: connector.accreditationExpiresAt,
+          title: daysUntilExpiry < 0 ? "انتهت صلاحية الاعتماد" : "اقتربت صلاحية الاعتماد",
+          detail: daysUntilExpiry < 0 ? "يجب تجديد الاعتماد قبل أي طلب تفعيل خارجي." : `متبقٍ ${daysUntilExpiry} يومًا على تاريخ الانتهاء.`,
+          acknowledged: false,
+        }] : [];
+        const statusAlert = [{
+          id: `${connector.id}:status`,
+          connectorId: connector.id,
+          kind: "status-change" as const,
+          severity: "info" as const,
+          daysUntilExpiry: null,
+          occurredAt: connector.lastStatusChangedAt,
+          title: "تغيرت حالة الموصل",
+          detail: `${connector.previousState} ← ${connector.state}. ${connector.statusChangeReason}`,
+          acknowledged: false,
+        }];
+        return [...expiryAlert, ...statusAlert];
+      });
       const auditLog = connectors.map(connector => {
         const safeEvent = {
           eventType: "connector_readiness_reviewed",
@@ -96,6 +131,7 @@ export const appRouter = router({
         activationPolicy: "fail-closed" as const,
         filters,
         connectors,
+        alerts,
         auditLog,
         filterOptions: {
           total: connectorReadinessRegistry.length,

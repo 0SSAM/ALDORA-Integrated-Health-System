@@ -993,3 +993,13 @@
 - [x] Add an admin-only audit-log view with filtering, empty/loading/error states, and clear fail-closed messaging.
 - [x] Add regression tests for filter combinations, invalid filters, admin-only access, scope isolation, audit integrity, and secret redaction.
 - [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.
+
+
+# Accreditation Expiry and Status Alerts 2026-08-15
+
+- [x] Define bilingual alert policy for expiring, expired, and status-changed government/insurance accreditations, including severity and lead-time thresholds.
+- [x] Add protected server-side alert derivation and acknowledgment procedures without enabling external connectors or notifications.
+- [x] Preserve admin-only access, organization/branch/jurisdiction scope, credential redaction, and tamper-evident audit metadata for alert actions.
+- [x] Add visible bilingual alert center and summary indicators to the connector dashboard with loading, empty, error, unread, and acknowledged states.
+- [x] Add regression tests for expiry thresholds, status changes, admin-only access, scope isolation, deduplication, acknowledgment, and fail-closed external delivery.
+- [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.

@@ -31,6 +31,11 @@ describe("connector readiness dashboard contract", () => {
     expect(result.filterOptions.providers).toEqual(expect.arrayContaining(["UPA", "EDA", "TPA / Payer APIs"]));
     expect(result.auditLog).toHaveLength(2);
     expect(result.auditLog.every(entry => entry.integrity === "tamper-evident" && entry.recordHash.match(/^[a-f0-9]{64}$/))).toBe(true);
+    expect(result.alerts).toHaveLength(4);
+    expect(result.alerts.filter(alert => alert.kind === "expiry")).toHaveLength(2);
+    expect(result.alerts.filter(alert => alert.kind === "status-change")).toHaveLength(2);
+    expect(result.alerts.some(alert => alert.severity === "warning" || alert.severity === "critical")).toBe(true);
+    expect(result.alerts.every(alert => alert.acknowledged === false)).toBe(true);
     expect(JSON.stringify(result)).not.toMatch(/password|token|secret|apiKey|authorization/i);
   });
 
@@ -42,6 +47,7 @@ describe("connector readiness dashboard contract", () => {
 
     const insurance = await caller.auth.connectorReadiness({ countryCode: "EG", provider: "TPA / Payer APIs", connectorType: "insurance-payer", readinessState: "blocked" });
     expect(insurance.connectors.map(connector => connector.id)).toEqual(["insurance-payers"]);
+    expect(insurance.alerts.every(alert => alert.connectorId === "insurance-payers")).toBe(true);
   });
 
   it("rejects invalid filters and non-admin users before exposing readiness or audit data", async () => {
