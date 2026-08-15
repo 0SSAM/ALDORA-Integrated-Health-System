@@ -744,4 +744,4 @@
 - [x] Add tests for scope isolation, state transitions, FEFO/expiry boundaries, discrepancy handling, recall/quarantine, and tamper-evident audit linkage.
 - [x] Document real supplier/API/EDI/GS1/regulatory integration prerequisites and fail-closed boundaries.
 - [x] Run full Vitest, TypeScript, production build, visual verification, and package the complete project, documentation, and tests into one downloadable ZIP archive.
-- [ ] Save and publish the supply-chain checkpoint.
+- [x] Save and publish the supply-chain checkpoint.
