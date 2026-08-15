@@ -499,6 +499,16 @@ export const internalSessions = mysqlTable("internal_sessions", {
   lastSeenAt: timestamp("lastSeenAt").defaultNow().notNull(),
 }, table => ({ sessionHashIdx: uniqueIndex("internal_sessions_hash_idx").on(table.sessionHash), userScopeIdx: index("internal_sessions_user_scope_idx").on(table.userId, table.organizationId, table.branchId, table.revokedAt) }));
 
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  credentialId: int("credentialId").notNull(),
+  tokenHash: varchar("tokenHash", { length: 128 }).notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ tokenHashIdx: uniqueIndex("password_reset_tokens_hash_idx").on(table.tokenHash), userIdx: index("password_reset_tokens_user_idx").on(table.userId, table.expiresAt) }));
+
 export const authenticationEvents = mysqlTable("authentication_events", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId"),
@@ -506,7 +516,7 @@ export const authenticationEvents = mysqlTable("authentication_events", {
   organizationId: int("organizationId"),
   branchId: int("branchId"),
   jurisdictionId: int("jurisdictionId"),
-  eventType: mysqlEnum("eventType", ["login_success", "login_failure", "logout", "lockout", "session_revoked"]).notNull(),
+  eventType: mysqlEnum("eventType", ["login_success", "login_failure", "logout", "lockout", "session_revoked", "password_reset_requested", "password_reset_completed"]).notNull(),
   source: mysqlEnum("source", ["internal", "oauth"]).notNull(),
   requestId: varchar("requestId", { length: 120 }),
   recordHash: varchar("recordHash", { length: 128 }).notNull(),

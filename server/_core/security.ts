@@ -80,7 +80,7 @@ export function createSecurityMiddleware() {
   return (req: Request, res: Response, next: NextFunction) => {
     const isMutation = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method.toUpperCase());
     const path = req.path;
-    const isAuth = path === "/api/trpc/auth.internalLogin" || path === "/api/oauth/callback";
+    const isAuth = path === "/api/trpc/auth.internalLogin" || path === "/api/trpc/auth.requestPasswordReset" || path === "/api/trpc/auth.resetPassword" || path === "/api/oauth/callback";
 
     const decision = isTrustedMutationRequest(req);
     if (!decision.allowed) {

@@ -1,6 +1,6 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, authenticationEvents, internalCredentials, internalSessions, users, organizationMemberships, branchUsers, branches, branchJurisdictions } from "../drizzle/schema";
+import { InsertUser, authenticationEvents, internalCredentials, internalSessions, passwordResetTokens, users, organizationMemberships, branchUsers, branches, branchJurisdictions } from "../drizzle/schema";
 import { hashAuditRecord, hashSessionToken } from "./domain/internal-auth";
 import { ENV } from './_core/env';
 import { safeErrorLabel } from './domain/safe-error';
@@ -98,6 +98,32 @@ export async function getInternalCredentialByUsername(username: string) {
   return result[0];
 }
 
+export async function createPasswordResetToken(input: { userId: number; credentialId: number; token: string; expiresAt: Date }) {
+  const db = await getDb();
+  if (!db) throw new Error("Password recovery requires a database");
+  await db.insert(passwordResetTokens).values({ userId: input.userId, credentialId: input.credentialId, tokenHash: hashSessionToken(input.token), expiresAt: input.expiresAt });
+}
+
+export async function resetInternalPasswordWithToken(input: { token: string; passwordHash: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Password reset requires a database");
+  const now = new Date();
+  const tokenHash = hashSessionToken(input.token);
+  return db.transaction(async tx => {
+    const matches = await tx.select({ reset: passwordResetTokens, credential: internalCredentials }).from(passwordResetTokens)
+      .innerJoin(internalCredentials, eq(internalCredentials.id, passwordResetTokens.credentialId))
+      .where(and(eq(passwordResetTokens.tokenHash, tokenHash), isNull(passwordResetTokens.usedAt)))
+      .limit(1);
+    const match = matches[0];
+    if (!match || match.reset.expiresAt.getTime() <= now.getTime() || !match.credential.active) return false;
+    const consumed = await tx.update(passwordResetTokens).set({ usedAt: now }).where(and(eq(passwordResetTokens.id, match.reset.id), isNull(passwordResetTokens.usedAt)));
+    if ((consumed as { affectedRows?: number }).affectedRows !== 1) return false;
+    await tx.update(internalCredentials).set({ passwordHash: input.passwordHash, failedAttempts: 0, lockedUntil: null, passwordChangedAt: now }).where(eq(internalCredentials.id, match.credential.id));
+    await tx.update(internalSessions).set({ revokedAt: now }).where(and(eq(internalSessions.userId, match.reset.userId), isNull(internalSessions.revokedAt)));
+    return { userId: match.reset.userId } as const;
+  });
+}
+
 export async function getInternalScopeForUser(userId: number) {
   const db = await getDb();
   if (!db) return undefined;
@@ -136,7 +162,7 @@ export async function revokeInternalSession(token: string) {
   await db.update(internalSessions).set({ revokedAt: new Date() }).where(and(eq(internalSessions.sessionHash, hashSessionToken(token)), isNull(internalSessions.revokedAt)));
 }
 
-export async function recordAuthenticationEvent(input: { userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; eventType: "login_success" | "login_failure" | "logout" | "lockout" | "session_revoked"; source: "internal" | "oauth"; requestId?: string | null }) {
+export async function recordAuthenticationEvent(input: { userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; eventType: "login_success" | "login_failure" | "logout" | "lockout" | "session_revoked" | "password_reset_requested" | "password_reset_completed"; source: "internal" | "oauth"; requestId?: string | null }) {
   const db = await getDb();
   if (!db) return;
   const previous = await db.select({ recordHash: authenticationEvents.recordHash }).from(authenticationEvents).orderBy(desc(authenticationEvents.id)).limit(1);

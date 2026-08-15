@@ -3,6 +3,7 @@ import {
   INTERNAL_MAX_FAILED_ATTEMPTS,
   createInternalSessionToken,
   hashInternalPassword,
+  hashSessionToken,
   hashAuditRecord,
   isLocked,
   normalizeInternalUsername,
@@ -42,10 +43,18 @@ describe("internal employee authentication contract", () => {
     expect(isLocked(null, new Date())).toBe(false);
   });
 
-  it("creates high-entropy opaque session tokens", () => {
+  it("creates high-entropy opaque session and recovery tokens", () => {
     const first = createInternalSessionToken();
     const second = createInternalSessionToken();
     expect(first).not.toBe(second);
     expect(first.length).toBeGreaterThanOrEqual(40);
+    expect(hashSessionToken(first)).not.toContain(first);
+    expect(hashSessionToken(first)).not.toBe(hashSessionToken(second));
+  });
+
+  it("rejects weak reset passwords through the shared policy", () => {
+    expect(() => hashInternalPassword("short")).toThrow();
+    expect(() => hashInternalPassword("no-uppercase-password9")).toThrow();
+    expect(() => hashInternalPassword("NoNumberPassword")).toThrow();
   });
 });

@@ -11,8 +11,9 @@ import { reportsRouter } from "./routers/reports";
 import { insuranceRouter } from "./routers/insurance";
 import { promotionsRouter } from "./routers/promotions";
 import { egyptHealthcareRouter } from "./routers/egypt-healthcare";
-import { getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, revokeInternalSession } from "./db";
-import { createInternalSessionToken, INTERNAL_LOCKOUT_MS, INTERNAL_MAX_FAILED_ATTEMPTS, INTERNAL_SESSION_COOKIE, INTERNAL_SESSION_TTL_MS, isLocked, normalizeInternalUsername, verifyInternalPassword } from "./domain/internal-auth";
+import { createPasswordResetToken, getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, resetInternalPasswordWithToken, revokeInternalSession } from "./db";
+import { assertPasswordPolicy, createInternalSessionToken, INTERNAL_LOCKOUT_MS, INTERNAL_MAX_FAILED_ATTEMPTS, INTERNAL_SESSION_COOKIE, INTERNAL_SESSION_TTL_MS, isLocked, normalizeInternalUsername, verifyInternalPassword } from "./domain/internal-auth";
+import { hashInternalPassword } from "./domain/internal-auth";
 
 export const appRouter = router({
   system: systemRouter,
@@ -49,6 +50,30 @@ export const appRouter = router({
       await recordAuthenticationEvent({ username, userId: credential.userId, ...scope, eventType: "login_success", source: "internal" });
       ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), maxAge: INTERNAL_SESSION_TTL_MS, path: "/" });
       return { success: true as const, mode: "internal" as const, scope };
+    }),
+    requestPasswordReset: publicProcedure.input(z.object({ username: z.string().min(3).max(80) })).mutation(async ({ input }) => {
+      const generic = { success: true as const, message: "إذا كانت بيانات الحساب صحيحة، فسيتم إرسال تعليمات الاستعادة عبر قناة المؤسسة المعتمدة." };
+      let username: string;
+      try { username = normalizeInternalUsername(input.username); } catch { return generic; }
+      const credential = await getInternalCredentialByUsername(username);
+      if (!credential || !credential.active) {
+        await recordAuthenticationEvent({ username, eventType: "password_reset_requested", source: "internal" });
+        return generic;
+      }
+      const token = createInternalSessionToken();
+      await createPasswordResetToken({ userId: credential.userId, credentialId: credential.id, token, expiresAt: new Date(Date.now() + 30 * 60 * 1000) });
+      await recordAuthenticationEvent({ username, userId: credential.userId, eventType: "password_reset_requested", source: "internal" });
+      // Token delivery is intentionally not returned to the browser. A verified email/OTP adapter must be configured before production delivery.
+      return generic;
+    }),
+    resetPassword: publicProcedure.input(z.object({ token: z.string().min(32).max(200), password: z.string().min(12).max(200), confirmPassword: z.string().min(12).max(200) })).mutation(async ({ input }) => {
+      if (input.password !== input.confirmPassword) return { success: false as const, message: "كلمتا المرور غير متطابقتين" };
+      try { assertPasswordPolicy(input.password); } catch { return { success: false as const, message: "يجب أن تتضمن كلمة المرور 12 حرفاً على الأقل، وحرفاً كبيراً وصغيراً ورقماً" }; }
+      const passwordHash = hashInternalPassword(input.password);
+      const reset = await resetInternalPasswordWithToken({ token: input.token, passwordHash });
+      if (!reset) return { success: false as const, message: "رابط الاستعادة غير صالح أو منتهي أو مستخدم مسبقاً" };
+      await recordAuthenticationEvent({ userId: reset.userId, eventType: "password_reset_completed", source: "internal" });
+      return { success: true as const, message: "تم تحديث كلمة المرور. يمكنك تسجيل الدخول الآن." };
     }),
     internalLogout: publicProcedure.mutation(async ({ ctx }) => {
       const token = ctx.req.cookies?.[INTERNAL_SESSION_COOKIE];

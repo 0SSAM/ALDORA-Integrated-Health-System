@@ -832,3 +832,13 @@
 - [x] Remove demo fixtures, synthetic workspace data, demo-only assets, and demo wording while preserving legitimate empty states.
 - [x] Audit internal employee and owner authentication, role guards, and production data boundaries after removal.
 - [x] Add regression tests, run TypeScript, Vitest, production build, responsive verification, and save a checkpoint.
+
+
+# Employee and Owner Login Recovery
+
+- [x] Review the existing real employee/owner authentication contract, login page, and server session boundaries before changes.
+- [x] Add a secure password-recovery request flow with generic anti-enumeration responses, throttling, expiry, single-use tokens, and audit events.
+- [x] Add a secure password-reset completion flow with strong validation, token invalidation, session invalidation, and fail-closed behavior.
+- [x] Improve Arabic/English login validation errors and visible loading/submission states without exposing credentials or sensitive authentication details.
+- [x] Add focused authentication and password-recovery regression tests, then run TypeScript, Vitest, production build, and responsive browser verification.
+- [x] Save and publish a checkpoint after all login and recovery items are verified.
