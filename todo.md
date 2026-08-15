@@ -1146,3 +1146,11 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Inventory project files and define safe archive exclusions for secrets, environment files, generated dependencies, and runtime logs.
 - [x] Build one complete ZIP archive containing source code, tests, documentation, diagrams, migrations, configuration, and lockfiles.
 - [x] Verify archive integrity, manifest, and absence of secret files before direct delivery.
+
+# Enduro Raw Local Setup PDF — 2026-08-15
+- [x] Create a formal Arabic local-setup guide titled «إعدادات التشغيل المحلي لنظام ALDORA» based on the provided setup instructions.
+- [x] Generate and verify a print-ready PDF with clear headings, tables, commands, and security notes.
+- [x] Deliver the PDF directly as a downloadable attachment.
+
+# ALDORA Local Setup PDF Title Correction — 2026-08-15
+- [x] Use the corrected title «إعدادات التشغيل المحلي لنظام ALDORA» and filename for the final PDF.
