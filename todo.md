@@ -1271,3 +1271,5 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add a regression test and apply the smallest safe fix for the published showcase login flow.
 - [ ] Verify the live login flow on the deployed domain and document the outcome.
 - [x] Ensure managed showcase reconciliation clears stale failed-attempt lockout for the isolated `test` account and add regression coverage without affecting production accounts.
+
+- [ ] Fix successful internal-login navigation so the employee showcase account lands on `/workspace`, not the public welcome page, and add regression coverage for the redirect contract.

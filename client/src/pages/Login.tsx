@@ -38,7 +38,7 @@ export default function Login() {
   const internalLogin = trpc.auth.internalLogin.useMutation({
     onSuccess: result => {
       if (!result.success) { setInternalError(result.message); return; }
-      setInternalError(""); setLocation("/");
+      setInternalError(""); setLocation("/workspace");
     },
     onError: error => setInternalError(error.data?.code === "TOO_MANY_REQUESTS" ? "تم إيقاف المحاولات مؤقتاً للحماية. انتظر قليلاً ثم حاول مرة أخرى." : "تعذر التحقق من البيانات حالياً. تأكد من الاتصال وحاول مرة أخرى."),
   });
