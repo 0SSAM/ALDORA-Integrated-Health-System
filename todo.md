@@ -1188,9 +1188,9 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Validate the documented local startup sequence, save the project checkpoint, and deliver the ZIP directly.
 
 # Direct ZIP Delivery Correction — 2026-08-15
-- [ ] Locate and verify the actual updated ALDORA ZIP archive path and integrity.
-- [ ] Rebuild the archive if the direct file is missing or stale.
-- [ ] Attach the ZIP file itself directly to the user, not a project-version link.
+- [x] Locate and verify the actual updated ALDORA ZIP archive path and integrity. Verified `/home/ubuntu/ALDORA-local-ready-2026-08-15.zip` with `unzip -t` and confirmed inclusion of the showcase repair, review report, setup guide, and environment template.
+- [x] Rebuild the archive if the direct file is missing or stale. Rebuilt after the showcase repair while excluding secrets, local environment files, Git metadata, dependencies, logs, and build artifacts.
+- [x] Attach the ZIP file itself directly to the user, not a project-version link. Prepared for direct delivery with the completed checkpoint version linked separately for hosted review.
 
 # Comprehensive System Review and Showcase Login Fix — 2026-08-15
 - [x] Diagnose the test account failure in the deployed application, including secret configuration, authentication flow, and environment parity. Root cause: the isolated showcase branch was missing its jurisdiction binding, so scope creation failed closed.
