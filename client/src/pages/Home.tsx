@@ -14,7 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { HardwareWorkspace } from "@/components/HardwareWorkspace";
 import { SupplyChainWorkspace } from "@/components/SupplyChainWorkspace";
 import { EgyptHealthcareWorkspace } from "@/components/EgyptHealthcareWorkspace";
-import { InsuranceWorkspace, OrganizationWorkspace, PromotionsWorkspace, ReportsWorkspace } from "@/components/IntegratedOperationsWorkspaces";
+import { InsuranceWorkspace, OperationsHubWorkspace, OrganizationWorkspace, PromotionsWorkspace, ReportsWorkspace } from "@/components/IntegratedOperationsWorkspaces";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NlmIcd10ReferencePanel } from "@/components/NlmIcd10ReferencePanel";
 import { AuthenticationSettingsWorkspace } from "@/components/AuthenticationSettingsWorkspace";
@@ -44,9 +44,10 @@ const modules = [
   { id: "hardware", label: "إعداد الأجهزة والمحاكاة", searchText: "hardware printers scanners simulation devices", icon: Settings2 },
   { id: "security", label: "إعدادات الحماية والمصادقة", searchText: "security authentication 2fa two factor password recovery email otp", icon: LockKeyhole },
   { id: "connectors", label: "مركز الموصلات والاعتمادات", searchText: "connectors integrations government insurance accreditation readiness UPA EDA ETA UHIA", icon: PlugZap },
+  { id: "operationsHub", label: "مركز التشغيل والباقات", searchText: "operations hub pharmacy hospital distributor laboratory insurer rehabilitation services bundles", icon: HeartPulse },
 ];
 
-const organizationModules: Record<string, string[]> = { government: ["overview", "compliance", "finance", "people", "insurance", "egyptHealthcare", "icd10"], pharmacy: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "customerCare", "callCentre", "catalog", "icd10"], pharmacy_chain: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "finance", "people", "customerCare", "callCentre", "catalog", "icd10"], distributor: ["overview", "inventory", "supplyChain", "promotions", "compliance", "finance", "people", "catalog"], insurer: ["overview", "insurance", "compliance", "finance", "people", "customerCare", "icd10"], rehabilitation: ["overview", "prescriptions", "customerCare", "finance", "compliance", "people", "icd10"], hospital: ["overview", "inventory", "prescriptions", "insurance", "egyptHealthcare", "compliance", "finance", "people", "customerCare", "icd10"], laboratory: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare", "icd10"], radiology: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare", "icd10"] };
+const organizationModules: Record<string, string[]> = { government: ["overview", "compliance", "finance", "people", "insurance", "egyptHealthcare", "icd10", "operationsHub"], pharmacy: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "customerCare", "callCentre", "catalog", "icd10", "operationsHub"], pharmacy_chain: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "finance", "people", "customerCare", "callCentre", "catalog", "icd10", "operationsHub"], distributor: ["overview", "inventory", "supplyChain", "promotions", "compliance", "finance", "people", "catalog", "operationsHub"], insurer: ["overview", "insurance", "compliance", "finance", "people", "customerCare", "icd10", "operationsHub"], rehabilitation: ["overview", "prescriptions", "customerCare", "finance", "compliance", "people", "icd10", "operationsHub"], hospital: ["overview", "inventory", "prescriptions", "insurance", "egyptHealthcare", "compliance", "finance", "people", "customerCare", "icd10", "operationsHub"], laboratory: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare", "icd10", "operationsHub"], radiology: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare", "icd10", "operationsHub"] };
 
 const coreShortcuts: ReadonlyArray<{ key: string; label: string; description: string; module: string; roles: readonly string[] }> = [
   { key: "F2", label: "فاتورة بيع جديدة", description: "فتح نقطة البيع لبدء معاملة جديدة", module: "pos", roles: ["admin", "manager", "pharmacist", "cashier"] },
@@ -55,6 +56,7 @@ const coreShortcuts: ReadonlyArray<{ key: string; label: string; description: st
   { key: "F7", label: "المخزون", description: "فتح المخزون وFEFO", module: "inventory", roles: ["admin", "manager", "pharmacist"] },
   { key: "F8", label: "البحث الذكي", description: "تركيز البحث عن الوحدات", module: "overview", roles: ["admin", "manager", "pharmacist", "cashier"] },
   { key: "F9", label: "التقارير", description: "فتح المالية والتقارير", module: "finance", roles: ["admin", "manager"] },
+  { key: "F10", label: "مركز التشغيل", description: "فتح الباقات القطاعية وحالة الجاهزية والتنبيهات", module: "operationsHub", roles: ["admin", "manager", "pharmacist", "cashier", "user"] },
   { key: "?", label: "دليل الاختصارات", description: "عرض الاختصارات المتاحة لهذا الدور", module: "overview", roles: ["admin", "manager", "pharmacist", "cashier", "user"] },
 ] as const;
 
@@ -91,7 +93,7 @@ export default function Home() {
   const role = user?.role as "admin" | "manager" | "pharmacist" | "cashier" | "user" | undefined;
   const allowedModules = useMemo(() => {
     if (!role) return modules.filter(item => item.id === "overview");
-    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], supplyChain: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], promotions: ["admin", "manager"], people: ["admin", "manager"], customerCare: ["admin", "manager", "pharmacist", "cashier"], callCentre: ["admin", "manager", "pharmacist", "cashier"], catalog: ["admin", "manager", "pharmacist"], icd10: ["admin", "manager", "pharmacist"], hardware: ["admin", "manager"], security: ["admin", "manager", "pharmacist", "cashier", "user"], connectors: ["admin"] };
+    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], supplyChain: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], promotions: ["admin", "manager"], people: ["admin", "manager"], customerCare: ["admin", "manager", "pharmacist", "cashier"], callCentre: ["admin", "manager", "pharmacist", "cashier"], catalog: ["admin", "manager", "pharmacist"], icd10: ["admin", "manager", "pharmacist"], operationsHub: ["admin", "manager", "pharmacist", "cashier", "user"], hardware: ["admin", "manager"], security: ["admin", "manager", "pharmacist", "cashier", "user"], connectors: ["admin"] };
     const scopedModuleIds = activeOrganizationType ? organizationModules[activeOrganizationType] : undefined;
     return modules.filter(item => (access[item.id] ?? (item.id === "egyptHealthcare" ? ["admin", "manager", "pharmacist"] : [])).includes(role) && (!scopedModuleIds || item.id === "hardware" || item.id === "connectors" || scopedModuleIds.includes(item.id)));
   }, [role, activeOrganizationType]);
@@ -254,6 +256,7 @@ function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { act
   if (active === "hardware") return <HardwareWorkspace />;
      if (active === "security") return <AuthenticationSettingsWorkspace />;
    if (active === "connectors") return <ConnectorAccreditationDashboard />;
+  if (active === "operationsHub") return <OperationsHubWorkspace organizationId={organizationId} jurisdictionId={jurisdictionId} />;
 
   if (active === "supplyChain") return <SupplyChainWorkspace branchId={branchId} jurisdictionId={jurisdictionId} />;
   if (active === "egyptHealthcare") return <EgyptHealthcareWorkspace organizationId={organizationId} branchId={branchId} jurisdictionId={jurisdictionId} />;
