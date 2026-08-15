@@ -62,4 +62,32 @@ describe("security middleware boundaries", () => {
     } as never;
     expect(securityInternals.requestOrigin(request)).toBe("https://aldora.example");
   });
+
+  it("trusts forwarded host and protocol when the socket is the loopback proxy", () => {
+    const request = {
+      ip: "198.51.100.9",
+      socket: { remoteAddress: "::1" },
+      protocol: "http",
+      headers: {
+        "x-forwarded-host": "aldora.example",
+        "x-forwarded-proto": "https",
+      },
+      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
+    } as never;
+    expect(securityInternals.requestOrigin(request)).toBe("https://aldora.example");
+  });
+
+  it("does not trust forwarded host when both client and socket are external", () => {
+    const request = {
+      ip: "198.51.100.9",
+      socket: { remoteAddress: "198.51.100.10" },
+      protocol: "http",
+      headers: {
+        "x-forwarded-host": "attacker.example",
+        "x-forwarded-proto": "https",
+      },
+      get: (name: string) => name === "host" ? "aldora.example" : undefined,
+    } as never;
+    expect(securityInternals.requestOrigin(request)).toBe("http://aldora.example");
+  });
 });

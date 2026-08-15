@@ -33,7 +33,10 @@ function isLoopbackAddress(value: string | undefined): boolean {
 }
 
 function requestOrigin(req: Request): string | undefined {
-  const trustedForwarder = isLoopbackAddress(req.ip);
+  // Express's trusted proxy setting may resolve req.ip to the original client;
+  // the socket address is the reliable boundary for a local reverse proxy.
+  const socketAddress = req.socket?.remoteAddress;
+  const trustedForwarder = isLoopbackAddress(socketAddress) || isLoopbackAddress(req.ip);
   const forwardedHost = trustedForwarder ? firstHeader(req.headers["x-forwarded-host"]) : undefined;
   const host = forwardedHost?.split(",")[0]?.trim() || req.get("host");
   if (!host) return undefined;
@@ -117,7 +120,7 @@ export function createSecurityMiddleware() {
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Resource-Policy": "same-origin",
     });
-    const trustedForwarder = isLoopbackAddress(req.ip);
+    const trustedForwarder = isLoopbackAddress(req.socket?.remoteAddress) || isLoopbackAddress(req.ip);
     if (req.protocol === "https" || (trustedForwarder && firstHeader(req.headers["x-forwarded-proto"])?.split(",")[0]?.trim() === "https")) {
       res.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     }
