@@ -22,7 +22,7 @@ The current codebase has strict organization, branch, and jurisdiction guards; r
 | Jordan country pack | Official data portal access was refused by the hosting layer | Re-check through an authorized accessible source; do not enable the pack from snippets. |
 | Qatar country pack | MoPH page is protected by anti-bot controls | Obtain an authorized source or manually verified regulatory package; do not bypass anti-bot controls. |
 | Morocco country pack | AMMPS source was recorded, but complete legal, privacy, tax, and operational coverage is not verified | Complete the source-linked domain matrix and approval evidence before enabling. |
-| ETA, EDA, insurance, government, payroll, and payer transports | Adapters remain readiness-gated without official API specifications, credentials, or sandbox contracts | Add adapters only after the authority or provider supplies endpoint, authentication, schema, submission, rejection, retry, and audit requirements. |
+| ETA, EDA, insurance, government, payroll, and payer transports | Adapters remain readiness-gated without official API specifications, credentials, or sandbox contracts | Add adapters only after the authority or provider supplies endpoint, authentication, schema, submission, acknowledgement, rejection, retry, audit, and acceptance requirements. The shared readiness policy now blocks unless all eight gates are verified. |
 
 ## Blocked by trusted client infrastructure
 

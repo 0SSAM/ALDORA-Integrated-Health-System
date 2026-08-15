@@ -610,3 +610,4 @@
 - [x] Add adaptive client performance defaults: conservative React Query caching, lazy-load non-critical routes/components, and avoid repeated session-storage work on every request without changing auth behavior.
 - [x] Include client-side unit tests in Vitest so the session-header cache test runs in CI and local regression checks.
 - [x] Refresh the open-prerequisites audit index with the latest 223-test regression and performance hardening status without closing external blockers.
+- [x] Harden external-adapter readiness with explicit endpoint contract, submission acknowledgement, retry, and audit requirements while keeping all unconfigured adapters blocked; 71 test files passed, 223 tests passed, and production build passed.
