@@ -1,7 +1,7 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, authenticationEvents, internalCredentials, internalSessions, passwordResetTokens, users, organizationMemberships, branchUsers, branches, branchJurisdictions } from "../drizzle/schema";
-import { hashAuditRecord, hashSessionToken } from "./domain/internal-auth";
+import { InsertUser, authenticationEvents, internalCredentials, internalSessions, passwordResetTokens, users, organizationMemberships, branchUsers, branches, branchJurisdictions, organizations } from "../drizzle/schema";
+import { hashAuditRecord, hashSessionToken, isSessionEnvironmentConsistent } from "./domain/internal-auth";
 import { ENV } from './_core/env';
 import { safeErrorLabel } from './domain/safe-error';
 
@@ -150,9 +150,37 @@ export async function createInternalSession(input: { token: string; userId: numb
 export async function getInternalSession(token: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select({ session: internalSessions, user: users }).from(internalSessions).innerJoin(users, eq(users.id, internalSessions.userId)).where(and(eq(internalSessions.sessionHash, hashSessionToken(token)), isNull(internalSessions.revokedAt))).limit(1);
+  const result = await db.select({ session: internalSessions, user: users, organizationEnvironment: organizations.environment }).from(internalSessions)
+    .innerJoin(users, eq(users.id, internalSessions.userId))
+    .innerJoin(internalCredentials, and(eq(internalCredentials.userId, internalSessions.userId), eq(internalCredentials.active, 1)))
+    .innerJoin(organizations, and(eq(organizations.id, internalSessions.organizationId), eq(organizations.status, "active")))
+    .innerJoin(organizationMemberships, and(
+      eq(organizationMemberships.userId, internalSessions.userId),
+      eq(organizationMemberships.organizationId, internalSessions.organizationId),
+      eq(organizationMemberships.active, 1),
+    ))
+    .innerJoin(branches, and(
+      eq(branches.id, internalSessions.branchId),
+      eq(branches.organizationId, internalSessions.organizationId),
+      eq(branches.active, 1),
+    ))
+    .innerJoin(branchUsers, and(
+      eq(branchUsers.userId, internalSessions.userId),
+      eq(branchUsers.branchId, internalSessions.branchId),
+      eq(branchUsers.active, 1),
+    ))
+    .innerJoin(branchJurisdictions, and(
+      eq(branchJurisdictions.branchId, internalSessions.branchId),
+      eq(branchJurisdictions.jurisdictionId, internalSessions.jurisdictionId),
+    ))
+    .where(and(
+      eq(internalSessions.sessionHash, hashSessionToken(token)),
+      isNull(internalSessions.revokedAt),
+    ))
+    .limit(1);
   const row = result[0];
   if (!row || row.session.expiresAt.getTime() <= Date.now()) return undefined;
+  if (!isSessionEnvironmentConsistent(row.session.sessionMode, row.organizationEnvironment)) return undefined;
   return row;
 }
 
@@ -162,14 +190,27 @@ export async function revokeInternalSession(token: string) {
   await db.update(internalSessions).set({ revokedAt: new Date() }).where(and(eq(internalSessions.sessionHash, hashSessionToken(token)), isNull(internalSessions.revokedAt)));
 }
 
-export async function recordAuthenticationEvent(input: { userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; eventType: "login_success" | "login_failure" | "logout" | "lockout" | "session_revoked" | "password_reset_requested" | "password_reset_completed" | "cache_refreshed" | "showcase_mutation_simulated"; source: "internal" | "oauth"; requestId?: string | null }) {
-  const db = await getDb();
-  if (!db) return;
-  const previous = await db.select({ recordHash: authenticationEvents.recordHash }).from(authenticationEvents).orderBy(desc(authenticationEvents.id)).limit(1);
-  const createdAt = new Date();
-  const previousHash = previous[0]?.recordHash ?? null;
-  const recordHash = hashAuditRecord({ ...input, previousHash, createdAt: createdAt.toISOString() });
-  await db.insert(authenticationEvents).values({ ...input, previousHash, recordHash, createdAt });
+type AuthenticationEventInput = { userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; eventType: "login_success" | "login_failure" | "logout" | "lockout" | "session_revoked" | "password_reset_requested" | "password_reset_completed" | "cache_refreshed" | "showcase_mutation_simulated"; source: "internal" | "oauth"; requestId?: string | null };
+
+let auditWriteQueue: Promise<void> = Promise.resolve();
+
+export function recordAuthenticationEvent(input: AuthenticationEventInput) {
+  const safeInput = {
+    ...input,
+    username: input.username?.trim().slice(0, 80) ?? null,
+    requestId: input.requestId?.trim().slice(0, 120) ?? null,
+  };
+  const write = auditWriteQueue.then(async () => {
+    const db = await getDb();
+    if (!db) return;
+    const previous = await db.select({ recordHash: authenticationEvents.recordHash }).from(authenticationEvents).orderBy(desc(authenticationEvents.id)).limit(1);
+    const createdAt = new Date();
+    const previousHash = previous[0]?.recordHash ?? null;
+    const recordHash = hashAuditRecord({ ...safeInput, previousHash, createdAt: createdAt.toISOString() });
+    await db.insert(authenticationEvents).values({ ...safeInput, previousHash, recordHash, createdAt });
+  });
+  auditWriteQueue = write.catch(() => undefined);
+  return write;
 }
 
 // TODO: add feature queries here as your schema grows.

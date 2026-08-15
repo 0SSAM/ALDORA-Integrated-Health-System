@@ -4,7 +4,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Loader2, Send, User, Sparkles } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { Streamdown } from "streamdown";
+import { defaultRehypePlugins, Streamdown } from "streamdown";
+import type { StreamdownProps } from "streamdown";
+import { harden } from "rehype-harden";
 
 /**
  * Message type matching server-side LLM Message interface
@@ -126,8 +128,13 @@ export function AIChatBox({
   const inputAreaRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Filter out system messages
+  // Filter out system messages. AI output is untrusted content: allow only HTTPS links,
+  // disallow data images and raw HTML, and retain only the hardened Markdown/Katex path.
   const displayMessages = messages.filter((msg) => msg.role !== "system");
+  const safeRehypePlugins = [
+    [harden, { allowedImagePrefixes: [], allowedLinkPrefixes: ["https://"], allowDataImages: false }],
+    defaultRehypePlugins.katex,
+  ] as unknown as NonNullable<StreamdownProps["rehypePlugins"]>;
 
   // Calculate min-height for last assistant message to push user message to top
   const [minHeightForLastMessage, setMinHeightForLastMessage] = useState(0);
@@ -262,7 +269,7 @@ export function AIChatBox({
                     >
                       {message.role === "assistant" ? (
                         <div className="prose prose-sm dark:prose-invert max-w-none">
-                          <Streamdown>{message.content}</Streamdown>
+                          <Streamdown rehypePlugins={safeRehypePlugins}>{message.content}</Streamdown>
                         </div>
                       ) : (
                         <p className="whitespace-pre-wrap text-sm">

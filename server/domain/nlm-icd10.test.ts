@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { clearNlmIcd10Cache, getNlmIcd10CacheStats, searchNlmIcd10Cm } from "./nlm-icd10";
+import { allowNlmManualRefresh, clearNlmIcd10Cache, getNlmIcd10CacheStats, NLM_MANUAL_REFRESH_INTERVAL_MS, searchNlmIcd10Cm } from "./nlm-icd10";
 
 describe("NLM ICD-10-CM reference adapter", () => {
   afterEach(() => {
@@ -72,5 +72,14 @@ describe("NLM ICD-10-CM reference adapter", () => {
     clearNlmIcd10Cache();
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 503 })));
     await expect(searchNlmIcd10Cm("diabetes")).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
+  });
+
+  it("limits manual refresh per admin actor and exposes safe cache provenance", async () => {
+    const firstAt = 1_000_000;
+    expect(allowNlmManualRefresh("user:admin-1", firstAt)).toBe(true);
+    expect(allowNlmManualRefresh("user:admin-1", firstAt + NLM_MANUAL_REFRESH_INTERVAL_MS - 1)).toBe(false);
+    expect(allowNlmManualRefresh("user:admin-1", firstAt + NLM_MANUAL_REFRESH_INTERVAL_MS)).toBe(true);
+    expect(allowNlmManualRefresh("", firstAt)).toBe(false);
+    expect(getNlmIcd10CacheStats()).toMatchObject({ source: expect.stringContaining("NLM"), version: "2026", jurisdiction: "US", latestRetrievedAt: null, latestExpiresAt: null });
   });
 });

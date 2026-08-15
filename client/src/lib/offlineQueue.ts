@@ -12,6 +12,8 @@ export type OfflineDraft = {
 const KEY = "bdf-offline-drafts";
 const DB_NAME = "bdf-pharma-offline";
 const STORE_NAME = "drafts";
+const SENSITIVE_KEY_PATTERN = /(?:patient|patientid|mrn|medicalrecord|nationalid|identity|prescription|diagnosis|icd|lab|laboratory|radiology|insurance|claim|password|token|secret|otp|phone|email|address|dob|birth|ssn|healthid)/i;
+const MAX_OFFLINE_PAYLOAD_BYTES = 64_000;
 
 function makeKey() {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -27,12 +29,28 @@ function openDb(): Promise<IDBDatabase> {
   });
 }
 
-export function canQueueOfflineDraft(draft: Pick<OfflineDraft, "regulated">): boolean {
-  return draft.regulated === false;
+function hasSensitiveKey(value: unknown, seen = new Set<unknown>()): boolean {
+  if (!value || typeof value !== "object" || seen.has(value)) return false;
+  seen.add(value);
+  if (Array.isArray(value)) return value.some(item => hasSensitiveKey(item, seen));
+  return Object.entries(value).some(([key, nested]) => SENSITIVE_KEY_PATTERN.test(key) || hasSensitiveKey(nested, seen));
+}
+
+export function isOfflinePayloadSafe(payload: unknown): boolean {
+  try {
+    const encoded = JSON.stringify(payload);
+    return encoded !== undefined && new TextEncoder().encode(encoded).byteLength <= MAX_OFFLINE_PAYLOAD_BYTES && !hasSensitiveKey(payload);
+  } catch {
+    return false;
+  }
+}
+
+export function canQueueOfflineDraft(draft: Pick<OfflineDraft, "regulated" | "payload">): boolean {
+  return draft.regulated === false && isOfflinePayloadSafe(draft.payload);
 }
 
 export function enqueueOfflineDraft(draft: Omit<OfflineDraft, "id" | "createdAt">): OfflineDraft {
-  if (!canQueueOfflineDraft(draft)) throw new Error("regulated-offline-draft-blocked");
+  if (!canQueueOfflineDraft(draft)) throw new Error("regulated-or-sensitive-offline-draft-blocked");
   const idempotencyKey = draft.idempotencyKey || makeKey();
   const item: OfflineDraft = { ...draft, id: idempotencyKey, idempotencyKey, createdAt: Date.now(), status: "queued" };
   const current = JSON.parse(localStorage.getItem(KEY) ?? "[]") as OfflineDraft[];
@@ -41,8 +59,22 @@ export function enqueueOfflineDraft(draft: Omit<OfflineDraft, "id" | "createdAt"
   return item;
 }
 
+function isStoredDraftSafe(item: unknown): item is OfflineDraft {
+  if (!item || typeof item !== "object") return false;
+  const draft = item as Partial<OfflineDraft>;
+  return draft.regulated === false && typeof draft.id === "string" && isOfflinePayloadSafe(draft.payload);
+}
+
 export function listOfflineDrafts(): OfflineDraft[] {
-  return JSON.parse(localStorage.getItem(KEY) ?? "[]") as OfflineDraft[];
+  try {
+    const stored = JSON.parse(localStorage.getItem(KEY) ?? "[]") as unknown[];
+    const safe = stored.filter(isStoredDraftSafe);
+    if (safe.length !== stored.length) localStorage.setItem(KEY, JSON.stringify(safe));
+    return safe;
+  } catch {
+    localStorage.removeItem(KEY);
+    return [];
+  }
 }
 
 export function removeOfflineDraft(id: string): void {
@@ -55,7 +87,20 @@ export async function listDurableOfflineDrafts(): Promise<OfflineDraft[]> {
     const db = await openDb();
     return await new Promise((resolve, reject) => {
       const request = db.transaction(STORE_NAME, "readonly").objectStore(STORE_NAME).getAll();
-      request.onsuccess = () => { db.close(); resolve((request.result as OfflineDraft[]).sort((a, b) => a.createdAt - b.createdAt)); };
+      request.onsuccess = () => {
+        const stored = request.result as unknown[];
+        const safe = stored.filter(isStoredDraftSafe).sort((a, b) => a.createdAt - b.createdAt);
+        const unsafeIds = stored.filter(item => !isStoredDraftSafe(item)).map(item => (item as Partial<OfflineDraft>).id).filter((id): id is string => typeof id === "string");
+        if (unsafeIds.length === 0) {
+          db.close();
+          resolve(safe);
+          return;
+        }
+        const cleanup = db.transaction(STORE_NAME, "readwrite").objectStore(STORE_NAME);
+        unsafeIds.forEach(id => cleanup.delete(id));
+        cleanup.transaction.oncomplete = () => { db.close(); resolve(safe); };
+        cleanup.transaction.onerror = () => { db.close(); resolve(safe); };
+      };
       request.onerror = () => { db.close(); reject(request.error ?? new Error("draft-list-failed")); };
     });
   } catch {

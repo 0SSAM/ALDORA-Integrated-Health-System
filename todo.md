@@ -897,41 +897,67 @@
 
 # Admin-Only NLM Cache Refresh
 
-- [ ] Update the reusable ALDORA skill with an admin-only cache invalidation workflow, audit requirements, and UI/server separation.
-- [ ] Add a server-side admin-only NLM cache refresh/invalidation procedure with scope checks, rate limiting, and audit metadata.
-- [ ] Add an Arabic/English manual refresh button visible only to administrators, with loading, success, failure, and last-retrieved/version status.
-- [ ] Add regression tests proving non-admin denial, audit behavior, cache invalidation, refresh success/failure, and no automatic diagnosis or billing mutation.
-- [ ] Run TypeScript, Vitest, production build, responsive verification, validate the reusable skill, and save/publish a checkpoint.
+- [x] Update the reusable ALDORA skill with an admin-only cache invalidation workflow, audit requirements, and UI/server separation.
+- [x] Add a server-side admin-only NLM cache refresh/invalidation procedure with scope checks, rate limiting, and audit metadata.
+- [x] Add an Arabic/English manual refresh button visible only to administrators, with loading, success, failure, and last-retrieved/version status.
+- [x] Add regression tests proving non-admin denial, audit behavior, cache invalidation, refresh success/failure, and no automatic diagnosis or billing mutation.
+- [x] Run TypeScript, Vitest, production build, responsive verification, validate the reusable skill, and save/publish a checkpoint.
 
 
 # Isolated Investor Showcase Account
 
-- [ ] Define a separate investor-showcase tenant/environment boundary with no access to production records, PHI, customer data, secrets, or external regulatory connectors.
-- [ ] Add a dedicated showcase account type and safe credential lifecycle; do not use weak production credentials such as test/test.
-- [ ] Add read-only/demo-safe permissions, blocked destructive/export/admin actions, audit logging, throttling, and session expiry for showcase users.
-- [ ] Provide isolated showcase data and clear UI labeling so investors understand they are viewing a demonstration environment.
-- [ ] Add investor contact CTA without exposing personal contact data, plus Arabic/English showcase guidance.
-- [ ] Add authentication, tenant-isolation, authorization, and UI regression tests; run TypeScript, Vitest, build, responsive verification, and save/publish a checkpoint.
+- [x] Define a separate investor-showcase tenant/environment boundary with no access to production records, PHI, customer data, secrets, or external regulatory connectors.
+- [x] Add a dedicated showcase account type and safe credential lifecycle; do not use weak production credentials such as test/test.
+- [x] Add read-only/demo-safe permissions, blocked destructive/export/admin actions, audit logging, throttling, and session expiry for showcase users.
+- [x] Provide isolated showcase data and clear UI labeling so investors understand they are viewing a demonstration environment.
+- [x] Add investor contact CTA without exposing personal contact data, plus Arabic/English showcase guidance.
+- [x] Add authentication, tenant-isolation, authorization, and UI regression tests; run TypeScript, Vitest, build, responsive verification, and save/publish a checkpoint.
 
 
-- [ ] Confirmed deployment model: investor showcase account runs on the same site but is bound to a separate showcase organization and isolated scope.
-- [ ] Confirmed showcase account must not use test/test credentials; use a strong managed credential with controlled rotation.
+- [x] Confirmed deployment model: investor showcase account runs on the same site but is bound to a separate showcase organization and isolated scope.
+- [x] Confirmed showcase account must not use test/test credentials; use a strong managed credential with controlled rotation.
 
 
-- [ ] Confirmed showcase credential choice: username `test` with a strong managed password, not `test/test`.
-- [ ] Confirmed same-site showcase scope: separate organization, labeled non-production data, trial permissions, no delete/export/production/sensitive-connector access.
+- [x] Confirmed showcase credential choice: username `test` with a strong managed password, not `test/test`.
+- [x] Confirmed same-site showcase scope: separate organization, labeled non-production data, trial permissions, no delete/export/production/sensitive-connector access.
 
 
-- [ ] Enforce server-side showcase simulation mode so sales, stock movements, receipts, invoices, claims, and other mutations cannot alter production balances or persistent production records.
-- [ ] Block external connectors, notifications, exports, deletion, and irreversible actions for showcase sessions, with explicit simulation audit events.
-- [ ] Provide isolated showcase data stores/records and visible Arabic/English simulation labels for all trial transactions.
-- [ ] Add regression tests proving showcase transactions never cross organization boundaries or mutate production balances.
+- [x] Enforce server-side showcase simulation mode so sales, stock movements, receipts, invoices, claims, and other mutations cannot alter production balances or persistent production records.
+- [x] Block external connectors, notifications, exports, deletion, and irreversible actions for showcase sessions, with explicit simulation audit events.
+- [x] Provide isolated showcase data stores/records and visible Arabic/English simulation labels for all trial transactions.
+- [x] Add regression tests proving showcase transactions never cross organization boundaries or mutate production balances.
 
 # Investor Showcase TODO
-- [ ] Create isolated ALDORA Investor Showcase organization, branch, and test account records
-- [ ] Populate showcase-only synthetic products, inventory, and sales data
-- [ ] Verify showcase login, scope isolation, and server-side mutation simulation guard
-- [ ] Finalize showcase UI labels and access documentation
-- [ ] Fix showcase login contract test returning HTTP 500 and rerun authentication tests
+- [x] Create isolated ALDORA Investor Showcase organization, branch, and test account records
+- [x] Populate showcase-only synthetic products, inventory, and sales data
+- [x] Verify showcase login, scope isolation, and server-side mutation simulation guard
+- [x] Finalize showcase UI labels and access documentation
+- [x] Fix showcase login contract test returning HTTP 500 and rerun authentication tests
 - [x] Review Pharma eMarket and UPA portals for read-only integration requirements and official evidence
 - [x] Switch tamper-evident audit signing from short JWT_SECRET to validated AUDIT_SIGNING_KEY and pass its regression test
+
+# Comprehensive ALDORA Audit TODO
+- [x] Audit repository architecture, runtime boundaries, schema, migrations, routes, UI, and dependency risks.
+- [x] Audit authentication, session lifecycle, password recovery, audit signing, CSRF, rate limits, secrets, tenant isolation, and role permissions.
+- [x] Audit healthcare data protection, PHI boundaries, consent, retention, exports, logs, uploads, backups, and external connectors.
+- [x] Audit clinical, pharmacy, inventory, prescription, insurance, laboratory, radiology, hospital, and GAHAR workflow safety boundaries.
+- [x] Research and document current official Egyptian and Arabic-region regulatory integration requirements without claiming certification.
+- [x] Implement high-confidence corrective fixes and regression tests discovered during the audit.
+- [x] Run full TypeScript, Vitest, production build, responsive verification, and security checks; document residual blockers.
+- [x] Produce an Arabic/English audit and readiness report for investors, UPA, EDA, Egyptian government entities, distributors, pharmacies, chains, laboratories, and manufacturers.
+
+- [x] Keep UPA, EDA, ETA, UHIA, government, insurer, and other official external connectors deferred and fail-closed until formal approval, specifications, credentials, sandbox access, and acceptance evidence are provided.
+- [x] Audit and improve all internal workflows independently of deferred government integrations; do not block internal readiness on external connector availability.
+
+- [x] Revalidate internal session user status, credential status, scope membership, branch activity, and jurisdiction binding on every request.
+- [x] Prevent audit-chain concurrency races and validate request identifiers before recording showcase simulation events.
+- [x] Add regression tests for stale/revoked membership, inactive users, expired sessions, and concurrent audit writes.
+
+- [ ] Review and remediate actionable production dependency advisories, prioritizing Drizzle ORM, Axios, Lodash, and redirect/SSRF-related packages; verify compatibility after updates.
+- [x] Review client offline persistence to ensure no PHI or credentials can be stored in localStorage or IndexedDB.
+
+- [x] Add payload-level defense-in-depth to offline drafts so common PHI, credential, and clinical identifiers cannot be queued even when a caller incorrectly marks a draft as non-regulated.
+
+- [x] Reduce initial JavaScript payload with safe vendor code-splitting and verify production build output.
+
+- [x] Trust forwarded host and protocol headers only when the request originates from the configured loopback proxy; add regression tests for direct-client spoofing.

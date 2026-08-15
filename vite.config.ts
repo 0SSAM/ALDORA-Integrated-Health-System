@@ -167,6 +167,18 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return undefined;
+          if (id.includes("@trpc") || id.includes("@tanstack")) return "vendor-data";
+          if (id.includes("recharts") || id.includes("chart.js")) return "vendor-charts";
+          if (id.includes("streamdown") || id.includes("mermaid") || id.includes("rehype")) return "vendor-markdown";
+          if (id.includes("react") || id.includes("wouter")) return "vendor-react";
+          return "vendor-core";
+        },
+      },
+    },
   },
   server: {
     host: true,

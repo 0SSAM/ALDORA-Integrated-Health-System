@@ -18,6 +18,10 @@ export type InternalScope = {
   role: string;
 };
 
+export function isSessionEnvironmentConsistent(sessionMode: "production" | "showcase", environment: "production" | "showcase") {
+  return sessionMode === environment;
+}
+
 export function assertPasswordPolicy(password: string) {
   if (typeof password !== "string" || password.length < PASSWORD_MIN_LENGTH) {
     throw new Error("Password does not meet the minimum security policy");

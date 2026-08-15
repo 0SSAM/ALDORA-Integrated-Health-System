@@ -15,6 +15,8 @@ type CacheEntry = {
 
 const resultCache = new Map<string, CacheEntry>();
 const inFlight = new Map<string, Promise<CacheEntry>>();
+const manualRefreshAt = new Map<string, number>();
+export const NLM_MANUAL_REFRESH_INTERVAL_MS = 60 * 1000;
 
 export type NlmIcd10Result = {
   code: string;
@@ -127,6 +129,32 @@ export function clearNlmIcd10Cache() {
   inFlight.clear();
 }
 
+export function allowNlmManualRefresh(actorKey: string, now = Date.now()) {
+  const key = actorKey.trim().slice(0, 120);
+  if (!key) return false;
+  const previous = manualRefreshAt.get(key);
+  if (previous && now - previous < NLM_MANUAL_REFRESH_INTERVAL_MS) return false;
+  manualRefreshAt.set(key, now);
+  if (manualRefreshAt.size > 1000) {
+    const oldest = manualRefreshAt.keys().next().value;
+    if (oldest) manualRefreshAt.delete(oldest);
+  }
+  return true;
+}
+
 export function getNlmIcd10CacheStats() {
-  return { entries: resultCache.size, maxEntries: NLM_CACHE_MAX_ENTRIES, ttlMs: NLM_CACHE_TTL_MS };
+  let latest: CacheEntry | undefined;
+  for (const entry of Array.from(resultCache.values())) {
+    if (!latest || entry.retrievedAt > latest.retrievedAt) latest = entry;
+  }
+  return {
+    entries: resultCache.size,
+    maxEntries: NLM_CACHE_MAX_ENTRIES,
+    ttlMs: NLM_CACHE_TTL_MS,
+    source: NLM_ICD10CM_SOURCE,
+    version: NLM_ICD10CM_VERSION,
+    jurisdiction: NLM_ICD10CM_JURISDICTION,
+    latestRetrievedAt: latest?.retrievedAt ?? null,
+    latestExpiresAt: latest ? new Date(latest.expiresAt).toISOString() : null,
+  };
 }

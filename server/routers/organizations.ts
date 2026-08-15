@@ -32,6 +32,7 @@ export const organizationsRouter = router({
         displayName: organizations.displayName,
         countryCode: organizations.countryCode,
         status: organizations.status,
+        environment: organizations.environment,
         organizationRole: organizationMemberships.organizationRole,
       })
       .from(organizationMemberships)

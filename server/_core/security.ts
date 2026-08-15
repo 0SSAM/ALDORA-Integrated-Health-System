@@ -26,12 +26,19 @@ function normalizedOrigin(value: string | undefined): string | undefined {
   }
 }
 
+function isLoopbackAddress(value: string | undefined): boolean {
+  if (!value) return false;
+  const normalized = value.replace(/^::ffff:/i, "");
+  return normalized === "127.0.0.1" || normalized === "::1";
+}
+
 function requestOrigin(req: Request): string | undefined {
-  const forwardedHost = firstHeader(req.headers["x-forwarded-host"]);
+  const trustedForwarder = isLoopbackAddress(req.ip);
+  const forwardedHost = trustedForwarder ? firstHeader(req.headers["x-forwarded-host"]) : undefined;
   const host = forwardedHost?.split(",")[0]?.trim() || req.get("host");
   if (!host) return undefined;
-  const forwardedProto = firstHeader(req.headers["x-forwarded-proto"])?.split(",")[0]?.trim();
-  const protocol = forwardedProto === "https" || req.protocol === "https" ? "https" : "http";
+  const forwardedProto = trustedForwarder ? firstHeader(req.headers["x-forwarded-proto"])?.split(",")[0]?.trim() : undefined;
+  const protocol = forwardedProto === "https" || (!forwardedProto && req.protocol === "https") ? "https" : "http";
   return `${protocol}://${host}`.toLowerCase();
 }
 
@@ -56,8 +63,7 @@ export function isTrustedMutationRequest(req: Request): SecurityDecision {
 }
 
 function clientKey(req: Request): string {
-  const forwarded = firstHeader(req.headers["x-forwarded-for"]);
-  return forwarded?.split(",")[0]?.trim() || req.ip || "unknown";
+  return req.ip || "unknown";
 }
 
 function take(bucketMap: Map<string, Bucket>, key: string, limit: number, now: number): boolean {
@@ -106,7 +112,8 @@ export function createSecurityMiddleware() {
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Resource-Policy": "same-origin",
     });
-    if (req.protocol === "https" || firstHeader(req.headers["x-forwarded-proto"])?.split(",")[0]?.trim() === "https") {
+    const trustedForwarder = isLoopbackAddress(req.ip);
+    if (req.protocol === "https" || (trustedForwarder && firstHeader(req.headers["x-forwarded-proto"])?.split(",")[0]?.trim() === "https")) {
       res.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     }
     if (path.startsWith("/api/") || path.startsWith("/manus-storage/")) res.set("Cache-Control", "no-store");
@@ -114,4 +121,4 @@ export function createSecurityMiddleware() {
   };
 }
 
-export const securityInternals = { normalizedOrigin, requestOrigin, take };
+export const securityInternals = { normalizedOrigin, requestOrigin, clientKey, take, isTrustedMutationRequest, isLoopbackAddress };

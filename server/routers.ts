@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getSessionCookieOptions, isSecureRequest } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { clearNlmIcd10Cache, getNlmIcd10CacheStats, searchNlmIcd10Cm } from "./domain/nlm-icd10";
+import { allowNlmManualRefresh, clearNlmIcd10Cache, getNlmIcd10CacheStats, searchNlmIcd10Cm } from "./domain/nlm-icd10";
 import { erpRouter } from "./routers/erp";
 import { regionalRouter } from "./routers/regional";
 import { organizationsRouter } from "./routers/organizations";
@@ -21,6 +21,13 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    sessionInfo: publicProcedure.query(({ ctx }) => ctx.user ? {
+      authenticated: true as const,
+      accountType: ctx.internalSession?.user ? (ctx.internalSession.user.openId === "showcase-test-user" ? "showcase" as const : "employee" as const) : "employee" as const,
+      sessionMode: ctx.internalSession?.session.sessionMode ?? "production" as const,
+      role: ctx.user.role,
+      expiresAt: ctx.internalSession?.session.expiresAt ?? null,
+    } : { authenticated: false as const }),
     internalLogin: publicProcedure.input(z.object({ username: z.string().min(3).max(80), password: z.string().min(1).max(200) })).mutation(async ({ ctx, input }) => {
       const username = normalizeInternalUsername(input.username);
       const credential = await getInternalCredentialByUsername(username);
@@ -104,10 +111,12 @@ export const appRouter = router({
         authority: "reference-only" as const,
         warning: "NLM ICD-10-CM is a US reference source and does not finalize diagnoses, claims, or billing.",
         results: await searchNlmIcd10Cm(input.terms, { count: input.count }),
+        cache: getNlmIcd10CacheStats(),
       };
     }),
     nlmIcd10CmRefresh: protectedProcedure.mutation(async ({ ctx }) => {
       if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN", message: "تحديث النتائج المخزنة متاح للمسؤولين فقط." });
+      if (!allowNlmManualRefresh(`user:${ctx.user.id}`)) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "يمكن تحديث الذاكرة المرجعية مرة كل دقيقة فقط." });
       clearNlmIcd10Cache();
       await recordAuthenticationEvent({ userId: ctx.user.id, eventType: "cache_refreshed", source: "oauth" });
       return { success: true as const, message: "تم تحديث نتائج NLM المرجعية. سيُعاد جلبها عند البحث التالي.", stats: getNlmIcd10CacheStats() };
