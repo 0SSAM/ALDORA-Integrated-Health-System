@@ -51,4 +51,15 @@ describe("showcase exploration access", () => {
     expect(source).toContain("لا يصدر إشعار، ولا يعاد صنف إلى المخزون");
     expect(trpcBoundary).toContain("هذه العملية محاكاة فقط ولا تُحفظ من حساب العرض.");
   });
+
+  it("keeps cash and card settlement educational, local, and non-persistent", () => {
+    expect(source).toContain("سيناريو بيع تدريبي: اختر طريقة الدفع");
+    expect(source).toContain("تسوية دفع تجريبية");
+    expect(source).toContain("المبلغ المستلم 200.00 ج.م");
+    expect(source).toContain("DEMO-CARD-4821");
+    expect(source).toContain("لا يتصل ببنك أو بوابة دفع ولا ينشئ بيعاً أو قيداً مالياً");
+    expect(source).toContain("لم يدخل أي مبلغ إلى صندوق نقدي ولم يُسجل إيصال");
+    expect(source).toContain("لا يُرسل طلب إلى بنك أو بوابة دفع، ولا تحفظ بيانات بطاقة");
+    expect(trpcBoundary).toContain("showcase_mutation_simulated");
+  });
 });

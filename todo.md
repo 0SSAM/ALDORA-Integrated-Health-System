@@ -1344,3 +1344,9 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add a barcode scan simulation to the showcase POS surface with a labelled demo code, product/batch verification, and no camera, persistence, or stock movement.
 - [x] Add both read-only flows to the Arabic showcase tour with progress controls and explicit no-save safety language.
 - [x] Add focused regression coverage for the simulated barcode and return path plus the server-side mutation block; validate with TypeScript, Vitest, build, and a mobile screenshot. Validation: TypeScript, production build, 349 passing tests with 9 safely skipped, and mobile capture.
+
+# Guided Showcase Cash and Card Settlement — 2026-08-16
+
+- [x] Define non-persistent cash and card settlement scenarios with invoice total, tendered amount/change, and a simulated card-approval result.
+- [x] Add an Arabic payment-choice step to the showcase sale walkthrough with clear selected-state feedback and explicit no-charge/no-save language.
+- [x] Add focused coverage proving the settlement is local-only and cannot create a financial, sale, or stock record; validate with TypeScript, Vitest, build, and a mobile screenshot. Validation: TypeScript, production build, six showcase-boundary tests, and mobile capture.
