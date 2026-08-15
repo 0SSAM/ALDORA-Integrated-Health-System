@@ -36,6 +36,20 @@ describe("security middleware boundaries", () => {
     expect(securityInternals.requestOrigin(request)).toBe("http://aldora.example");
   });
 
+  it("accepts the public HTTPS origin when TLS terminates before the app", () => {
+    const request = {
+      ip: "10.0.0.8",
+      method: "POST",
+      protocol: "http",
+      headers: {
+        origin: "https://aldora.example",
+        "sec-fetch-site": "same-origin",
+      },
+      get: (name: string) => name === "host" ? "aldora.example" : undefined,
+    } as never;
+    expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
+  });
+
   it("accepts forwarded host and protocol only from loopback proxy", () => {
     const request = {
       ip: "127.0.0.1",

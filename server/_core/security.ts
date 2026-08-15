@@ -53,10 +53,15 @@ export function isTrustedMutationRequest(req: Request): SecurityDecision {
   const refererHeader = firstHeader(req.headers.referer);
   const expected = requestOrigin(req);
   const supplied = normalizedOrigin(originHeader ?? refererHeader);
+  const requestHost = req.get("host")?.toLowerCase();
+  const hostBoundOrigins = requestHost ? new Set([`http://${requestHost}`, `https://${requestHost}`]) : new Set<string>();
 
   // Non-browser clients may omit both headers. Browser requests with an origin
   // or referer must match the current host before cookie-authenticated mutation.
-  if ((originHeader || refererHeader) && (!expected || supplied !== expected)) {
+  // The public WebDev reverse proxy may terminate TLS before the app receives
+  // the request, so accept either scheme for the *current Host* without trusting
+  // forwarded host/protocol headers supplied by a direct client.
+  if ((originHeader || refererHeader) && (!supplied || (!hostBoundOrigins.has(supplied) && supplied !== expected))) {
     return { allowed: false, status: 403, reason: "request origin rejected" };
   }
   return { allowed: true };

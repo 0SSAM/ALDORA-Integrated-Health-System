@@ -1263,3 +1263,10 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Resolve CI compatibility blockers revealed by the migrated repository: TypeScript 6 rejecting deprecated baseUrl and dependency-review unsupported on the current private repository plan, while retaining visible security evidence.
 - [x] Add an explicit post-migration schema assertion/repair in the isolated test runner so CI fails with the missing table/column name and never proceeds with a partially compatible disposable schema.
 - [x] Add the remaining missing jurisdictionId columns discovered by schema comparison for customer_profiles and call_tickets, generate/apply the next MySQL migration, and rerun isolated CI.
+
+# Showcase Login Regression — 2026-08-16
+
+- [x] Diagnose the published `test` account login error showing a data-verification/connection failure.
+- [x] Verify the authentication API, showcase reconciliation, deployment configuration, and production logs without exposing secrets.
+- [x] Add a regression test and apply the smallest safe fix for the published showcase login flow.
+- [ ] Verify the live login flow on the deployed domain and document the outcome.
