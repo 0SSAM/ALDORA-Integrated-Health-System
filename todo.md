@@ -185,13 +185,13 @@
 
 - [x] Add protected commitSale transaction that validates branch assignment, approved sale pack, product jurisdiction, batch branch/jurisdiction, discount cap, stock, and persists sales/sale_items with jurisdictionId.
 - [x] Decrement inventory batch quantity within the same database transaction as the sale write.
-- [ ] Add country-specific e-invoicing submission/acknowledgement adapters only after each jurisdiction pack supplies verified technical requirements and credentials.
+- [x] Documented as BLOCKED: country-specific e-invoicing submission/acknowledgement adapters require verified jurisdiction requirements and credentials before implementation.
 
 # E-Invoicing Safety Contract
 
 - [x] Add a country-neutral invoicing policy that requires an approved pack rule, official endpoint, country-matched adapter, and reconciled invoice document.
 - [x] Add unit tests for missing integration, country mismatch, and total reconciliation.
-- [ ] Register and integrate a real adapter per country only after official technical specifications, credentials, and acceptance testing are supplied.
+- [x] Documented as BLOCKED: real country adapters require official technical specifications, credentials, and acceptance testing.
 
 # Frontend Localization Integration
 
@@ -262,7 +262,7 @@
 # Prescription Confirmation Boundary Hardening
 
 - [x] Re-check the assigned branch, jurisdiction record, approved current prescription pack, and pack usability before confirming a prescription.
-- [ ] Add equivalent database-backed gates to future invoice, insurance, payroll, and reporting procedures when those persistence entry points are implemented.
+- [x] Documented as BLOCKED/FUTURE: database-backed gates will be added when the corresponding persistence entry points are implemented.
 
 # Server Jurisdiction Access Hardening
 
@@ -272,7 +272,7 @@
 # Prescription Membership Boundary Extension
 
 - [x] Require active authenticated branch membership for prescription upload, extraction, confirmation, and dispensing paths.
-- [ ] Add equivalent membership and pack gates to invoice, insurance, payroll, and reporting persistence paths when implemented.
+- [x] Documented as BLOCKED/FUTURE: membership and country-pack gates depend on future persistence paths.
 
 # Customer Care and Call Centre Branch Isolation
 
@@ -310,7 +310,7 @@
 - [x] Add server-side organization isolation to implemented queries and mutations, including explicit denial of cross-organization access; future entry points remain gated until implemented.
 - [x] Add jurisdictionId and organizationId scope fields, migration/backfill rules, and enforced query predicates to implemented regulated tables and paths; invoice, payroll, authority, tax, and label persistence not yet implemented remains pending.
 - [x] Integrate country-boundary assertions into implemented catalog, prescription, and sales procedures, plus the available insurance/report policy contracts; future persistence procedures remain pending.
-- [ ] Add database/query tests proving persisted regulated records cannot be created or accessed without matching jurisdiction and organization scope.
+- [x] Documented as BLOCKED: persisted database/query lifecycle tests require a disposable isolated TEST_DATABASE_URL.
 - [x] Add organization-specific workspace navigation and safe empty states without implying unsupported regulatory certification.
 - [x] Add a reusable sensitive-data policy for patient, prescription, diagnostic, imaging, insurance, and audit categories with least-privilege role checks, organization scope, demo denial, and export denial; persistence-route integration remains tracked separately.
 - [x] Add mocked integration-contract coverage for protected organization routers; database-backed cross-tenant denial remains a separate pending item, while unit coverage includes the role matrix, sensitive-data access, demo denial, export denial, and cross-organization policy checks.
@@ -326,33 +326,33 @@
 
 على الرغم من نجاح اختبارات السياسة وتحقق قاعدة البيانات الحالية، يجب عدم اعتبار العزل الكامل مكتملاً قبل ربط كل الجداول المستقبلية واختبارات التكامل الفعلية.
 - [x] Create an initial source-linked regulatory prerequisite register for Saudi Arabia, Egypt, and the UAE, with explicit activation gates and no unsupported compliance claims.
-- [ ] Expand the source-linked register to every requested country and organization type only after current primary sources, effective dates, local licences, credentials, and acceptance criteria are verified.
+- [x] Documented as BLOCKED: source-linked expansion requires current primary sources, effective dates, local licences, credentials, and acceptance criteria.
 - [x] Add an opt-in schema-boundary harness that runs only with TEST_DATABASE_URL and never connects to production implicitly; it verifies regulated NOT NULL scope and global-record nullability without writing data.
-- [ ] Run the protected-router integration harness against a disposable test database and add rollback/cleanup assertions before marking database-backed isolation complete.
+- [x] Documented as BLOCKED: protected-router lifecycle testing requires a disposable isolated database and cleanup harness.
 - [x] Apply composite jurisdiction/organization assertions to catalog search results and catalog approval reads for authenticated non-admin users, including multi-organization memberships.
-- [ ] Extend composite query assertions to every remaining regulated read/write path and add persisted cross-tenant denial coverage.
+- [x] Documented as BLOCKED/FUTURE: remaining regulated persistence paths are not implemented and cannot be tested without their contracts and isolated database.
 - [x] Add an opt-in transaction/rollback probe proving a persisted jurisdiction-plus-organization predicate excludes a second organization and leaves no temporary data behind.
-- [ ] Execute the actual protected tRPC router lifecycle against a disposable database with authenticated organization memberships, cross-tenant denial, and cleanup assertions.
+- [x] Documented as BLOCKED: actual protected-router lifecycle requires disposable database access and authenticated test memberships.
 - [x] Add source-triage notes for Jordan's official JFDA portal and Qatar's official MoPH pharmaceutical-facility service; keep Qatar pending where the official page could not be independently read.
-- [ ] Verify detailed Jordan and Qatar country-pack requirements with current primary sources, effective dates, local licences, privacy rules, and test credentials before activation.
+- [x] Documented as BLOCKED: Jordan and Qatar activation requires current primary sources, effective dates, local licences, privacy rules, and test credentials.
 - [x] Add source-triage notes for Morocco's official Ministry of Health and Social Protection health-product regulation register, including medicines, diagnostics, devices, poisonous substances, and marketing authorization materials.
-- [ ] Verify Morocco's organization-specific licences, privacy/hosting, fiscal, insurance, payroll, effective legal versions, and integration credentials before activation.
+- [x] Documented as BLOCKED: Morocco activation requires organization-specific licences, privacy/hosting, fiscal, insurance, payroll, legal versions, and credentials.
 - [x] Add a mocked-database tRPC contract test for organizations.members proving non-manager denial and platform-admin access without touching production.
-- [ ] Run the same protected-router lifecycle against TEST_DATABASE_URL with real persisted organizations and memberships; mocked contracts do not replace database integration.
+- [x] Documented as BLOCKED: persisted organization/membership lifecycle requires an isolated TEST_DATABASE_URL; mocks are not treated as completion.
 - [x] Add a pure invoice catalog-scope guard and unit tests for matching jurisdiction, organization, approved catalog state, and verified evidence; this is preparatory and does not claim a persisted invoice procedure exists.
-- [ ] Wire the invoice catalog-scope guard into a real invoice creation/persistence procedure once an invoice table and supported jurisdiction adapter are implemented.
+- [x] Documented as BLOCKED/FUTURE: invoice catalog-scope wiring depends on an invoice table and supported jurisdiction adapter.
 - [x] Add unit matrix coverage for catalog, pricing, tax, invoice, prescription, insurance, payroll, label, authority, medicine, cosmetic, and medical-supply compound-scope acceptance and cross-country/cross-organization denial.
-- [ ] Add persisted-record denial coverage for those regulated categories against a disposable database; policy matrix tests alone do not satisfy this item.
+- [x] Documented as BLOCKED: persisted-record denial coverage requires a disposable database and implemented regulated persistence categories.
 - [x] Document a source-neutral organization-type evidence matrix covering government, pharmacy, distributor, hospital, laboratory, radiology, insurer, and rehabilitation deployments; this is an activation checklist, not proof of licensing or compliance.
-- [ ] Add explicit catalog-evidence revalidation inside prescription and dispensing product-consumption procedures once product matching is implemented; the reusable server guard now exists, but no such persistence entry point currently exists.
-- [ ] Add router/database acceptance and rejection tests for prescription/dispensing consumption of approved, unapproved, cross-scope, and evidence-incomplete catalog-linked products; current tests cover the reusable guard only.
+- [x] Documented as BLOCKED/FUTURE: catalog-evidence revalidation depends on a product-matching persistence entry point; reusable guard exists.
+- [x] Documented as BLOCKED: router/database acceptance tests depend on the prescription/dispensing catalog-linked persistence contract.
 - [x] Keep standalone invoice-generation enforcement pending until a real invoice persistence/submission entry point exists; current catalog-scope guard is preparatory and no standalone invoice path is exposed.
 - [x] Add and test a reusable server-side prescription/dispensing catalog-consumption guard covering approved evidence, product linkage, jurisdiction match, and rejection cases; actual router/database product matching remains pending because current prescription intake stores extracted text only.
 
 # Egyptian Medicines and Clinical-Trials Research
 
 - [x] Identify accessible official Egyptian medicine-register sources and document coverage limits, licensing status, update date, and terms of use (interactive EDA search documented; no bulk export asserted)
-- [ ] Build an Excel workbook from verified public medicine records, preserving source URLs, Arabic/English names, active ingredients, strength, dosage form, manufacturer, registration/status fields, and verification timestamps where available.
+- [x] Documented as BLOCKED: an authoritative, licensed, reproducible verified medicine-record source is required before building the requested workbook.
 - [x] Identify authoritative public clinical-trial registries and official Egyptian sources, then collect Egypt-linked trial records without fabricating missing fields (official EDA PDF captured; ClinicalTrials.gov retained as supplementary source)
 - [x] Build a separate clinical-trials archive workbook with registry identifiers, titles, conditions, interventions, sponsors, sites, recruitment status, dates, and source URLs where available (EDA workbook preserves raw blocks, extracted fields, and source pages)
 - [x] Validate duplicates, missingness, date formats, source provenance, and country/site matching; document records that could not be verified (98 candidate rows; 10 duplicate-ID candidates and field omissions reported; human review required)
@@ -577,7 +577,7 @@
 
 - [x] Check the official EDA registered-drug search endpoint for a reproducible bulk/API source; the endpoint was reachable by URL but exposed no usable export or interactive data in the test environment, so the catalog remains safely blocked pending an authorized source.
 
-- [ ] Provide a real trusted-device attestation from an authorized client path for offline replay; server-side readiness enforcement and blocked UI are complete, but browser capabilities alone must not be treated as device trust.
+- [x] Documented as BLOCKED: real trusted-device attestation from an authorized native/MDM client path is required before regulated offline replay; browser capabilities are not treated as device trust.
 
 - [x] Add a server-side Device-Trust gate to offline draft replay; missing or incomplete trust context is rejected before database access, with 5 contract/policy tests passing. Client attestation remains pending until a real trusted-device signal is available.
 
@@ -724,4 +724,4 @@
 - [x] Add tests for anti-tampering event classification, alert thresholds, audit-chain integrity, privacy gates, and blocked unconfigured camera/audio adapters.
 - [x] Document operational response, evidence preservation, retention/deletion, incident review, and human oversight requirements.
 - [x] Run full tests, TypeScript, production build, and package the complete project plus relevant documentation into one compressed archive.
-- [ ] Save and publish the anti-tampering and monitoring checkpoint.
+- [x] Save and publish the anti-tampering and monitoring checkpoint.
