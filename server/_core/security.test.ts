@@ -50,6 +50,36 @@ describe("security middleware boundaries", () => {
     expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
   });
 
+  it("allows the configured public origin when the proxy exposes an internal Host", () => {
+    const request = {
+      ip: "10.0.0.8",
+      socket: { remoteAddress: "127.0.0.1" },
+      method: "POST",
+      protocol: "http",
+      headers: {
+        origin: "https://bdfpharma-icsvf3q3.manus.space",
+        "sec-fetch-site": "same-site",
+      },
+      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
+    } as never;
+    expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
+  });
+
+  it("rejects an unconfigured public origin when the proxy exposes an internal Host", () => {
+    const request = {
+      ip: "10.0.0.8",
+      socket: { remoteAddress: "127.0.0.1" },
+      method: "POST",
+      protocol: "http",
+      headers: {
+        origin: "https://attacker.example",
+        "sec-fetch-site": "same-site",
+      },
+      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
+    } as never;
+    expect(securityInternals.isTrustedMutationRequest(request)).toMatchObject({ allowed: false, status: 403 });
+  });
+
   it("allows a browser same-origin request when the reverse proxy exposes an internal Host", () => {
     const request = {
       ip: "10.0.0.8",

@@ -4,6 +4,15 @@ const MAX_RATE_ENTRIES = 10_000;
 const WINDOW_MS = 60_000;
 const AUTH_LIMIT = 12;
 const MUTATION_LIMIT = 240;
+const DEFAULT_PUBLIC_ORIGINS = ["https://bdfpharma-icsvf3q3.manus.space"];
+
+function configuredPublicOrigins(): Set<string> {
+  const configured = (process.env.ALDORA_PUBLIC_ORIGINS ?? "")
+    .split(",")
+    .map((value) => normalizedOrigin(value.trim()))
+    .filter((origin): origin is string => Boolean(origin));
+  return new Set([...DEFAULT_PUBLIC_ORIGINS.map(normalizedOrigin), ...configured].filter((origin): origin is string => Boolean(origin)));
+}
 
 type Bucket = { count: number; resetAt: number };
 
@@ -71,9 +80,10 @@ export function isTrustedMutationRequest(req: Request): SecurityDecision {
   // the request, so accept either scheme for the *current Host* without trusting
   // forwarded host/protocol headers supplied by a direct client.
   const browserSameOrigin = secFetchSite === "same-origin" && Boolean(originHeader || refererHeader);
+  const publicOriginMatch = supplied !== undefined && configuredPublicOrigins().has(supplied);
   if (
     (originHeader || refererHeader) &&
-    (!supplied || (!hostBoundOrigins.has(supplied) && supplied !== expected && !browserSameOrigin))
+    (!supplied || (!hostBoundOrigins.has(supplied) && supplied !== expected && !browserSameOrigin && !publicOriginMatch))
   ) {
     return { allowed: false, status: 403, reason: "request origin rejected" };
   }
@@ -139,4 +149,4 @@ export function createSecurityMiddleware() {
   };
 }
 
-export const securityInternals = { normalizedOrigin, requestOrigin, clientKey, take, isTrustedMutationRequest, isLoopbackAddress };
+export const securityInternals = { normalizedOrigin, requestOrigin, clientKey, take, isTrustedMutationRequest, isLoopbackAddress, configuredPublicOrigins };
