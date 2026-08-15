@@ -89,7 +89,6 @@ export const sales = mysqlTable("sales", {
   paymentMethod: mysqlEnum("paymentMethod", ["cash", "meeza", "instapay", "insurance"]).notNull(),
   etaStatus: mysqlEnum("etaStatus", ["pending", "submitted", "valid", "invalid"]).default("pending").notNull(),
   saleStatus: mysqlEnum("saleStatus", ["completed", "voided", "cancelled"]).default("completed").notNull(),
-  recordMode: mysqlEnum("recordMode", ["production", "demo"]).default("production").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, table => ({ invoiceIdx: uniqueIndex("sales_invoice_idx").on(table.invoiceNumber), branchDateIdx: index("sales_branch_date_idx").on(table.branchId, table.createdAt) }));
 
@@ -472,7 +471,7 @@ export const insuranceRequests = mysqlTable("insurance_requests", {
 export type InsuranceRequestRecord = typeof insuranceRequests.$inferSelect;
 
 
-/** Internal employee authentication is deliberately separate from OAuth and demo sessions. */
+/** Internal employee authentication is deliberately separate from OAuth sessions. */
 export const internalCredentials = mysqlTable("internal_credentials", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
@@ -508,7 +507,7 @@ export const authenticationEvents = mysqlTable("authentication_events", {
   branchId: int("branchId"),
   jurisdictionId: int("jurisdictionId"),
   eventType: mysqlEnum("eventType", ["login_success", "login_failure", "logout", "lockout", "session_revoked"]).notNull(),
-  source: mysqlEnum("source", ["internal", "oauth", "demo"]).notNull(),
+  source: mysqlEnum("source", ["internal", "oauth"]).notNull(),
   requestId: varchar("requestId", { length: 120 }),
   recordHash: varchar("recordHash", { length: 128 }).notNull(),
   previousHash: varchar("previousHash", { length: 128 }),

@@ -16,17 +16,20 @@ export type SensitiveAccessRequest = {
   memberships: OrganizationMembershipSnapshot[];
   organizationId: number;
   dataType: SensitiveDataType;
-  isDemo: boolean;
   purpose: "view" | "create" | "update" | "export";
 };
 
 export function canAccessSensitiveData(request: SensitiveAccessRequest) {
-  if (request.isDemo) return false;
   if (request.purpose === "export") return false;
   if (request.dataType === "audit") {
     return canViewOrganizationAudit(request.userRole, request.memberships, request.organizationId);
   }
-  return canViewSensitiveClinicalData(request.userRole, request.memberships, request.organizationId);
+  if (!canViewSensitiveClinicalData(request.userRole, request.memberships, request.organizationId)) return false;
+
+  // High-risk imaging and insurance records require a future domain-specific capability.
+  // Do not widen the existing clinical-lead permission while removing demo bypasses.
+  if (request.dataType === "imaging" || request.dataType === "insurance") return false;
+  return true;
 }
 
 export function assertSensitiveDataAccess(request: SensitiveAccessRequest) {

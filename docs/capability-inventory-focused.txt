@@ -6,7 +6,6 @@
     planFefo: protectedProcedure
     prepareSale: protectedProcedure
     search: protectedProcedure
-    startDemo: publicProcedure
     validateDiscount: protectedProcedure
   addEvidence: adminProcedure
   approvePack: adminProcedure

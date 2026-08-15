@@ -21,17 +21,6 @@ export function useAuth(options?: UseAuthOptions) {
     refetchOnWindowFocus: false,
   });
 
-  const startDemoMutation = trpc.auth.startDemo.useMutation({
-    onSuccess: async () => {
-      await utils.auth.me.invalidate();
-    },
-  });
-
-  const startDemo = useCallback(async () => {
-    await startDemoMutation.mutateAsync();
-    if (typeof window !== "undefined") window.location.assign("/workspace");
-  }, [startDemoMutation]);
-
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       utils.auth.me.setData(undefined, null);
@@ -68,10 +57,9 @@ export function useAuth(options?: UseAuthOptions) {
     );
     return {
       user: meQuery.data ?? null,
-      loading: meQuery.isLoading || logoutMutation.isPending || startDemoMutation.isPending,
-      error: meQuery.error ?? logoutMutation.error ?? startDemoMutation.error ?? null,
+      loading: meQuery.isLoading || logoutMutation.isPending,
+      error: meQuery.error ?? logoutMutation.error ?? null,
       isAuthenticated: Boolean(meQuery.data),
-      isDemo: meQuery.data?.loginMethod === "demo",
     };
   }, [
     meQuery.data,
@@ -79,8 +67,6 @@ export function useAuth(options?: UseAuthOptions) {
     meQuery.isLoading,
     logoutMutation.error,
     logoutMutation.isPending,
-    startDemoMutation.error,
-    startDemoMutation.isPending,
   ]);
 
   useEffect(() => {
@@ -108,6 +94,5 @@ export function useAuth(options?: UseAuthOptions) {
     ...state,
     refresh: () => meQuery.refetch(),
     logout,
-    startDemo,
   };
 }

@@ -823,3 +823,12 @@
 - [x] Add government/private hospital dashboards and reports without claiming accreditation or substituting for GAHAR inspection.
 - [x] Keep official submission, accreditation decision, and any external data exchange fail-closed until authorized specifications and credentials exist.
 - [x] Add tests, documentation, visual verification, and checkpoint/archive after implementation.
+
+
+# Remove Demo Mode and Demo Account
+
+- [x] Remove demo-mode entry points, buttons, routes, session flags, and demo-only navigation.
+- [x] Remove demo account/session handling and prevent demo authentication or bypass paths.
+- [x] Remove demo fixtures, synthetic workspace data, demo-only assets, and demo wording while preserving legitimate empty states.
+- [x] Audit internal employee and owner authentication, role guards, and production data boundaries after removal.
+- [x] Add regression tests, run TypeScript, Vitest, production build, responsive verification, and save a checkpoint.

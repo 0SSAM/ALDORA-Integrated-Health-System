@@ -1,7 +1,6 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
-import { DEMO_COOKIE_NAME, DEMO_USER, verifyDemoToken } from "./demo";
 import { getInternalSession } from "../db";
 import { INTERNAL_SESSION_COOKIE } from "../domain/internal-auth";
 import type { InternalSession } from "../../drizzle/schema";
@@ -10,7 +9,6 @@ export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
   res: CreateExpressContextOptions["res"];
   user: User | null;
-  isDemo: boolean;
   internalSession: { session: InternalSession; user: User } | null;
 
 };
@@ -19,7 +17,6 @@ export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
   let user: User | null = null;
-  let isDemo = false;
   let internalSession: { session: InternalSession; user: User } | null = null;
 
   try {
@@ -37,16 +34,11 @@ export async function createContext(
     }
   }
 
-  if (!user && verifyDemoToken(opts.req.cookies?.[DEMO_COOKIE_NAME])) {
-    user = DEMO_USER;
-    isDemo = true;
-  }
 
   return {
     req: opts.req,
     res: opts.res,
     user,
-    isDemo,
     internalSession,
   };
 }

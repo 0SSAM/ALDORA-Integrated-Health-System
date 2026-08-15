@@ -2,7 +2,6 @@ import { NOT_ADMIN_ERR_MSG, UNAUTHED_ERR_MSG } from '@shared/const';
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import type { TrpcContext } from "./context";
-import { isDemoQueryAllowed } from "../domain/demo-access";
 
 const t = initTRPC.context<TrpcContext>().create({
   transformer: superjson,
@@ -17,10 +16,6 @@ const requireUser = t.middleware(async opts => {
   if (!ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
   }
-  if (ctx.isDemo && (opts.type !== "query" || !isDemoQueryAllowed(opts.path))) {
-    throw new TRPCError({ code: "FORBIDDEN", message: "وضع العرض التجريبي للقراءة فقط. تواصل معنا لطلب نسخة تشغيلية." });
-  }
-
   return next({
     ctx: {
       ...ctx,
@@ -35,8 +30,8 @@ export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
     const { ctx, next } = opts;
 
-    if (!ctx.user || ctx.isDemo || ctx.user.role !== 'admin') {
-      throw new TRPCError({ code: "FORBIDDEN", message: ctx.isDemo ? "وضع العرض التجريبي لا يتيح إجراءات الإدارة." : NOT_ADMIN_ERR_MSG });
+    if (!ctx.user || ctx.user.role !== 'admin') {
+      throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
     }
 
     return next({

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLocalization } from "@/contexts/LocalizationContext";
-import { ArrowLeft, ArrowRight, CheckCircle2, ChevronLeft, LockKeyhole, Play, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ChevronLeft, LockKeyhole, ShieldCheck, Sparkles } from "lucide-react";
 
 export const welcomeRoutes = { login: "/login", workspace: "/workspace" } as const;
 
@@ -20,7 +20,7 @@ function BrandMark() {
 }
 
 export default function Welcome() {
-  const { user, loading, startDemo, isDemo } = useAuth();
+  const { user } = useAuth();
   const { language, direction } = useLocalization();
   const english = language === "en";
   const Arrow = direction === "rtl" ? ArrowLeft : ArrowRight;
@@ -31,9 +31,8 @@ export default function Welcome() {
         title: "One secure operating space for the healthcare journey.",
         subtitle: "A calm, intelligent foundation for pharmacies, hospitals, insurers, distributors, laboratories, and care teams across the Arab world.",
         login: "Sign in securely",
-        demo: "Explore the interactive demo",
-        continue: isDemo ? "Open the demo workspace" : "Continue to your workspace",
-        demoNote: "Synthetic local data only. No invoices, prescriptions, claims, or external submissions are created.",
+        continue: "Continue to your workspace",
+        demoNote: "Secure access is available only through authorized employee or administrator accounts.",
         trust: "Security-first by design",
         trustBody: "Tenant isolation, scoped permissions, audit trails, and fail-closed regulated workflows.",
         features: ["Unified operations", "Regional readiness", "Human-friendly workflows"],
@@ -44,9 +43,8 @@ export default function Welcome() {
         title: "مساحة تشغيل آمنة وموحّدة لدورة الرعاية الصحية.",
         subtitle: "أساس هادئ وذكي للصيدليات والمستشفيات وشركات التأمين والتوزيع والمعامل وفرق الرعاية في العالم العربي.",
         login: "تسجيل الدخول بأمان",
-        demo: "استعراض العرض التجريبي التفاعلي",
-        continue: isDemo ? "فتح مساحة العرض التجريبي" : "متابعة إلى مساحة العمل",
-        demoNote: "بيانات اصطناعية محلية فقط. لا يتم إنشاء فواتير أو وصفات أو مطالبات أو إرسال خارجي.",
+        continue: "متابعة إلى مساحة العمل",
+        demoNote: "الوصول متاح فقط من خلال حساب موظف أو مسؤول مصرح به.",
         trust: "الأمان أولاً",
         trustBody: "عزل المؤسسات، صلاحيات محددة، سجل تدقيق، وفشل آمن في العمليات المنظمة.",
         features: ["عمليات موحّدة", "جاهزية إقليمية", "تجربة عمل إنسانية"],
@@ -79,7 +77,6 @@ export default function Welcome() {
             <p className="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">{copy.subtitle}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Button asChild size="lg" className="h-12 rounded-xl bg-[#0d1b2a] px-6 text-white shadow-lg shadow-slate-900/15 hover:bg-[#18314a]"><a href={welcomeRoutes.login}>{copy.login}<Arrow className="mr-2 h-4 w-4" /></a></Button>
-              <Button size="lg" variant="outline" disabled={loading} onClick={() => void startDemo()} className="h-12 rounded-xl border-cyan-300 bg-white px-6 text-cyan-900 shadow-sm hover:bg-cyan-50"><Play className="ml-2 h-4 w-4 fill-current" />{loading ? (english ? "Opening…" : "جارٍ الفتح…") : copy.demo}</Button>
               {user && <Button asChild size="lg" variant="ghost" className="h-12 rounded-xl px-4 text-slate-700 hover:bg-white"><a href={welcomeRoutes.workspace}>{copy.continue}<ChevronLeft className="mr-2 h-4 w-4" /></a></Button>}
             </div>
             <p className="mt-4 max-w-xl text-xs leading-6 text-slate-500"><LockKeyhole className="mr-1 inline h-3.5 w-3.5 text-cyan-700" />{copy.demoNote}</p>
@@ -90,7 +87,7 @@ export default function Welcome() {
             <div className="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-br from-cyan-200/50 via-white/20 to-violet-200/40 blur-2xl" aria-hidden="true" />
             <div className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-white/80 p-5 shadow-[0_24px_80px_rgba(13,27,42,0.14)] backdrop-blur-xl sm:p-7">
               <div className="flex items-center justify-between border-b border-slate-100 pb-5"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">ALDORA / WORKSPACE</p><p className="mt-1 text-lg font-bold">{english ? "A clear view of the operation" : "رؤية واضحة لسير العمل"}</p></div><div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 text-cyan-700"><CheckCircle2 className="h-5 w-5" /></div></div>
-              <div className="mt-6 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-[#0d1b2a] p-4 text-white sm:col-span-2"><p className="text-xs text-cyan-200">{english ? "One governed workspace" : "مساحة عمل منضبطة"}</p><p className="mt-2 text-2xl font-bold">{english ? "Care, operations, control" : "رعاية · تشغيل · رقابة"}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full w-4/5 rounded-full bg-gradient-to-l from-cyan-300 to-teal-200" /></div></div><div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><p className="text-xs text-slate-500">{english ? "Access" : "الوصول"}</p><p className="mt-2 font-bold text-emerald-700">{english ? "Scoped & audited" : "منضبط ومدقق"}</p></div><div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><p className="text-xs text-slate-500">{english ? "Demo" : "العرض"}</p><p className="mt-2 font-bold text-violet-700">{english ? "Safe & local" : "آمن ومحلي"}</p></div></div>
+              <div className="mt-6 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-[#0d1b2a] p-4 text-white sm:col-span-2"><p className="text-xs text-cyan-200">{english ? "One governed workspace" : "مساحة عمل منضبطة"}</p><p className="mt-2 text-2xl font-bold">{english ? "Care, operations, control" : "رعاية · تشغيل · رقابة"}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full w-4/5 rounded-full bg-gradient-to-l from-cyan-300 to-teal-200" /></div></div><div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><p className="text-xs text-slate-500">{english ? "Access" : "الوصول"}</p><p className="mt-2 font-bold text-emerald-700">{english ? "Scoped & audited" : "منضبط ومدقق"}</p></div><div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><p className="text-xs text-slate-500">{english ? "Governance" : "الحوكمة"}</p><p className="mt-2 font-bold text-cyan-700">{english ? "Scoped & controlled" : "منضبطة ومتحكم بها"}</p></div></div>
               <div className="mt-6 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-cyan-700" /><p className="text-sm leading-6 text-cyan-950">{copy.trust} — {copy.trustBody}</p></div></div>
             </div>
           </div>

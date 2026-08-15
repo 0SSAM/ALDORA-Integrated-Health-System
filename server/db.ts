@@ -136,7 +136,7 @@ export async function revokeInternalSession(token: string) {
   await db.update(internalSessions).set({ revokedAt: new Date() }).where(and(eq(internalSessions.sessionHash, hashSessionToken(token)), isNull(internalSessions.revokedAt)));
 }
 
-export async function recordAuthenticationEvent(input: { userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; eventType: "login_success" | "login_failure" | "logout" | "lockout" | "session_revoked"; source: "internal" | "oauth" | "demo"; requestId?: string | null }) {
+export async function recordAuthenticationEvent(input: { userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; eventType: "login_success" | "login_failure" | "logout" | "lockout" | "session_revoked"; source: "internal" | "oauth"; requestId?: string | null }) {
   const db = await getDb();
   if (!db) return;
   const previous = await db.select({ recordHash: authenticationEvents.recordHash }).from(authenticationEvents).orderBy(desc(authenticationEvents.id)).limit(1);

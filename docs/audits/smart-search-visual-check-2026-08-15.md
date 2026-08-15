@@ -1,6 +1,6 @@
 # Smart Search Visual Check — 2026-08-15
 
-The authenticated workspace header visibly exposes the bilingual search field with the Arabic/English placeholder and remains aligned with the RTL sidebar. The main workspace and Demo query render without layout errors at the desktop viewport. The catalog-specific correction notice is conditional and appears only after a matching keyboard-layout candidate is found; no silent replacement of user input is used.
+The authenticated workspace header visibly exposes the bilingual search field with the Arabic/English placeholder and remains aligned with the RTL sidebar. The authenticated main workspace and search query render without layout errors at the desktop viewport; no demo workspace or synthetic account is available. The catalog-specific correction notice is conditional and appears only after a matching keyboard-layout candidate is found; no silent replacement of user input is used.
 
 The visual capture did not claim hardware or external data connectivity. Search remains local/indexed for the currently wired catalog and module labels; broader production-table indexing requires the corresponding server query contract and data source.
 

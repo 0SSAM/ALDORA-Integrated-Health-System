@@ -22,4 +22,4 @@ Provide each artifact through an authorized secure channel and identify its issu
 
 ## Current safe state
 
-The server and UI remain fail-closed for every item above. Demo mode continues to use synthetic local data only. The Egyptian Pharmacopoeia source is recorded as provenance metadata without copying protected monograph text; no current legally usable pan-Arab reference has been verified, so regional activation remains blocked.
+The server and UI remain fail-closed for every item above. Demo mode and synthetic-account paths have been removed; only authenticated operational data paths remain. The Egyptian Pharmacopoeia source is recorded as provenance metadata without copying protected monograph text; no current legally usable pan-Arab reference has been verified, so regional activation remains blocked.
