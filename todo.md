@@ -616,3 +616,6 @@
 - [x] Create Arabic and English operational manuals covering the implemented ALDO Health Care Eco System workflows by professional role, with country-specific readiness notes where relevant.
 - [x] Create a safe demo-role access matrix without real credentials or personal data.
 - [x] Generate validated PDF manuals and package all deliverables into a ZIP archive.
+- [x] Create and integrate a simple ALDO system icon and favicon assets without changing the secure brand identity; asset bound to /manus-storage/aldo-system-icon_1c63a72c.png in HTML and PWA manifest.
+- [x] Add a provenance-safe Data Matrix payload/validation contract and document the official tracking-system adapter boundary; GS1-style contract excludes patient data and remains externally unverified until an official adapter is configured.
+- [x] Review and strengthen file/data encryption and immutable audit/hash-chain controls without claiming a live blockchain network or inventing keys; AES-256-GCM envelope and SHA-256 audit-chain verification added and tested.

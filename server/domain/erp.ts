@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 
 export type Shift = { startHour: number; endHour: number; hours: number; isNight: boolean; isRamadan: boolean };
 
@@ -29,6 +29,53 @@ export function classifyInsuranceClaim(input: { submittedAmount: number; approve
 export function createAuditHash(input: { previousHash: string | null; actorId: number | null; action: string; entityType: string; entityId: string | null; timestamp: number }) {
   const payload = JSON.stringify(input);
   return createHash("sha256").update(payload).digest("hex");
+}
+
+export type AuditRecord = { previousHash: string | null; actorId: number | null; action: string; entityType: string; entityId: string | null; timestamp: number; hash: string };
+
+export function verifyAuditHashChain(records: AuditRecord[]) {
+  let previousHash: string | null = null;
+  for (const record of records) {
+    if (record.previousHash !== previousHash) return { valid: false as const, reason: "PREVIOUS_HASH_MISMATCH" as const };
+    const expected = createAuditHash({ previousHash: record.previousHash, actorId: record.actorId, action: record.action, entityType: record.entityType, entityId: record.entityId, timestamp: record.timestamp });
+    if (record.hash !== expected) return { valid: false as const, reason: "HASH_MISMATCH" as const };
+    previousHash = record.hash;
+  }
+  return { valid: true as const, recordCount: records.length, lastHash: previousHash };
+}
+
+export type DataMatrixTraceInput = { gtin: string; batchNumber: string; expiryDate: string; serialNumber: string; jurisdictionCode: string; organizationScope: string; sourceReference: string };
+
+export function buildDataMatrixTraceContract(input: DataMatrixTraceInput) {
+  const values = Object.values(input);
+  if (values.some(value => !value.trim())) throw new Error("Data Matrix trace fields are required");
+  if (!/^\d{8,14}$/.test(input.gtin)) throw new Error("GTIN must contain 8 to 14 digits");
+  if (!/^\d{6}$/.test(input.expiryDate)) throw new Error("Expiry date must use YYMMDD format");
+  if (input.serialNumber.length > 20 || input.batchNumber.length > 20) throw new Error("Trace identifiers are too long");
+  if (/[\u0000-\u001f]/.test(values.join(""))) throw new Error("Trace fields contain control characters");
+  return { format: "GS1_DATA_MATRIX" as const, payload: `(01)${input.gtin}(17)${input.expiryDate}(10)${input.batchNumber}(21)${input.serialNumber}`, jurisdictionCode: input.jurisdictionCode, organizationScope: input.organizationScope, sourceReference: input.sourceReference, containsPatientData: false as const, officialAdapterRequired: true as const, externallyVerified: false as const };
+}
+
+export type EncryptedEnvelope = { algorithm: "AES-256-GCM"; keyVersion: string; iv: string; authTag: string; ciphertext: string };
+
+function requireEncryptionKey(key: Uint8Array) {
+  if (key.length !== 32) throw new Error("AES-256 key must be exactly 32 bytes");
+  return Buffer.from(key);
+}
+
+export function encryptSensitiveBytes(input: { plaintext: Uint8Array; key: Uint8Array; keyVersion: string }): EncryptedEnvelope {
+  if (!input.keyVersion.trim()) throw new Error("Encryption key version is required");
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", requireEncryptionKey(input.key), iv);
+  const ciphertext = Buffer.concat([cipher.update(input.plaintext), cipher.final()]);
+  return { algorithm: "AES-256-GCM", keyVersion: input.keyVersion, iv: iv.toString("base64"), authTag: cipher.getAuthTag().toString("base64"), ciphertext: ciphertext.toString("base64") };
+}
+
+export function decryptSensitiveBytes(envelope: EncryptedEnvelope, key: Uint8Array) {
+  if (envelope.algorithm !== "AES-256-GCM") throw new Error("Unsupported encryption algorithm");
+  const decipher = createDecipheriv("aes-256-gcm", requireEncryptionKey(key), Buffer.from(envelope.iv, "base64"));
+  decipher.setAuthTag(Buffer.from(envelope.authTag, "base64"));
+  return Buffer.concat([decipher.update(Buffer.from(envelope.ciphertext, "base64")), decipher.final()]);
 }
 
 export const EGYPTIAN_TPA_PROVIDER_CODES = [

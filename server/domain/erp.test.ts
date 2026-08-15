@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertPrescriptionConfirmed, calculateCompoundingCost, calculateEgyptianPayroll, classifyInsuranceAging, classifyInsuranceClaim, createAuditHash, createCompoundingLiability, deductCompoundingBom, EGYPTIAN_TPA_PROVIDER_CODES, evaluateColdChain, buildLegalLabel, planInventoryAdjustment, preparePosSale, validateAuthorityArtifacts, validateEtaInvoice, validateFinanceEntry, validateInventorySchedulePolicy, validatePatientRecord, validatePrescriptionUpload } from "./erp";
+import { assertPrescriptionConfirmed, buildDataMatrixTraceContract, calculateCompoundingCost, calculateEgyptianPayroll, classifyInsuranceAging, classifyInsuranceClaim, createAuditHash, createCompoundingLiability, decryptSensitiveBytes, deductCompoundingBom, EGYPTIAN_TPA_PROVIDER_CODES, encryptSensitiveBytes, evaluateColdChain, buildLegalLabel, planInventoryAdjustment, preparePosSale, validateAuthorityArtifacts, validateEtaInvoice, validateFinanceEntry, validateInventorySchedulePolicy, validatePatientRecord, validatePrescriptionUpload, verifyAuditHashChain } from "./erp";
 
 describe("ERP domain services", () => {
   it("calculates overtime and Ramadan/night shift metrics", () => {
@@ -62,8 +62,31 @@ describe("ERP domain services", () => {
     expect(validatePrescriptionUpload({ mimeType: "image/png", byteLength: 128 })).toBe(true);
   });
 
-  it("creates deterministic tamper-evident hashes", () => {
-    const input = { previousHash: null, actorId: 1, action: "CREATE", entityType: "SALE", entityId: "1", timestamp: 100 };
-    expect(createAuditHash(input)).toBe(createAuditHash(input));
+  it("creates and verifies a tamper-evident audit hash chain", () => {
+    const first = { previousHash: null, actorId: 1, action: "CREATE", entityType: "SALE", entityId: "1", timestamp: 100 };
+    const firstHash = createAuditHash(first);
+    const second = { previousHash: firstHash, actorId: 1, action: "UPDATE", entityType: "SALE", entityId: "1", timestamp: 101 };
+    const result = verifyAuditHashChain([{ ...first, hash: firstHash }, { ...second, hash: createAuditHash(second) }]);
+    expect(result.valid).toBe(true);
+    expect(verifyAuditHashChain([{ ...first, hash: "tampered" }]).valid).toBe(false);
+  });
+
+  it("builds a provenance-safe GS1 Data Matrix contract without patient data", () => {
+    const result = buildDataMatrixTraceContract({ gtin: "06212345678901", batchNumber: "B-2026", expiryDate: "261231", serialNumber: "SN-001", jurisdictionCode: "EG", organizationScope: "ORG-1", sourceReference: "EDA-REF-PENDING" });
+    expect(result.format).toBe("GS1_DATA_MATRIX");
+    expect(result.payload).toContain("(01)06212345678901");
+    expect(result.containsPatientData).toBe(false);
+    expect(result.officialAdapterRequired).toBe(true);
+    expect(() => buildDataMatrixTraceContract({ gtin: "not-a-gtin", batchNumber: "B", expiryDate: "261231", serialNumber: "S", jurisdictionCode: "EG", organizationScope: "ORG-1", sourceReference: "REF" })).toThrow(/GTIN/);
+  });
+
+  it("encrypts and authenticates sensitive bytes with AES-256-GCM", () => {
+    const key = new Uint8Array(32).fill(7);
+    const plaintext = new TextEncoder().encode("sensitive-document-bytes");
+    const envelope = encryptSensitiveBytes({ plaintext, key, keyVersion: "v1" });
+    expect(envelope.algorithm).toBe("AES-256-GCM");
+    expect(new TextDecoder().decode(decryptSensitiveBytes(envelope, key))).toBe("sensitive-document-bytes");
+    expect(() => decryptSensitiveBytes(envelope, new Uint8Array(32).fill(8))).toThrow();
+    expect(() => encryptSensitiveBytes({ plaintext, key: new Uint8Array(16), keyVersion: "v1" })).toThrow(/32 bytes/);
   });
 });
