@@ -57,7 +57,13 @@ export function isTrustedMutationRequest(req: Request): SecurityDecision {
   const expected = requestOrigin(req);
   const supplied = normalizedOrigin(originHeader ?? refererHeader);
   const requestHost = req.get("host")?.toLowerCase();
-  const hostBoundOrigins = requestHost ? new Set([`http://${requestHost}`, `https://${requestHost}`]) : new Set<string>();
+  const hostBoundOrigins = requestHost
+    ? new Set(
+        [`http://${requestHost}`, `https://${requestHost}`]
+          .map(normalizedOrigin)
+          .filter((origin): origin is string => Boolean(origin)),
+      )
+    : new Set<string>();
 
   // Non-browser clients may omit both headers. Browser requests with an origin
   // or referer must match the current host before cookie-authenticated mutation.

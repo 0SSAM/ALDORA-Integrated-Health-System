@@ -50,6 +50,22 @@ describe("security middleware boundaries", () => {
     expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
   });
 
+  it("normalizes the default TLS port when binding the browser origin to Host", () => {
+    const request = {
+      ip: "10.0.0.8",
+      socket: { remoteAddress: "127.0.0.1" },
+      method: "POST",
+      protocol: "http",
+      headers: {
+        origin: "https://aldora.example",
+        "sec-fetch-site": "same-origin",
+        "x-forwarded-proto": "https",
+      },
+      get: (name: string) => name === "host" ? "aldora.example:443" : undefined,
+    } as never;
+    expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
+  });
+
   it("accepts forwarded host and protocol only from loopback proxy", () => {
     const request = {
       ip: "127.0.0.1",
