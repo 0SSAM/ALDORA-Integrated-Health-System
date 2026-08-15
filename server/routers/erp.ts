@@ -3,7 +3,7 @@ import { parse as parseCookie } from "cookie";
 import { createHash } from "node:crypto";
 import { and, desc, eq, gte, inArray, isNull, like, lt, or, sql } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, ePrescriptions, ePrescriptionLines, healthcarePatients, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, salesReturns, taxInvoices, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships, auditLogs } from "../../drizzle/schema";
+import { prescriptionIntakes, ePrescriptions, ePrescriptionLines, healthcarePatients, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, salesReturns, taxInvoices, taxInvoiceTemplates, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships, auditLogs } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -324,6 +324,33 @@ export const erpRouter = router({
         let calculated; try { calculated = calculateVatInvoice(tax, input.lines.map(line => ({ sku: line.sku, quantity: line.quantity, unitPrice: line.unitPrice, discountAmount: line.discountAmount, vatRule: { code: "scope", rate: line.vatRate, exempt: line.exempt, verified: tax.ratesVerified } }))); } catch { throw new TRPCError({ code: "BAD_REQUEST", message: "Tax invoice calculation rejected the request" }); }
         const created = await db.insert(taxInvoices).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, saleId: input.saleId, returnId: input.returnId, invoiceNumber: input.invoiceNumber, invoiceType: input.invoiceType, currencyCode: calculated.currencyCode, subtotal: calculated.subtotal.toFixed(2), vatAmount: calculated.vatAmount.toFixed(2), totalAmount: calculated.total.toFixed(2), status: "issued_local", externalSubmissionGate: "not_configured", createdByUserId: ctx.user.id, issuedAt: new Date() });
         return { invoiceId: Number(created[0].insertId), status: "ISSUED_LOCAL" as const, externalSubmission: "BLOCKED_UNTIL_ETA_CREDENTIALS" as const, ...calculated };
+      }),
+    getTaxInvoiceTemplate: protectedProcedure
+      .input(z.object({ branchId: z.number().int().positive() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb(); if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
+        const template = (await db.select().from(taxInvoiceTemplates).where(and(eq(taxInvoiceTemplates.organizationId, organizationId), eq(taxInvoiceTemplates.branchId, input.branchId), eq(taxInvoiceTemplates.jurisdictionId, assignment.jurisdictionId), eq(taxInvoiceTemplates.active, 1))).limit(1))[0];
+        return template ?? { id: null, organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, nameAr: "قالب الفاتورة الضريبية", nameEn: "Tax Invoice Template", addressAr: null, addressEn: null, taxRegistrationNumber: null, phone: null, email: null, logoUrl: null, accentColor: "#0f766e", footerAr: "فاتورة ضريبية محلية - الإرسال الرسمي غير مفعّل", footerEn: "Local tax invoice - official submission is not enabled", active: 1 };
+      }),
+    saveTaxInvoiceTemplate: protectedProcedure
+      .input(z.object({ branchId: z.number().int().positive(), nameAr: z.string().trim().min(1).max(160), nameEn: z.string().trim().min(1).max(160), addressAr: z.string().trim().max(500).optional(), addressEn: z.string().trim().max(500).optional(), taxRegistrationNumber: z.string().trim().max(80).optional(), phone: z.string().trim().max(40).optional(), email: z.string().email().max(160).optional().or(z.literal("")), logoUrl: z.string().url().max(1000).optional().or(z.literal("")), accentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/), footerAr: z.string().trim().max(500).optional(), footerEn: z.string().trim().max(500).optional() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!["admin", "manager"].includes(ctx.user.role)) throw new TRPCError({ code: "FORBIDDEN", message: "Only administrators or managers can update invoice templates" });
+        const db = await getDb(); if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
+        const values = { organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, nameAr: input.nameAr, nameEn: input.nameEn, addressAr: input.addressAr || null, addressEn: input.addressEn || null, taxRegistrationNumber: input.taxRegistrationNumber || null, phone: input.phone || null, email: input.email || null, logoUrl: input.logoUrl || null, accentColor: input.accentColor, footerAr: input.footerAr || null, footerEn: input.footerEn || null, active: 1, updatedByUserId: ctx.user.id };
+        const existing = (await db.select().from(taxInvoiceTemplates).where(and(eq(taxInvoiceTemplates.organizationId, organizationId), eq(taxInvoiceTemplates.branchId, input.branchId), eq(taxInvoiceTemplates.jurisdictionId, assignment.jurisdictionId))).limit(1))[0];
+        let templateId: number;
+        if (existing) { await db.update(taxInvoiceTemplates).set(values).where(and(eq(taxInvoiceTemplates.id, existing.id), eq(taxInvoiceTemplates.organizationId, organizationId), eq(taxInvoiceTemplates.branchId, input.branchId), eq(taxInvoiceTemplates.jurisdictionId, assignment.jurisdictionId))); templateId = existing.id; }
+        else { const created = await db.insert(taxInvoiceTemplates).values(values); templateId = Number(created[0].insertId); }
+        const createdAt = new Date().toISOString(); const recordHash = hashAuditRecord({ eventType: "tax_invoice_template_updated", userId: ctx.user.id, organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, requestId: String(templateId), createdAt });
+        await db.insert(auditLogs).values({ userId: ctx.user.id, organizationId, branchId: input.branchId, action: "tax_invoice_template_updated", entityType: "tax_invoice_template", entityId: String(templateId), previousHash: null, recordHash });
+        return { templateId, status: "SAVED" as const };
       }),
   }),
   schedule: router({

@@ -1073,3 +1073,21 @@
 - [x] Enforce original-invoice linkage, quantity limits, duplicate protection, jurisdiction tax profile, rounding, numbering, and audit events.
 - [x] Add a bilingual sales workspace for return processing and tax-invoice preview/issuance with clear fail-closed states.
 - [x] Add focused tests, full validation, responsive screenshots, documentation/skill updates, and publish a checkpoint.
+
+# Local Tax Invoice PDF and Organization Template 2026-08-15
+
+- [x] Review local tax-invoice output fields, organization scope, numbering, VAT status, and current POS invoice contract.
+- [x] Add organization-scoped invoice template settings with safe defaults, validation, and auditability; never store file bytes in the database.
+- [x] Add protected invoice preview, browser print, and PDF export for local invoices with explicit local/non-ETA status.
+- [x] Add template customization UI for bilingual organization identity, address, tax identifiers, colors, footer, and optional uploaded logo reference.
+- [x] Add tests for tenant isolation, template validation, PDF/print contract, and fail-closed behavior; run responsive verification and publish a checkpoint.
+
+# Tax Invoice PDF and Organization Templates
+
+- [x] Add organization-scoped tax invoice template editor and preview controls to SalesFinanceWorkspace.
+- [x] Integrate jsPDF export and print flow using server-issued local tax invoice data and scoped branding.
+- [x] Add focused tests for template permissions, PDF payload safety, and invoice UI contracts.
+- [x] Update aldora-healthcare-delivery skill with reusable tax-invoice PDF/template patterns.
+- [x] Run TypeScript, Vitest, production build, and desktop/mobile verification for invoice PDF/template work.
+
+Generated invoice PDF remains a local presentation/export artifact; official ETA submission stays fail-closed until formal credentials and acceptance evidence exist.

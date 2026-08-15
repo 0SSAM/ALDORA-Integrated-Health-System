@@ -166,6 +166,28 @@ export const taxInvoices = mysqlTable("tax_invoices", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, table => ({ numberScopeIdx: uniqueIndex("tax_invoices_scope_number_idx").on(table.organizationId, table.branchId, table.jurisdictionId, table.invoiceNumber), scopeStatusIdx: index("tax_invoices_scope_status_idx").on(table.organizationId, table.branchId, table.jurisdictionId, table.status), saleIdx: index("tax_invoices_sale_idx").on(table.saleId) }));
 
+export const taxInvoiceTemplates = mysqlTable("tax_invoice_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  branchId: int("branchId"),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  nameAr: varchar("nameAr", { length: 160 }).default("قالب الفاتورة الضريبية").notNull(),
+  nameEn: varchar("nameEn", { length: 160 }).default("Tax Invoice Template").notNull(),
+  addressAr: varchar("addressAr", { length: 500 }),
+  addressEn: varchar("addressEn", { length: 500 }),
+  taxRegistrationNumber: varchar("taxRegistrationNumber", { length: 80 }),
+  phone: varchar("phone", { length: 40 }),
+  email: varchar("email", { length: 160 }),
+  logoUrl: varchar("logoUrl", { length: 1000 }),
+  accentColor: varchar("accentColor", { length: 9 }).default("#0f766e").notNull(),
+  footerAr: varchar("footerAr", { length: 500 }),
+  footerEn: varchar("footerEn", { length: 500 }),
+  active: int("active").default(1).notNull(),
+  updatedByUserId: int("updatedByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: uniqueIndex("tax_invoice_templates_scope_idx").on(table.organizationId, table.branchId, table.jurisdictionId), activeIdx: index("tax_invoice_templates_active_idx").on(table.organizationId, table.branchId, table.active) }));
+
 export const auditLogs = mysqlTable("audit_logs", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId"),
