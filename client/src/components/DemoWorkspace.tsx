@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { describeSearchMatch, smartSearch } from "@/lib/smartSearch";
 import { HardwareWorkspace } from "@/components/HardwareWorkspace";
 import { AlertTriangle, BarChart3, Boxes, BrainCircuit, CheckCircle2, ClipboardCheck, FileText, FlaskConical, PackageSearch, PhoneCall, Receipt, RotateCcw, Search, ShieldCheck, ShoppingCart, Ticket, UserRound, Users, WalletCards, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -18,14 +19,13 @@ export function clampDemoDiscount(value: string): number {
 }
 
 export function filterDemoCatalog(query: string) {
-  const normalized = query.trim().toUpperCase();
-  return catalogItems.filter(item => item.name.toUpperCase().includes(normalized) || item.id.includes(normalized));
+  return smartSearch(catalogItems, query, ["id", "name", "nameEn", "category", "keywords"]);
 }
 
 const catalogItems = [
-  { id: "MED-001", name: "باراسيتامول 500 مجم — عرض تجريبي", category: "دواء", source: "سجل اصطناعي" },
-  { id: "COS-014", name: "مرطب جلدي — عرض تجريبي", category: "تجميل", source: "سجل اصطناعي" },
-  { id: "SUP-032", name: "قفازات فحص — عرض تجريبي", category: "مستلزم طبي", source: "سجل اصطناعي" },
+  { id: "MED-001", name: "باراسيتامول 500 مجم — عرض تجريبي", nameEn: "Paracetamol 500 mg — Demo", category: "دواء", source: "سجل اصطناعي", keywords: "medicine analgesic fever" },
+  { id: "COS-014", name: "مرطب جلدي — عرض تجريبي", nameEn: "Dermal Moisturizer — Demo", category: "تجميل", source: "سجل اصطناعي", keywords: "cosmetic skincare" },
+  { id: "SUP-032", name: "قفازات فحص — عرض تجريبي", nameEn: "Examination Gloves — Demo", category: "مستلزم طبي", source: "سجل اصطناعي", keywords: "medical supply gloves" },
 ];
 
 const initialCart: DemoCartItem[] = [
@@ -73,6 +73,7 @@ export function DemoWorkspace({ active, onNavigate }: { active: string; onNaviga
   const safeDiscount = clampDemoDiscount(discount);
   const discountedTotal = total - (total * safeDiscount) / 100;
   const filteredCatalog = useMemo(() => filterDemoCatalog(search), [search]);
+  const catalogCorrection = filteredCatalog.find(result => result.matchedBy === "keyboard-layout");
   const resetDemo = () => {
     setCart(initialCart);
     setDiscount("7");
@@ -107,7 +108,7 @@ export function DemoWorkspace({ active, onNavigate }: { active: string; onNaviga
       case "callCentre":
         return <DemoPanel title="مركز الاتصال" icon={PhoneCall} description="أنشئ تذاكر محلية، غيّر الأولوية، وتابع دورة الحالة دون حفظ تسجيلات أو اتصال بخدمة هاتفية."><div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]"><div className="space-y-3 rounded-2xl bg-slate-50 p-4"><Input value={ticketSubject} onChange={event => setTicketSubject(event.target.value)} placeholder="موضوع تذكرة تجريبية" aria-label="موضوع تذكرة تجريبية" /><Button onClick={() => { if (!ticketSubject.trim()) { setTicketStatus("اكتب موضوع التذكرة أولاً"); return; } setTickets(current => [{ id: Date.now(), subject: ticketSubject.trim(), priority: "عادي", status: "جديدة" }, ...current]); setTicketSubject(""); setTicketStatus("تم إنشاء تذكرة محلية اصطناعية"); }} className="w-full bg-[#0d1b2a]"><Ticket className="ml-2 h-4 w-4" />فتح تذكرة محلية</Button><Badge variant="outline">{ticketStatus}</Badge></div><div className="space-y-2">{tickets.map(ticket => <div key={ticket.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3"><div><p className="font-medium">#{ticket.id} · {ticket.subject}</p><p className="text-xs text-slate-500">{ticket.status} · {ticket.priority}</p></div><Button variant="ghost" size="sm" onClick={() => setTickets(current => current.map(item => item.id === ticket.id ? { ...item, status: item.status === "جديدة" ? "قيد المتابعة" : "جديدة" } : item))}>تبديل الحالة</Button></div>)}</div></div></DemoPanel>;
       case "catalog":
-        return <DemoPanel title="كتالوج الأصناف" icon={PackageSearch} description="ابحث في ثلاثة أصناف اصطناعية توضح فصل الأدوية والتجميل والمستلزمات ومصدر كل سجل."><div className="flex items-center gap-2"><Search className="h-4 w-4 text-slate-400" /><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="ابحث بالاسم أو SKU" aria-label="بحث أصناف Demo" /></div><div className="mt-4 grid gap-3 md:grid-cols-3">{filteredCatalog.map(item => <div key={item.id} className="rounded-xl border border-slate-200 p-4"><Badge variant="outline">{item.category}</Badge><p className="mt-3 font-medium">{item.name}</p><p className="mt-2 text-xs text-slate-500">{item.id} · {item.source}</p></div>)}{filteredCatalog.length === 0 && <p className="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500 md:col-span-3">لا توجد نتائج في السجل الاصطناعي.</p>}</div></DemoPanel>;
+        return <DemoPanel title="كتالوج الأصناف" icon={PackageSearch} description="ابحث في ثلاثة أصناف اصطناعية توضح فصل الأدوية والتجميل والمستلزمات ومصدر كل سجل."><div className="flex items-center gap-2"><Search className="h-4 w-4 text-slate-400" /><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="ابحث بالعربية أو English أو SKU" aria-label="بحث أصناف Demo متعدد اللغات" /></div>{catalogCorrection && <p className="mt-2 text-xs text-cyan-700" role="status">{describeSearchMatch(catalogCorrection)} — عُرضت النتائج المطابقة.</p>}<div className="mt-4 grid gap-3 md:grid-cols-3">{filteredCatalog.map(result => <div key={result.item.id} className="rounded-xl border border-slate-200 p-4"><Badge variant="outline">{result.item.category}</Badge><p className="mt-3 font-medium">{result.item.name}</p><p className="mt-1 text-xs text-slate-500">{result.item.nameEn}</p><p className="mt-2 text-xs text-slate-500">{result.item.id} · {result.item.source}</p></div>)}{filteredCatalog.length === 0 && <p className="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500 md:col-span-3">لا توجد نتائج في السجل الاصطناعي.</p>}</div></DemoPanel>;
       case "hardware":
         return <DemoPanel title="إعداد الأجهزة والمحاكاة" icon={Wrench} description="اختر موديل الطابعة والاتصال، ثم اختبر ماسح الباركود والطابعة الحرارية دون أجهزة فعلية."><HardwareWorkspace /></DemoPanel>;
       case "insurance":

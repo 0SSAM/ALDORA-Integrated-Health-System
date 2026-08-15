@@ -688,3 +688,11 @@
 - [x] Redirect Demo sessions directly to the interactive workspace and provide a safe return path from the welcome screen.
 - [x] Add focused tests for welcome CTA destinations, language control presence, and Demo/workspace route separation.
 - [x] Verify desktop/mobile visuals, RTL/LTR, TypeScript, Vitest, production build, and save a published checkpoint.
+
+# Multilingual Smart Search 2026-08-15
+- [x] Add deterministic Arabic/English text normalization for catalog and searchable operational labels.
+- [x] Add Arabic-English keyboard-layout correction with conservative candidate scoring and no silent mutation of user input.
+- [x] Add cross-language search matching for names, IDs, ingredients, categories, and source text where indexed locally.
+- [x] Expose search suggestions and explain when a keyboard-layout correction was applied.
+- [x] Add focused tests for Arabic normalization, English/Arabic lookup, keyboard mapping, mixed text, and no-result safety.
+- [x] Verify performance, RTL/LTR behavior, TypeScript, Vitest, production build, and save a published checkpoint.

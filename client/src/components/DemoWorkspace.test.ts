@@ -10,6 +10,7 @@ describe("interactive demo safety helpers", () => {
 
   it("searches only the explicitly local synthetic catalog", () => {
     expect(filterDemoCatalog("MED-001")).toHaveLength(1);
+    expect(filterDemoCatalog("paracetamol")[0]?.item.id).toBe("MED-001");
     expect(filterDemoCatalog("عرض تجريبي")).toHaveLength(3);
     expect(filterDemoCatalog("not-a-real-record")).toHaveLength(0);
   });
