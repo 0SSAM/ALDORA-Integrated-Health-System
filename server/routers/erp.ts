@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
-import { and, desc, eq, inArray, isNull, like, lt, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, like, lt, or, sql } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
 import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships } from "../../drizzle/schema";
 import { getDb } from "../db";
@@ -100,6 +100,25 @@ const callCentreDraftSchema = z.object({
 });
 
 export const erpRouter = router({
+  forecast: router({
+    salesHistory: protectedProcedure
+      .input(z.object({ branchId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), productIds: z.array(z.number().int().positive()).max(100).optional(), historyDays: z.number().int().min(7).max(180).default(56) }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
+        await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId);
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
+        if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Sales history is outside the active organization scope" });
+        const start = new Date(Date.now() - (input.historyDays - 1) * 24 * 60 * 60 * 1000);
+        const filters = [eq(sales.organizationId, organizationId), eq(sales.branchId, input.branchId), eq(sales.jurisdictionId, input.jurisdictionId), gte(sales.createdAt, start)];
+        const rows = await db.select({ productId: saleItems.productId, day: sql<string>`DATE(${sales.createdAt})`, units: sql<string>`SUM(${saleItems.quantity})` }).from(saleItems).innerJoin(sales, eq(saleItems.saleId, sales.id)).where(and(...filters, ...(input.productIds?.length ? [inArray(saleItems.productId, input.productIds)] : []))).groupBy(saleItems.productId, sql`DATE(${sales.createdAt})`);
+        const dayKeys = Array.from({ length: input.historyDays }, (_, index) => { const day = new Date(start.getTime() + index * 24 * 60 * 60 * 1000); return day.toISOString().slice(0, 10); });
+        const byProduct = new Map<number, Map<string, number>>();
+        for (const row of rows) { const product = byProduct.get(row.productId) ?? new Map<string, number>(); product.set(String(row.day).slice(0, 10), Number(row.units ?? 0)); byProduct.set(row.productId, product); }
+        return Array.from(byProduct.entries()).map(([productId, values]) => ({ productId, historyDays: dayKeys.map(day => values.get(day) ?? 0), observedDays: dayKeys.filter(day => values.has(day)).length, historyStart: dayKeys[0], historyEnd: dayKeys[dayKeys.length - 1], scope: { organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId } }));
+      }),
+  }),
   policy: router({
     validateDiscount: protectedProcedure
       .input(z.object({ officialPrice: z.number().nonnegative(), discountAmount: z.number().nonnegative() }))

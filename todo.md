@@ -755,3 +755,24 @@
 - [x] Add tests for forecast boundaries, seasonality/data gaps, lead-time and safety-stock calculations, expiry/FEFO constraints, scope isolation, and no-data fail-closed behavior.
 - [x] Document that recommendations are decision support, require authorized review, and do not create purchase orders automatically without approval.
 - [x] Run full Vitest, TypeScript, production build, and responsive visual verification, then save and publish the checkpoint.
+
+# Actual Sales Forecast Integration and Reusable Skill
+
+- [ ] Review the implemented sales schema and forecast policy to define the authorized aggregation boundary for actual sales.
+- [ ] Add server-side actual-sales aggregation by organization, branch, jurisdiction, product, and time bucket with exclusion of cancelled, voided, demo, and unauthorized records.
+- [ ] Connect the aggregation to the demand forecast and reorder dashboard with data-quality states, source timestamps, and no-data fail-closed behavior.
+- [ ] Add tests for tenant/branch isolation, status filtering, time-window boundaries, duplicate/idempotency handling, and forecast input provenance.
+- [ ] Document that recommendations remain decision support and never create purchase orders without authorized approval.
+- [ ] Create a reusable skill package describing the secure healthcare ERP review, fail-closed implementation, testing, visual verification, checkpoint, and archive workflow.
+- [ ] Validate the reusable skill with the official skill validator and deliver its SKILL.md.
+- [ ] Run full Vitest, TypeScript, production build, responsive visual verification, and save/publish the application checkpoint.
+- [ ] Prepare the updated complete project archive if the user requests a downloadable bundle after this change.
+
+
+# Current Forecast Integration TODO
+
+- [x] Complete the reusable `aldora-healthcare-delivery` skill and validate its frontmatter/content.
+- [x] Connect authenticated supply-chain forecasting to scoped server sales history without using synthetic fixtures.
+- [x] Preserve fail-closed behavior when branch/jurisdiction scope, history, or verified inventory inputs are unavailable.
+- [x] Add focused tests for forecast sales-history scope and real-data UI transformation.
+- [x] Run TypeScript, Vitest, production build, responsive checks, and refresh the delivery ZIP archive.

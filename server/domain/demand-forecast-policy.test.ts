@@ -34,4 +34,17 @@ describe("demand forecast policy", () => {
   it("rejects negative stock inputs", () => {
     expect(() => calculateDemandRecommendation({ ...base, onHand: -1 })).toThrow("FORECAST_INVALID_ON_HAND");
   });
+
+  it("rejects every mismatched organization, branch, or jurisdiction scope", () => {
+    expect(canReadDemandForecast(base.scope, { ...base.scope, organizationId: 2 })).toBe(false);
+    expect(canReadDemandForecast(base.scope, { ...base.scope, branchId: 11 })).toBe(false);
+    expect(canReadDemandForecast(base.scope, { ...base.scope, jurisdictionId: 21 })).toBe(false);
+  });
+
+  it("keeps an empty real history fail-closed", () => {
+    const result = calculateDemandRecommendation({ ...base, dailyUnits: [0, 0, 0, 0, 0, 0] });
+    expect(result.dataQuality).toBe("insufficient");
+    expect(result.suggestedOrderUnits).toBeNull();
+    expect(result.requiresReview).toBe(true);
+  });
 });
