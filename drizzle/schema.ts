@@ -36,6 +36,7 @@ export const users = mysqlTable("users", {
 export const branches = mysqlTable("branches", {
   id: int("id").autoincrement().primaryKey(),
   organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId"),
   code: varchar("code", { length: 32 }).notNull(),
   nameAr: varchar("nameAr", { length: 160 }).notNull(),
   address: text("address"),

@@ -1251,3 +1251,13 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Update documentation, retrospective matrix, archive, and release notes; run tests, build, audit, and visual checks. TypeScript, 100 test files/331 passing tests with 9 skipped, production build, high/critical production audit, and desktop/375px visual checks passed; external CI verification remains open.
 - [x] Save a checkpoint and deliver the implemented additions together with remaining external prerequisites. Expansion checkpoint `7a24deb1` is available; a subsequent documentation-only checkpoint is still required after this reconciliation.
 - [x] Do not close the task if GitHub access prevents observable CI verification; request reconnection instead. The blocker is preserved explicitly in the audit and final summary.
+
+# GitHub Repository Migration Verification — 2026-08-15
+- [ ] Verify access to the migrated repository `ALDO-Health-Care-Eco-System` and confirm its exact owner/name.
+- [ ] Inspect the migrated workflow definitions and recent GitHub Actions runs without reading secret values.
+- [ ] Run or follow the MySQL disposable-service lifecycle job and record its observable result.
+- [ ] Update the documented CI repository reference and close the prior access blocker only when evidence is available.
+
+- [ ] Fix CI disposable MySQL schema drift by adding the missing nullable branches.jurisdictionId migration, regression coverage, and external GitHub verification.
+- [ ] Package and integrity-check the final local-ready ALDORA archive after CI verification.
+- [ ] Resolve CI compatibility blockers revealed by the migrated repository: TypeScript 6 rejecting deprecated baseUrl and dependency-review unsupported on the current private repository plan, while retaining visible security evidence.
