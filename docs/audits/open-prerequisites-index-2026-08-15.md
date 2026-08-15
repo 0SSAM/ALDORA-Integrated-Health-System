@@ -5,7 +5,7 @@
 
 ## Engineering work completed and verified
 
-The current codebase has strict organization, branch, and jurisdiction guards; readiness policies for regulated mutation, privacy, controlled substances, inventory, tax, invoice preparation, localization, audit, notifications, clinical access, patient identity, data export, offline sync, and device trust; country-pack domain coverage enforcement; fail-closed offline replay; a production-safe database test harness; all current connection-opening database tests aligned with that fail-closed guard; and source-level regulated-entrypoint coverage for the implemented POS and prescription procedures. The latest regression passed 71 test files and 223 tests, with 5 optional database tests skipped because an isolated `TEST_DATABASE_URL` is unavailable. The production build passed. The client also now uses conservative React Query caching, a short-lived session-header cache for the existing bearer fallback, and lazy loading for the non-critical NotFound route; these changes do not weaken cookie precedence, server authorization, organization isolation, or regulated-operation gates.
+The current codebase has strict organization, branch, and jurisdiction guards; readiness policies for regulated mutation, privacy, controlled substances, inventory, tax, invoice preparation, localization, audit, notifications, clinical access, patient identity, data export, offline sync, and device trust; country-pack domain coverage enforcement; fail-closed offline replay; a production-safe database test harness; all current connection-opening database tests aligned with that fail-closed guard; and source-level regulated-entrypoint coverage for the implemented POS and prescription procedures. The latest regression passed 71 test files and 231 tests, with 5 optional database tests skipped because an isolated `TEST_DATABASE_URL` is unavailable. The production build passed. The client also now uses conservative React Query caching, a short-lived session-header cache for the existing bearer fallback, and lazy loading for the non-critical NotFound route; these changes do not weaken cookie precedence, server authorization, organization isolation, or regulated-operation gates. The server now also contains a pure trusted-attestation contract validator for nonce, freshness, revocation, and organization/jurisdiction scope; it is not treated as a real attestation provider and is not enabled for browser-generated evidence.
 
 ## Blocked by isolated infrastructure
 
@@ -28,7 +28,7 @@ The current codebase has strict organization, branch, and jurisdiction guards; r
 
 | Dependency | Current state | Safe next action |
 |---|---|---|
-| Trusted-device attestation | Server policy, fail-closed replay gate, UI blocked state, and contract documentation are complete; browser capabilities are intentionally not accepted as proof | Select and configure an approved native/device-attestation provider, then add verification and revocation tests. |
+| Trusted-device attestation | Server policy, fail-closed replay gate, UI blocked state, contract documentation, and pure nonce/freshness/revocation/scope validation are complete; browser capabilities are intentionally not accepted as proof | Select and configure an approved native/device-attestation provider, then bind its verified claims and revocation signal to replay acceptance. |
 
 ## Deliberately absent workflows
 
