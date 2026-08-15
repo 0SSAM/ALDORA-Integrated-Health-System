@@ -1280,3 +1280,29 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Run the complete automated validation suite, production build, audit checks, and targeted live-flow checks.
 - [x] Fix each verified defect or conflict safely and add regression coverage; document issues that require external credentials or official integrations.
 - [x] Revalidate the repaired system, confirm no unchecked review items remain, and save a final checkpoint.
+
+# Login UX and Monitoring Enhancements — 2026-08-16
+
+- [x] Add an explicit, accessible success message after internal login and preserve the `/workspace` redirect.
+- [x] Add a secure showcase-account trial button that starts the isolated showcase session server-side without displaying or transmitting the password in the browser.
+- [x] Add a platform-managed periodic login monitor through `/api/scheduled/*`, with idempotent checks, safe status logging, and regression tests; do not use in-process timers.
+- [x] Validate the three enhancements, save a checkpoint, and report that the monitor callback is deployed while the production schedule remains pending job creation.
+
+# Enhancement & Monitoring — Showcase Login
+
+- [x] Add a clear post-authentication success state before routing to `/workspace`, without exposing credentials.
+- [x] Add a server-side `showcaseTrial` mutation and a password-less Showcase Trial button that starts the isolated `test` account session.
+- [x] Add an authenticated, idempotent Heartbeat callback that probes the login health contract without attempting to log in with or exposing a password.
+- [x] Register the login-health scheduled endpoint before the static/Vite fallthrough and document the production scheduling prerequisite.
+- [x] Add focused regression tests for the showcase trial boundary, login success UX, and scheduled handler authentication/health response.
+- [x] Run TypeScript, Vitest, production build, and responsive login verification before the next checkpoint.
+
+# Enhancement & Monitoring — Showcase Login
+
+- [x] Add a clear post-authentication success state before routing to `/workspace`, without exposing credentials.
+- [x] Add a server-side `showcaseTrial` mutation and a password-less Showcase Trial button that starts the isolated `test` account session.
+- [x] Add an authenticated, idempotent Heartbeat callback that probes the login health contract without attempting to log in with or exposing a password.
+- [x] Register the login-health scheduled endpoint before the static/Vite fallthrough and document the production scheduling prerequisite.
+- [x] Add focused regression tests for the showcase trial boundary, login success UX, and scheduled handler authentication/health response.
+- [x] Run TypeScript, Vitest, production build, and responsive login verification before the next checkpoint.
+- [ ] Create and verify the production Heartbeat job after the deployed callback is confirmed reachable.

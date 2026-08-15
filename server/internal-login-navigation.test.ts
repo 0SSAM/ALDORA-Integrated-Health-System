@@ -5,8 +5,9 @@ import { resolve } from "node:path";
 describe("internal login navigation contract", () => {
   it("routes successful employee login to the protected workspace", () => {
     const loginSource = readFileSync(resolve(process.cwd(), "client/src/pages/Login.tsx"), "utf8");
-    expect(loginSource).toContain('setInternalError(""); setLocation("/workspace");');
-    expect(loginSource).not.toContain('setInternalError(""); setLocation("/");');
+    expect(loginSource).toContain("تم تسجيل الدخول بنجاح");
+    expect(loginSource).toContain('setLocation("/workspace")');
+    expect(loginSource).not.toContain('setLocation("/");');
   });
 });
 

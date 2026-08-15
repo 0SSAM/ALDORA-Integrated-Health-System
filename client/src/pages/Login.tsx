@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [internalError, setInternalError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
   const [recoveryOpen, setRecoveryOpen] = useState(Boolean(resetToken));
   const [recoveryUsername, setRecoveryUsername] = useState("");
   const [resetPassword, setResetPassword] = useState("");
@@ -37,10 +38,17 @@ export default function Login() {
 
   const internalLogin = trpc.auth.internalLogin.useMutation({
     onSuccess: result => {
-      if (!result.success) { setInternalError(result.message); return; }
-      setInternalError(""); setLocation("/workspace");
+      if (!result.success) { setAuthSuccess(""); setInternalError(result.message); return; }
+      setInternalError(""); setAuthSuccess("تم تسجيل الدخول بنجاح. جارٍ فتح مساحة العمل الآمنة…");
     },
-    onError: error => setInternalError(error.data?.code === "TOO_MANY_REQUESTS" ? "تم إيقاف المحاولات مؤقتاً للحماية. انتظر قليلاً ثم حاول مرة أخرى." : "تعذر التحقق من البيانات حالياً. تأكد من الاتصال وحاول مرة أخرى."),
+    onError: error => { setAuthSuccess(""); setInternalError(error.data?.code === "TOO_MANY_REQUESTS" ? "تم إيقاف المحاولات مؤقتاً للحماية. انتظر قليلاً ثم حاول مرة أخرى." : "تعذر التحقق من البيانات حالياً. تأكد من الاتصال وحاول مرة أخرى."); },
+  });
+  const showcaseTrial = trpc.auth.showcaseTrial.useMutation({
+    onSuccess: result => {
+      if (!result.success) { setAuthSuccess(""); setInternalError(result.message); return; }
+      setInternalError(""); setAuthSuccess("تم فتح بيئة العرض المعزولة بنجاح. جارٍ فتح مساحة العمل…");
+    },
+    onError: () => { setAuthSuccess(""); setInternalError("تعذر فتح بيئة العرض حالياً. حاول مرة أخرى لاحقاً."); },
   });
   const requestReset = trpc.auth.requestPasswordReset.useMutation({
     onSuccess: result => { setRecoveryError(""); setRecoverySuccess(result.message); },
@@ -72,6 +80,13 @@ export default function Login() {
     }
   };
   const recoveryPending = requestReset.isPending || completeReset.isPending;
+  const authPending = internalLogin.isPending || showcaseTrial.isPending;
+
+  useEffect(() => {
+    if (!authSuccess) return;
+    const timer = window.setTimeout(() => setLocation("/workspace"), 650);
+    return () => window.clearTimeout(timer);
+  }, [authSuccess, setLocation]);
 
   if (loading) return <main dir="rtl" className="grid min-h-screen place-items-center bg-[#f4f7fb] text-slate-600"><div className="flex items-center gap-3" role="status" aria-live="polite"><Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" /> جارٍ التحقق من الجلسة…</div></main>;
 
@@ -98,7 +113,9 @@ export default function Login() {
               <button type="button" onClick={() => { setRecoveryOpen(false); setRecoveryError(""); setRecoverySuccess(""); }} className="w-full text-sm text-slate-500 hover:text-slate-900">العودة إلى تسجيل الدخول</button>
             </form>
           </> : <>
-            <form className="mt-8 space-y-4" onSubmit={submitLogin} noValidate><div className="space-y-2"><Label htmlFor="internal-username">اسم المستخدم</Label><Input id="internal-username" autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="مثال: cashier.branch1" disabled={internalLogin.isPending} aria-invalid={Boolean(internalError)} /></div><div className="space-y-2"><Label htmlFor="internal-password">كلمة المرور</Label><Input id="internal-password" type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} disabled={internalLogin.isPending} aria-invalid={Boolean(internalError)} /></div><Notice error={internalError} /><Button type="submit" disabled={internalLogin.isPending} className="h-12 w-full bg-[#0d1b2a] text-base hover:bg-[#16324a]">{internalLogin.isPending ? <><Loader2 className="ml-2 h-4 w-4 animate-spin" aria-hidden="true" /> جارٍ التحقق من البيانات…</> : <><UserRound className="ml-2 h-4 w-4" /> دخول الموظفين</>}</Button></form>
+            <form className="mt-8 space-y-4" onSubmit={submitLogin} noValidate><div className="space-y-2"><Label htmlFor="internal-username">اسم المستخدم</Label><Input id="internal-username" autoComplete="username" value={username} onChange={e => { setUsername(e.target.value); setAuthSuccess(""); }} placeholder="مثال: cashier.branch1" disabled={authPending} aria-invalid={Boolean(internalError)} /></div><div className="space-y-2"><Label htmlFor="internal-password">كلمة المرور</Label><Input id="internal-password" type="password" autoComplete="current-password" value={password} onChange={e => { setPassword(e.target.value); setAuthSuccess(""); }} disabled={authPending} aria-invalid={Boolean(internalError)} /></div><Notice error={internalError} success={authSuccess} /><Button type="submit" disabled={authPending} className="h-12 w-full bg-[#0d1b2a] text-base hover:bg-[#16324a]">{internalLogin.isPending ? <><Loader2 className="ml-2 h-4 w-4 animate-spin" aria-hidden="true" /> جارٍ التحقق من البيانات…</> : <><UserRound className="ml-2 h-4 w-4" /> دخول الموظفين</>}</Button></form>
+            <Button type="button" variant="outline" onClick={() => { setInternalError(""); setAuthSuccess(""); showcaseTrial.mutate(); }} disabled={authPending} className="mt-3 h-12 w-full border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-100">{showcaseTrial.isPending ? <><Loader2 className="ml-2 h-4 w-4 animate-spin" aria-hidden="true" /> جارٍ فتح بيئة العرض…</> : <><ShieldCheck className="ml-2 h-4 w-4" /> تجربة الحساب المعزول</>}</Button>
+            <p className="mt-2 text-center text-xs leading-5 text-slate-500">دخول آمن إلى بيئة عرض غير إنتاجية. لا تُرسل كلمة مرور من هذا الزر.</p>
             <button type="button" onClick={() => { setRecoveryOpen(true); setRecoveryError(""); setRecoverySuccess(""); }} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-cyan-800 hover:text-cyan-950"><KeyRound className="h-4 w-4" /> نسيت كلمة المرور؟</button>
             <div className="my-7 flex items-center gap-3 text-xs text-slate-400"><span className="h-px flex-1 bg-slate-200" /><span>أو حساب الإدارة</span><span className="h-px flex-1 bg-slate-200" /></div><Button type="button" variant="outline" onClick={() => startLogin()} className="h-12 w-full border-cyan-200 bg-white text-cyan-900 hover:bg-cyan-50">المتابعة إلى دخول الإدارة الآمن</Button>
           </>}
