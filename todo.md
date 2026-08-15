@@ -1109,3 +1109,8 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Prepare formal bilingual product description, role-based user manuals, IT/admin/owner guide, proposal, ALDO naming explanation, diagrams, and visual assets.
 - [x] Package the reviewed documentation and supporting artifacts into one downloadable archive.
 - [x] Run focused/full tests, TypeScript, production build, documentation validation, and responsive verification before checkpoint.
+
+# Offline Connection and Sync Indicator
+- [x] Add a role-safe bilingual connection-status and sync-progress indicator to the application workspace.
+- [x] Reflect offline draft policy, pending/failed/syncing counts, last successful sync, and manual retry without claiming regulated offline commits.
+- [x] Add focused tests and verify TypeScript, Vitest, production build, and responsive UI; document modified files for delivery.
