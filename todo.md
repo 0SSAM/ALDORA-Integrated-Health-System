@@ -842,3 +842,35 @@
 - [x] Improve Arabic/English login validation errors and visible loading/submission states without exposing credentials or sensitive authentication details.
 - [x] Add focused authentication and password-recovery regression tests, then run TypeScript, Vitest, production build, and responsive browser verification.
 - [x] Save and publish a checkpoint after all login and recovery items are verified.
+
+
+# Verified Recovery Channel and 2FA
+
+- [ ] Review enabled connector configuration and choose an approved email or SMS/OTP delivery path without exposing secrets.
+- [ ] Request and validate mandatory provider credentials and sender/issuer configuration for password recovery and 2FA delivery.
+- [ ] Add 2FA enrollment, challenge, verification, recovery-code, lockout, and audit data structures with strict organization/user boundaries.
+- [ ] Connect password-recovery tokens to a real verified delivery channel with generic responses, expiry, single use, throttling, and fail-closed behavior.
+- [ ] Require 2FA at login for owner and internal employees according to policy, with secure session issuance only after successful verification.
+- [ ] Add Arabic/English UI for 2FA setup, OTP challenge, recovery, password recovery delivery status, and clear loading/error states.
+- [ ] Add tests for provider delivery failure, OTP replay/expiry/rate limits, recovery-code handling, tenant isolation, and authentication bypass resistance.
+- [ ] Run TypeScript, Vitest, production build, responsive verification, and save/publish a checkpoint.
+
+
+# ICD-11 Clinical Coding Integration
+
+- [ ] Research and record the official WHO ICD-11 browser/API source, release/version, licensing, language coverage, and update obligations.
+- [ ] Define ICD-11 catalog, extension-code, version, provenance, and jurisdiction-boundary models without copying unverified or unlicensed data.
+- [ ] Implement Arabic/English ICD-11 search with exact/prefix/full-text matching, synonym handling, version visibility, and safe empty/error states.
+- [ ] Add clinician diagnosis selection, draft/final status, verification, encounter/patient linkage, and immutable audit history.
+- [ ] Link verified ICD-11 diagnoses to hospital billing, insurance claims, reports, and GAHAR evidence workflows without changing financial outcomes automatically.
+- [ ] Enforce organization, branch, jurisdiction, role, and least-privilege access controls for ICD-11 data and updates.
+- [ ] Add controlled catalog refresh/version activation workflow with evidence, approval, rollback, and fail-closed stale-version behavior.
+- [ ] Add regression tests, TypeScript/build checks, responsive UI verification, documentation, and a published checkpoint.
+
+
+# Alternative Disease Classification Sources
+
+- [x] Identify free or open alternatives for disease classification and terminology lookup, including official national/open datasets and public APIs.
+- [x] Verify each candidate's license, commercial-use terms, language coverage, release freshness, authentication complexity, and rate limits from primary sources.
+- [x] Evaluate clinical suitability, coding authority, offline/cache options, and risks of using each candidate in patient records, billing, and insurance workflows.
+- [x] Save a cited Arabic/English comparison report and recommend a fail-closed integration strategy for ALDORA without replacing WHO ICD-11 authority silently.
