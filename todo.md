@@ -893,3 +893,45 @@
 - [x] Implement NLM result caching with retrieval timestamp, dataset/version metadata, source URI, bounded memory/storage, and no patient data in cache keys or values.
 - [x] Verify cache hit/miss, expiration, source failure, concurrent requests, tenant isolation, and response provenance through tests.
 - [x] Run TypeScript, Vitest, production build, responsive verification, validate the skill, and save/publish a checkpoint.
+
+
+# Admin-Only NLM Cache Refresh
+
+- [ ] Update the reusable ALDORA skill with an admin-only cache invalidation workflow, audit requirements, and UI/server separation.
+- [ ] Add a server-side admin-only NLM cache refresh/invalidation procedure with scope checks, rate limiting, and audit metadata.
+- [ ] Add an Arabic/English manual refresh button visible only to administrators, with loading, success, failure, and last-retrieved/version status.
+- [ ] Add regression tests proving non-admin denial, audit behavior, cache invalidation, refresh success/failure, and no automatic diagnosis or billing mutation.
+- [ ] Run TypeScript, Vitest, production build, responsive verification, validate the reusable skill, and save/publish a checkpoint.
+
+
+# Isolated Investor Showcase Account
+
+- [ ] Define a separate investor-showcase tenant/environment boundary with no access to production records, PHI, customer data, secrets, or external regulatory connectors.
+- [ ] Add a dedicated showcase account type and safe credential lifecycle; do not use weak production credentials such as test/test.
+- [ ] Add read-only/demo-safe permissions, blocked destructive/export/admin actions, audit logging, throttling, and session expiry for showcase users.
+- [ ] Provide isolated showcase data and clear UI labeling so investors understand they are viewing a demonstration environment.
+- [ ] Add investor contact CTA without exposing personal contact data, plus Arabic/English showcase guidance.
+- [ ] Add authentication, tenant-isolation, authorization, and UI regression tests; run TypeScript, Vitest, build, responsive verification, and save/publish a checkpoint.
+
+
+- [ ] Confirmed deployment model: investor showcase account runs on the same site but is bound to a separate showcase organization and isolated scope.
+- [ ] Confirmed showcase account must not use test/test credentials; use a strong managed credential with controlled rotation.
+
+
+- [ ] Confirmed showcase credential choice: username `test` with a strong managed password, not `test/test`.
+- [ ] Confirmed same-site showcase scope: separate organization, labeled non-production data, trial permissions, no delete/export/production/sensitive-connector access.
+
+
+- [ ] Enforce server-side showcase simulation mode so sales, stock movements, receipts, invoices, claims, and other mutations cannot alter production balances or persistent production records.
+- [ ] Block external connectors, notifications, exports, deletion, and irreversible actions for showcase sessions, with explicit simulation audit events.
+- [ ] Provide isolated showcase data stores/records and visible Arabic/English simulation labels for all trial transactions.
+- [ ] Add regression tests proving showcase transactions never cross organization boundaries or mutate production balances.
+
+# Investor Showcase TODO
+- [ ] Create isolated ALDORA Investor Showcase organization, branch, and test account records
+- [ ] Populate showcase-only synthetic products, inventory, and sales data
+- [ ] Verify showcase login, scope isolation, and server-side mutation simulation guard
+- [ ] Finalize showcase UI labels and access documentation
+- [ ] Fix showcase login contract test returning HTTP 500 and rerun authentication tests
+- [x] Review Pharma eMarket and UPA portals for read-only integration requirements and official evidence
+- [x] Switch tamper-evident audit signing from short JWT_SECRET to validated AUDIT_SIGNING_KEY and pass its regression test

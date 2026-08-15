@@ -29,11 +29,11 @@ describe("internal employee authentication contract", () => {
   });
 
   it("requires a configured audit signing key", () => {
-    const previous = process.env.JWT_SECRET;
-    delete process.env.JWT_SECRET;
+    const previous = process.env.AUDIT_SIGNING_KEY;
+    delete process.env.AUDIT_SIGNING_KEY;
     expect(() => hashAuditRecord({ eventType: "test", createdAt: new Date().toISOString() })).toThrow(/Audit signing key/);
-    if (previous === undefined) delete process.env.JWT_SECRET;
-    else process.env.JWT_SECRET = previous;
+    if (previous === undefined) delete process.env.AUDIT_SIGNING_KEY;
+    else process.env.AUDIT_SIGNING_KEY = previous;
   });
 
   it("uses a bounded lockout threshold", () => {

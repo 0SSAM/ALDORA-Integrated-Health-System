@@ -69,7 +69,7 @@ export function hashSessionToken(token: string) {
 }
 
 export function hashAuditRecord(input: { previousHash?: string | null; eventType: string; userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; requestId?: string | null; createdAt: string }) {
-  const auditKey = process.env.JWT_SECRET;
+  const auditKey = process.env.AUDIT_SIGNING_KEY;
   if (!auditKey || auditKey.length < 32) throw new Error("Audit signing key is not configured");
   return createHmac("sha256", auditKey)
     .update(JSON.stringify(input))

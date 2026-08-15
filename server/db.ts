@@ -141,10 +141,10 @@ export async function getInternalScopeForUser(userId: number) {
   return result[0];
 }
 
-export async function createInternalSession(input: { token: string; userId: number; organizationId: number; branchId: number; jurisdictionId: number; role: string; expiresAt: Date }) {
+export async function createInternalSession(input: { token: string; userId: number; organizationId: number; branchId: number; jurisdictionId: number; role: string; expiresAt: Date; sessionMode?: "production" | "showcase" }) {
   const db = await getDb();
   if (!db) throw new Error("Internal authentication requires a database");
-  await db.insert(internalSessions).values({ sessionHash: hashSessionToken(input.token), userId: input.userId, organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId, role: input.role, expiresAt: input.expiresAt });
+  await db.insert(internalSessions).values({ sessionHash: hashSessionToken(input.token), userId: input.userId, organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId, role: input.role, expiresAt: input.expiresAt, sessionMode: input.sessionMode ?? "production" });
 }
 
 export async function getInternalSession(token: string) {
@@ -162,7 +162,7 @@ export async function revokeInternalSession(token: string) {
   await db.update(internalSessions).set({ revokedAt: new Date() }).where(and(eq(internalSessions.sessionHash, hashSessionToken(token)), isNull(internalSessions.revokedAt)));
 }
 
-export async function recordAuthenticationEvent(input: { userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; eventType: "login_success" | "login_failure" | "logout" | "lockout" | "session_revoked" | "password_reset_requested" | "password_reset_completed"; source: "internal" | "oauth"; requestId?: string | null }) {
+export async function recordAuthenticationEvent(input: { userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; eventType: "login_success" | "login_failure" | "logout" | "lockout" | "session_revoked" | "password_reset_requested" | "password_reset_completed" | "cache_refreshed" | "showcase_mutation_simulated"; source: "internal" | "oauth"; requestId?: string | null }) {
   const db = await getDb();
   if (!db) return;
   const previous = await db.select({ recordHash: authenticationEvents.recordHash }).from(authenticationEvents).orderBy(desc(authenticationEvents.id)).limit(1);

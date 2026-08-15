@@ -24,7 +24,14 @@ const requireUser = t.middleware(async opts => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(requireUser);
+const blockShowcaseMutations = t.middleware(async opts => {
+  if (opts.type === "mutation" && opts.ctx.internalSession?.session.sessionMode === "showcase") {
+    throw new TRPCError({ code: "FORBIDDEN", message: "هذه العملية محاكاة فقط ولا تُحفظ من حساب العرض." });
+  }
+  return opts.next();
+});
+
+export const protectedProcedure = t.procedure.use(requireUser).use(blockShowcaseMutations);
 
 export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
@@ -41,4 +48,4 @@ export const adminProcedure = t.procedure.use(
       },
     });
   }),
-);
+).use(blockShowcaseMutations);

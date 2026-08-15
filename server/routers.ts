@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getSessionCookieOptions, isSecureRequest } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { searchNlmIcd10Cm } from "./domain/nlm-icd10";
+import { clearNlmIcd10Cache, getNlmIcd10CacheStats, searchNlmIcd10Cm } from "./domain/nlm-icd10";
 import { erpRouter } from "./routers/erp";
 import { regionalRouter } from "./routers/regional";
 import { organizationsRouter } from "./routers/organizations";
@@ -48,10 +48,10 @@ export const appRouter = router({
         return invalid();
       }
       const token = createInternalSessionToken();
-      await createInternalSession({ token, userId: credential.userId, ...scope, expiresAt: new Date(now.getTime() + INTERNAL_SESSION_TTL_MS) });
+      await createInternalSession({ token, userId: credential.userId, ...scope, sessionMode: credential.accountType === "showcase" ? "showcase" : "production", expiresAt: new Date(now.getTime() + INTERNAL_SESSION_TTL_MS) });
       await recordAuthenticationEvent({ username, userId: credential.userId, ...scope, eventType: "login_success", source: "internal" });
       ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), maxAge: INTERNAL_SESSION_TTL_MS, path: "/" });
-      return { success: true as const, mode: "internal" as const, scope };
+      return { success: true as const, mode: "internal" as const, scope, accountType: credential.accountType, sessionMode: credential.accountType === "showcase" ? "showcase" as const : "production" as const };
     }),
     requestPasswordReset: publicProcedure.input(z.object({ username: z.string().min(3).max(80) })).mutation(async ({ input }) => {
       const generic = { success: true as const, message: "إذا كانت بيانات الحساب صحيحة، فسيتم إرسال تعليمات الاستعادة عبر قناة المؤسسة المعتمدة." };
@@ -105,6 +105,12 @@ export const appRouter = router({
         warning: "NLM ICD-10-CM is a US reference source and does not finalize diagnoses, claims, or billing.",
         results: await searchNlmIcd10Cm(input.terms, { count: input.count }),
       };
+    }),
+    nlmIcd10CmRefresh: protectedProcedure.mutation(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN", message: "تحديث النتائج المخزنة متاح للمسؤولين فقط." });
+      clearNlmIcd10Cache();
+      await recordAuthenticationEvent({ userId: ctx.user.id, eventType: "cache_refreshed", source: "oauth" });
+      return { success: true as const, message: "تم تحديث نتائج NLM المرجعية. سيُعاد جلبها عند البحث التالي.", stats: getNlmIcd10CacheStats() };
     }),
   }),
 });

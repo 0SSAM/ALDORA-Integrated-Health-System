@@ -211,6 +211,20 @@
       "when": 1786793116995,
       "tag": "0029_fat_tinkerer",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1786801490590,
+      "tag": "0030_stiff_whizzer",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1786802425531,
+      "tag": "0031_polite_piledriver",
+      "breakpoints": true
     }
   ]
 }
