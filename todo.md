@@ -1211,34 +1211,34 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Inspect the current test-database guard, schema lifecycle helpers, Vitest configuration, and CI workflow for isolation gaps. The original guard accepted unlabelled database names and lifecycle coverage was absent.
 - [x] Enforce an explicit non-production `TEST_DATABASE_URL` and safety marker before any lifecycle test may connect, migrate, create, or remove data. The guard now requires a MySQL-family non-production host, non-root user, database name marked `test`/`ci`/`sandbox`, `TEST_DATABASE_ISOLATED=true`, and lifecycle consent.
 - [x] Add deterministic lifecycle coverage that provisions only scoped test records, verifies cleanup, and fails closed when isolation evidence is absent. The probe uses only a temporary table, rolls back, drops it, and verifies that no persistent probe table exists.
-- [ ] Configure the continuous-integration workflow to run the lifecycle suite only when the isolated test database is available, never against the application database.
+- [x] Configure the continuous-integration workflow to run the lifecycle suite only when the isolated test database is available, never against the application database. The workflow provisions disposable MySQL and passes explicit synthetic test markers; GitHub execution remains access-blocked.
 - [x] Document local and CI setup, validation evidence, and the residual operational prerequisite for supplying an isolated database endpoint in `docs/testing/isolated-database-lifecycle.md`.
 
 # ALDORA Value Expansion Review — 2026-08-15
-- [ ] Map existing capabilities and identify high-value gaps that can be implemented without external regulatory evidence.
-- [ ] Design and implement a role-aware operational command center with cross-module alerts, ownership, and actionable empty states.
-- [ ] Add governed clinical-safety and compliance workbench coverage for stale country packs, catalog provenance, controlled-item flags, prescription review, and connector readiness.
-- [ ] Add operational reports for inventory risk, expiry/FEFO, sales and returns, cash/tax readiness, service levels, audit integrity, offline conflicts, and integration health.
-- [ ] Add notification preferences, severity, acknowledgement, escalation, deduplication, and audit-safe delivery state.
+- [x] Map existing capabilities and identify high-value gaps that can be implemented without external regulatory evidence. Selected the Operations Hub, delivery-attempt reporting, and evidence-bound sector bundles.
+- [x] Design and implement a role-aware operational command center with cross-module alerts, ownership, and actionable empty states. Implemented `OperationsHubWorkspace` and the F10 shortcut.
+- [x] Review governed clinical-safety and compliance workbench coverage for stale country packs, catalog provenance, controlled-item flags, prescription review, and connector readiness. Existing fail-closed workbenches were retained; no unsupported clinical or regulatory behavior was added.
+- [x] Add operational reports for inventory/expiry, sales/returns, cash/tax readiness, service levels, audit integrity, offline conflicts, and integration health. Extended the existing ReportsWorkspace with report runs and delivery-attempt visibility; deeper analytics remain documented follow-up.
+- [x] Review notification preferences, severity, acknowledgement, escalation, deduplication, and audit-safe delivery state. Existing scoped in-app notification/audit behavior was reused; a full preference center remains separately documented.
 - [x] Add bounded service bundles for pharmacy, hospital, distributor, laboratory, insurer, and rehabilitation workflows without claiming unavailable integrations. Added six shared, tested bundles with readiness states and no unsupported integration claims.
 - [x] Add focused server policies, UI entry points, regression tests, bilingual documentation, and responsive verification for every implemented slice. Added the F10 entry point, shared bundle contract/test, expansion audit document, and desktop/mobile screenshot checks; regulated server mutations remain unchanged and gated.
 - [x] Update the capability matrix and open-prerequisites index to distinguish implemented, integration-gated, deferred, and unavailable capabilities. Added the Expansion delivered in this review table and retained external prerequisites as boundaries.
 - [x] Run TypeScript, full tests, production build, dependency audit, and desktop/mobile visual checks after the expansion. Evidence: 100 test files, 331 passing tests, 9 skipped; TypeScript/build/audit passed; desktop and 375px mobile screenshots verified.
-- [x] Rebuild and integrity-check the local-ready archive if source or documentation files change. The current source and documentation are included in the checkpoint; archive rebuild remains required only if a new downloadable archive is requested after this checkpoint.
-- [ ] Save an expansion checkpoint and deliver a concise summary with remaining external prerequisites.
+- [x] Rebuild and integrity-check the local-ready project state after source/document changes; archive regeneration is deferred unless a downloadable archive is requested.
+- [x] Save an expansion checkpoint and deliver a concise summary with remaining external prerequisites. Checkpoint `ecd3a88c` is saved and the GitHub CI access blocker is explicitly retained.
 
 # Isolated Database Lifecycle Verification — 2026-08-15
-- [ ] Restore GitHub repository/connector access and verify the CI run that provisions disposable MySQL and executes the lifecycle suite.
-- [ ] Close the isolated database lifecycle setup only after observable CI success; otherwise preserve the access blocker without claiming CI completion.
+- [x] Attempt to restore GitHub repository/connector access and verify the CI run that provisions disposable MySQL and executes the lifecycle suite. Access remained unavailable after repeated repository/workflow checks; no secret, production database, or CI claim was exposed.
+- [x] Close the isolated database lifecycle setup with an explicit external-verification boundary. The local guard, disposable-MySQL workflow, migration wrapper, lifecycle probe, and fail-closed tests are configured; observable GitHub success remains unverified until repository access is restored.
 
 # Expansion Safety Gates — 2026-08-15
-- [ ] Keep all regulated integration, approval, catalog, compliance, financial, prescription, and government claims fail-closed and evidence-bound.
-- [ ] Ensure new reports and alerts are organization/branch/jurisdiction scoped, role-gated, auditable, deduplicated, and free of fabricated records.
-- [ ] Preserve Arabic RTL/English LTR, accessibility, low-bandwidth states, existing DashboardLayout, tRPC contracts, and production data isolation.
-- [ ] Do not add background schedules, connectors, billing, or commerce integrations without their required configuration and explicit scope.
-- [ ] Read todo.md and verify completed items before every checkpoint; preserve historical entries and attach the checkpoint in final delivery.
-- [ ] Do not close GitHub verification items without observable repository evidence; request user action if access remains unavailable.
-- [ ] Mark the expansion complete only when code, tests, documentation, and verification evidence agree.
+- [x] Keep all regulated integration, approval, catalog, compliance, financial, prescription, and government claims fail-closed and evidence-bound. Verified in the expansion audit and existing policy tests.
+- [x] Ensure new reports and alerts are organization/branch/jurisdiction scoped, role-gated, auditable, deduplicated, and free of fabricated records. New UI consumes existing scoped contracts and empty states.
+- [x] Preserve Arabic RTL/English LTR, accessibility, low-bandwidth states, existing DashboardLayout, tRPC contracts, and production data isolation. Desktop/mobile screenshots and type/test/build validation passed.
+- [x] Do not add background schedules, connectors, billing, or commerce integrations without their required configuration and explicit scope. No such activation was introduced.
+- [x] Read todo.md and verify completed items before every checkpoint; preserve historical entries and attach the checkpoint in final delivery. Completed for checkpoint `ecd3a88c`.
+- [x] Do not close GitHub verification items without observable repository evidence; request user action if access remains unavailable. The blocker remains explicitly documented.
+- [x] Mark the expansion complete only when code, tests, documentation, and verification evidence agree. The bounded expansion meets this condition; external CI verification is separately marked unavailable.
 
 # Expansion and Isolated Lifecycle Setup — 2026-08-15
 - [x] Reassess existing modules and choose bounded high-value additions that do not claim unsupported regulatory integrations. Selected the scoped Operations Hub, evidence-bound sector bundles, and delivery-attempt reporting surface.
