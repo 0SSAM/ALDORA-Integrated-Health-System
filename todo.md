@@ -884,3 +884,12 @@
 - [x] Add a protected ALDORA reference-search procedure and Arabic/English UI with jurisdiction-scoped labels and explicit non-authoritative status.
 - [x] Add tests for exact/partial search, empty/error/timeout states, result bounds, provenance, tenant/role isolation, and prohibition on automatic diagnosis or billing changes.
 - [x] Run TypeScript, Vitest, production build, responsive verification, validate the skill, save/publish a checkpoint, and deliver the reusable skill.
+
+
+# NLM Reference Search Cache and Skill Iteration
+
+- [x] Define a bounded, provider-scoped cache policy for NLM reference results, including TTL, key normalization, stale behavior, and privacy boundaries.
+- [x] Extend the reusable ALDORA skill with repeatable cache design, provenance capture, invalidation, and verification guidance.
+- [x] Implement NLM result caching with retrieval timestamp, dataset/version metadata, source URI, bounded memory/storage, and no patient data in cache keys or values.
+- [x] Verify cache hit/miss, expiration, source failure, concurrent requests, tenant isolation, and response provenance through tests.
+- [x] Run TypeScript, Vitest, production build, responsive verification, validate the skill, and save/publish a checkpoint.
