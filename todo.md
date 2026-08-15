@@ -1180,3 +1180,9 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Verify repository, branch, existing Dependabot configuration, and GitHub security-update availability.
 - [x] Enable Dependabot security updates and configure safe dependency update grouping/scheduling without auto-merging major changes.
 - [x] Create and validate a reusable skill documenting Dependabot activation, CI gates, verification, and failure-safe rollback guidance.
+
+# ALDORA Local-Ready Archive Refresh — 2026-08-15
+- [x] Inventory the latest project files, CI, Dependabot, security policy, tests, and documentation for safe packaging.
+- [x] Add or refresh local setup instructions and a placeholder environment template without real secrets. (Added LOCAL_SETUP.md; real environment files remain excluded by design.)
+- [x] Build one complete updated ZIP archive and verify integrity, manifest, and absence of secrets or generated dependencies.
+- [x] Validate the documented local startup sequence, save the project checkpoint, and deliver the ZIP directly.
