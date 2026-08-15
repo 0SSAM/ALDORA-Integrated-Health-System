@@ -1306,3 +1306,11 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add focused regression tests for the showcase trial boundary, login success UX, and scheduled handler authentication/health response.
 - [x] Run TypeScript, Vitest, production build, and responsive login verification before the next checkpoint.
 - [x] Create and verify the production Heartbeat job after the deployed callback is confirmed reachable. Task UID: `i2xXRmbB233gsrfeuEqS68`; enabled schedule: `0 */5 * * * *` UTC.
+
+# Showcase Exploration Access Repair — 2026-08-16
+
+- [x] Diagnose why the isolated showcase account exposes only the overview route on the mobile sidebar: the captured page was a non-authenticated workspace shell rather than an active showcase session.
+- [x] Add a server-enforced showcase navigation allowlist for safe, non-production, non-destructive demonstration modules; destructive showcase mutations remain blocked in the tRPC boundary.
+- [x] Make the mobile sidebar show the permitted showcase modules with clear Arabic labels and a visible read-only/demo notice; add an overview exploration launcher.
+- [x] Add focused regression coverage proving the showcase account can view permitted modules but cannot reach destructive, export, administration, or production-data paths.
+- [x] Verify the repaired exploration flow at a mobile viewport, run TypeScript/Vitest/build, and save a checkpoint.
