@@ -776,3 +776,22 @@
 - [x] Preserve fail-closed behavior when branch/jurisdiction scope, history, or verified inventory inputs are unavailable.
 - [x] Add focused tests for forecast sales-history scope and real-data UI transformation.
 - [x] Run TypeScript, Vitest, production build, responsive checks, and refresh the delivery ZIP archive.
+
+
+# Comprehensive Integration Review
+
+- [ ] Audit end-to-end integration between authentication, organization/branch/jurisdiction scope, roles, and module navigation.
+- [ ] Audit server procedures and database boundaries for POS, inventory, prescriptions, catalog, customer care, call centre, procurement, reports, notifications, and offline workflows.
+- [ ] Audit frontend-to-backend contracts, loading/error/empty states, and real-versus-demo data boundaries.
+- [ ] Fix confirmed integration gaps without activating unverified regulatory, hardware, surveillance, or external-provider connectors.
+- [ ] Add or update integration regression tests and run TypeScript, Vitest, production build, and responsive visual verification.
+- [ ] Update integration documentation and save a new checkpoint/archive after all items are verified.
+
+
+# Confirmed Integration Gaps
+
+- [x] Connect the real insurance request workflow to an authenticated workspace with scoped list/create/transition states and fail-closed messaging.
+- [x] Connect scheduled/report-definition and report-run workflows to a discoverable reports workspace, preserving organization/jurisdiction authorization.
+- [x] Connect promotion list/create/approve workflows to an authorized workspace and expose statutory-cap/readiness states.
+- [x] Add a scoped organization-management entry point for authorized managers/admins, or document it as intentionally server-only.
+- [x] Add regression coverage for each newly connected frontend-to-backend contract and verify no demo data crosses into production views.
