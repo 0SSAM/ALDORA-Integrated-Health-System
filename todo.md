@@ -638,3 +638,20 @@
 - [x] Apply only reproducible fixes and additions, then run focused and full validation with visual checks.
 - [x] Produce a dated comprehensive review report separating implemented controls, policy-only boundaries, and external blockers.
 - [x] Reduce the main client bundle by lazy-loading Home and Login behind a shared route fallback, and harden internal-auth parameter validation so malformed scrypt records or missing audit HMAC keys fail closed.
+
+# Interactive Demo Enhancement 2026-08-15
+- [ ] Replace the current read-only/demo landing behavior with an interactive demo workspace that exposes safe sample data for core ERP/CRM modules.
+- [ ] Add explicit demo-mode guardrails: synthetic data banner, no real persistence, no regulated submission, no external connector calls, and resettable demo state.
+- [ ] Add demo actions for browsing catalog, preparing a sample POS cart, reviewing a prescription workflow, viewing customer care/call-centre examples, and inspecting reports/alerts.
+- [ ] Add focused tests for demo-mode isolation, reset behavior, and blocked regulated/external mutations.
+- [ ] Verify desktop and mobile demo flows visually and run TypeScript, Vitest, and production build before checkpoint.
+- [ ] Document the demo entry path and the difference between simulated results and production integrations.
+
+# Interactive Demo Enhancement
+
+- [x] Replace the read-only Demo placeholder with a local synthetic-data interactive workspace.
+- [x] Expose all Demo navigation modules while keeping real-user role and organization scoping unchanged.
+- [x] Add safe local simulations for POS, FEFO inventory, prescription review, insurance, catalog, customer care, call centre, compliance, finance, compounding, and people views.
+- [x] Add Demo reset action and explicit fail-closed/no-external-submission messaging.
+- [x] Add unit coverage for Demo discount limits and synthetic catalog search.
+- [x] Validate TypeScript, production build, full Vitest regression, and desktop visual routes.
