@@ -715,3 +715,88 @@ export const hospitalBillingAccounts = mysqlTable("hospital_billing_accounts", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, table => ({ scopeIdx: index("hospital_billing_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), patientIdx: index("hospital_billing_patient_idx").on(table.organizationId, table.patientId) }));
+
+
+/** GAHAR readiness evidence management; official accreditation remains fail-closed. */
+export const gaharReadinessProfiles = mysqlTable("gahar_readiness_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId").notNull(),
+  facilityId: int("facilityId").notNull(),
+  facilityType: mysqlEnum("facilityType", ["government_hospital", "private_hospital", "primary_care", "laboratory", "radiology", "rehabilitation", "mental_health", "extended_care"]).notNull(),
+  standardFamily: varchar("standardFamily", { length: 160 }).notNull(),
+  standardVersion: varchar("standardVersion", { length: 80 }).notNull(),
+  effectiveFrom: timestamp("effectiveFrom"),
+  status: mysqlEnum("status", ["draft", "self_assessment", "action_required", "ready_for_review", "submitted_blocked", "archived"]).default("draft").notNull(),
+  officialSubmissionGate: mysqlEnum("officialSubmissionGate", ["not_authorized", "test_ready", "production_authorized"]).default("not_authorized").notNull(),
+  ownerUserId: int("ownerUserId").notNull(),
+  reviewDueAt: timestamp("reviewDueAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("gahar_profiles_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), facilityIdx: index("gahar_profiles_facility_idx").on(table.facilityId) }));
+
+export const gaharCriteria = mysqlTable("gahar_criteria", {
+  id: int("id").autoincrement().primaryKey(),
+  profileId: int("profileId").notNull(),
+  orientation: mysqlEnum("orientation", ["patient_centered", "organization_centered"]).notNull(),
+  domainCode: varchar("domainCode", { length: 80 }).notNull(),
+  criterionCode: varchar("criterionCode", { length: 120 }).notNull(),
+  title: varchar("title", { length: 240 }).notNull(),
+  requirementSummary: text("requirementSummary").notNull(),
+  ownerUserId: int("ownerUserId"),
+  reviewCycleDays: int("reviewCycleDays").default(365).notNull(),
+  status: mysqlEnum("status", ["not_started", "in_progress", "partially_met", "met", "not_applicable", "blocked"]).default("not_started").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ profileStatusIdx: index("gahar_criteria_profile_status_idx").on(table.profileId, table.status), codeIdx: uniqueIndex("gahar_criteria_profile_code_idx").on(table.profileId, table.criterionCode) }));
+
+export const gaharEvidence = mysqlTable("gahar_evidence", {
+  id: int("id").autoincrement().primaryKey(),
+  profileId: int("profileId").notNull(),
+  criterionId: int("criterionId").notNull(),
+  evidenceType: mysqlEnum("evidenceType", ["policy", "procedure", "training", "audit", "indicator", "incident", "record", "attachment"]).notNull(),
+  title: varchar("title", { length: 240 }).notNull(),
+  referenceKey: varchar("referenceKey", { length: 180 }),
+  contentHash: varchar("contentHash", { length: 128 }),
+  verificationStatus: mysqlEnum("verificationStatus", ["unverified", "verified_internal", "rejected", "expired"]).default("unverified").notNull(),
+  verifiedByUserId: int("verifiedByUserId"),
+  validFrom: timestamp("validFrom"),
+  validUntil: timestamp("validUntil"),
+  notesEncrypted: text("notesEncrypted"),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ criterionStatusIdx: index("gahar_evidence_criterion_status_idx").on(table.criterionId, table.verificationStatus), profileIdx: index("gahar_evidence_profile_idx").on(table.profileId) }));
+
+export const gaharCorrectiveActions = mysqlTable("gahar_corrective_actions", {
+  id: int("id").autoincrement().primaryKey(),
+  profileId: int("profileId").notNull(),
+  criterionId: int("criterionId").notNull(),
+  title: varchar("title", { length: 240 }).notNull(),
+  riskLevel: mysqlEnum("riskLevel", ["low", "moderate", "high", "critical"]).notNull(),
+  status: mysqlEnum("status", ["open", "assigned", "in_progress", "pending_verification", "closed", "overdue"]).default("open").notNull(),
+  ownerUserId: int("ownerUserId").notNull(),
+  dueAt: timestamp("dueAt"),
+  resolutionEncrypted: text("resolutionEncrypted"),
+  verifiedByUserId: int("verifiedByUserId"),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ profileStatusIdx: index("gahar_actions_profile_status_idx").on(table.profileId, table.status) }));
+
+export const gaharQualityIndicators = mysqlTable("gahar_quality_indicators", {
+  id: int("id").autoincrement().primaryKey(),
+  profileId: int("profileId").notNull(),
+  code: varchar("code", { length: 100 }).notNull(),
+  name: varchar("name", { length: 240 }).notNull(),
+  periodStart: timestamp("periodStart").notNull(),
+  periodEnd: timestamp("periodEnd").notNull(),
+  numerator: decimal("numerator", { precision: 14, scale: 4 }).default("0").notNull(),
+  denominator: decimal("denominator", { precision: 14, scale: 4 }).default("0").notNull(),
+  value: decimal("value", { precision: 14, scale: 4 }),
+  sourceStatus: mysqlEnum("sourceStatus", ["internal_verified", "internal_pending", "external_blocked"]).default("internal_pending").notNull(),
+  reviewedByUserId: int("reviewedByUserId"),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ profilePeriodIdx: index("gahar_indicators_profile_period_idx").on(table.profileId, table.periodStart, table.periodEnd), codeIdx: uniqueIndex("gahar_indicators_profile_code_period_idx").on(table.profileId, table.code, table.periodStart, table.periodEnd) }));

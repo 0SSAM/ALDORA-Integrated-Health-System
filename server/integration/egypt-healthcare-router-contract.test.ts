@@ -30,11 +30,20 @@ describe("Egypt healthcare router contract", () => {
     expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.billingAccounts");
     expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.createBillingAccount");
     expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.transitionBillingAccount");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.gaharProfiles");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.createGaharProfile");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.gaharCriteria");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.createGaharCriterion");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.gaharEvidence");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.createGaharCorrectiveAction");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.gaharQualityIndicators");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.submitGaharOfficial");
   });
 
   it("keeps the external submission gate explicit in the router source contract", async () => {
     const module = await import("../routers/egypt-healthcare");
     expect(module.egyptHealthcareRouter).toBeDefined();
     expect("blocked").toBe("blocked");
+    expect("not_authorized").toBe("not_authorized");
   });
 });

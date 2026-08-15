@@ -813,3 +813,13 @@
 - [x] Expand universal health insurance internally: beneficiary eligibility, provider/payer contracts, preauthorization, claims, adjudication states, remittance/reconciliation, appeals, and audit.
 - [x] Keep Egypt external adapters blocked until official endpoint specifications, credentials, test environment, acceptance evidence, and responsible authority are supplied.
 - [x] Add schema migrations, server procedures, UI workspaces, scope/security tests, full validation, documentation, and an updated checkpoint/archive.
+
+
+# GAHAR and Egypt Hospital Accreditation Readiness
+
+- [x] Research and record current official GAHAR accreditation domains, standards, manuals, and evidence requirements with source dates and URLs.
+- [x] Add scoped facility accreditation profiles, standard/domain catalog, readiness assessments, evidence register, corrective actions, and approval states.
+- [x] Add patient-safety, infection-prevention, medication-safety, emergency preparedness, credentialing, incident reporting, complaints, quality indicators, and audit workflows.
+- [x] Add government/private hospital dashboards and reports without claiming accreditation or substituting for GAHAR inspection.
+- [x] Keep official submission, accreditation decision, and any external data exchange fail-closed until authorized specifications and credentials exist.
+- [x] Add tests, documentation, visual verification, and checkpoint/archive after implementation.

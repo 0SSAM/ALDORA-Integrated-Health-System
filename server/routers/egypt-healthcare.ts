@@ -4,7 +4,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { branches, branchJurisdictions, healthcareAdmissions, healthcareAppointments, healthcareBeds, healthcareClinicalOrders, healthcareEncounters, healthcareFacilities, healthcarePatients, healthcareReferrals, hospitalBillingAccounts, insuranceAppeals, insuranceClaims, insuranceMembers, insurancePayerContracts, insurancePreauthorizations, insuranceRemittances, jurisdictionProfiles, organizationMemberships } from "../../drizzle/schema";
+import { branches, branchJurisdictions, healthcareAdmissions, healthcareAppointments, healthcareBeds, healthcareClinicalOrders, healthcareEncounters, healthcareFacilities, healthcarePatients, healthcareReferrals, hospitalBillingAccounts, insuranceAppeals, insuranceClaims, insuranceMembers, insurancePayerContracts, insurancePreauthorizations, insuranceRemittances, gaharReadinessProfiles, gaharCriteria, gaharEvidence, gaharCorrectiveActions, gaharQualityIndicators, jurisdictionProfiles, organizationMemberships } from "../../drizzle/schema";
 
 const facilityType = z.enum(["government_hospital", "private_hospital", "primary_care", "laboratory", "radiology", "rehabilitation"]);
 const claimStatus = z.enum(["draft", "ready", "submitted", "received", "under_review", "approved", "partially_approved", "rejected", "appealed", "paid", "reconciled", "cancelled"]);
@@ -224,5 +224,66 @@ export const egyptHealthcareRouter = router({
     if (["submitted", "received", "under_review", "approved", "partially_approved", "paid", "reconciled"].includes(input.toStatus) && row.credentialGate !== "production_ready") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Official payer credentials and acceptance evidence are required before external claim states" });
     await db.update(insuranceClaims).set({ status: input.toStatus, externalReference: input.externalReference }).where(and(eq(insuranceClaims.id, row.id), eq(insuranceClaims.organizationId, row.organizationId), eq(insuranceClaims.branchId, row.branchId)));
     return { success: true, status: input.toStatus, externalSubmission: "blocked" as const };
+  }),
+
+  gaharProfiles: protectedProcedure.input(z.object({ organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive() })).query(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    return db.select().from(gaharReadinessProfiles).where(and(eq(gaharReadinessProfiles.organizationId, input.organizationId), eq(gaharReadinessProfiles.jurisdictionId, input.jurisdictionId), eq(gaharReadinessProfiles.branchId, input.branchId))).orderBy(desc(gaharReadinessProfiles.updatedAt)).limit(100);
+  }),
+
+  createGaharProfile: protectedProcedure.input(z.object({ organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive(), facilityId: z.number().int().positive(), facilityType: z.enum(["government_hospital", "private_hospital", "primary_care", "laboratory", "radiology", "rehabilitation", "mental_health", "extended_care"]), standardFamily: z.string().min(2).max(160), standardVersion: z.string().min(1).max(80), effectiveFrom: z.date().optional(), reviewDueAt: z.date().optional() })).mutation(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    const inserted = await db.insert(gaharReadinessProfiles).values({ ...input, ownerUserId: ctx.user.id, status: "draft", officialSubmissionGate: "not_authorized" });
+    return { profileId: Number(inserted[0].insertId), officialSubmission: "blocked" as const };
+  }),
+
+  gaharCriteria: protectedProcedure.input(z.object({ profileId: z.number().int().positive(), organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive() })).query(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    const profile = (await db.select({ id: gaharReadinessProfiles.id }).from(gaharReadinessProfiles).where(and(eq(gaharReadinessProfiles.id, input.profileId), eq(gaharReadinessProfiles.organizationId, input.organizationId), eq(gaharReadinessProfiles.jurisdictionId, input.jurisdictionId), eq(gaharReadinessProfiles.branchId, input.branchId))).limit(1))[0];
+    if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "GAHAR readiness profile not found" });
+    return db.select().from(gaharCriteria).where(eq(gaharCriteria.profileId, input.profileId)).orderBy(gaharCriteria.domainCode, gaharCriteria.criterionCode).limit(500);
+  }),
+
+  createGaharCriterion: protectedProcedure.input(z.object({ profileId: z.number().int().positive(), organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive(), orientation: z.enum(["patient_centered", "organization_centered"]), domainCode: z.string().min(1).max(80), criterionCode: z.string().min(1).max(120), title: z.string().min(2).max(240), requirementSummary: z.string().min(2).max(5000), reviewCycleDays: z.number().int().min(1).max(3650).optional() })).mutation(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    const profile = (await db.select({ id: gaharReadinessProfiles.id }).from(gaharReadinessProfiles).where(and(eq(gaharReadinessProfiles.id, input.profileId), eq(gaharReadinessProfiles.organizationId, input.organizationId), eq(gaharReadinessProfiles.jurisdictionId, input.jurisdictionId), eq(gaharReadinessProfiles.branchId, input.branchId))).limit(1))[0];
+    if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "GAHAR readiness profile not found" });
+    const inserted = await db.insert(gaharCriteria).values({ profileId: input.profileId, orientation: input.orientation, domainCode: input.domainCode, criterionCode: input.criterionCode, title: input.title, requirementSummary: input.requirementSummary, reviewCycleDays: input.reviewCycleDays ?? 365, status: "not_started" });
+    return { criterionId: Number(inserted[0].insertId) };
+  }),
+
+  gaharEvidence: protectedProcedure.input(z.object({ profileId: z.number().int().positive(), organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive() })).query(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    const profile = (await db.select({ id: gaharReadinessProfiles.id }).from(gaharReadinessProfiles).where(and(eq(gaharReadinessProfiles.id, input.profileId), eq(gaharReadinessProfiles.organizationId, input.organizationId), eq(gaharReadinessProfiles.jurisdictionId, input.jurisdictionId), eq(gaharReadinessProfiles.branchId, input.branchId))).limit(1))[0];
+    if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "GAHAR readiness profile not found" });
+    return db.select({ id: gaharEvidence.id, criterionId: gaharEvidence.criterionId, evidenceType: gaharEvidence.evidenceType, title: gaharEvidence.title, referenceKey: gaharEvidence.referenceKey, verificationStatus: gaharEvidence.verificationStatus, validUntil: gaharEvidence.validUntil }).from(gaharEvidence).where(eq(gaharEvidence.profileId, input.profileId)).orderBy(desc(gaharEvidence.updatedAt)).limit(500);
+  }),
+
+  createGaharCorrectiveAction: protectedProcedure.input(z.object({ profileId: z.number().int().positive(), criterionId: z.number().int().positive(), organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive(), title: z.string().min(2).max(240), riskLevel: z.enum(["low", "moderate", "high", "critical"]), ownerUserId: z.number().int().positive(), dueAt: z.date().optional(), resolution: z.string().max(5000).optional() })).mutation(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    const profile = (await db.select({ id: gaharReadinessProfiles.id }).from(gaharReadinessProfiles).where(and(eq(gaharReadinessProfiles.id, input.profileId), eq(gaharReadinessProfiles.organizationId, input.organizationId), eq(gaharReadinessProfiles.jurisdictionId, input.jurisdictionId), eq(gaharReadinessProfiles.branchId, input.branchId))).limit(1))[0];
+    if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "GAHAR readiness profile not found" });
+    const inserted = await db.insert(gaharCorrectiveActions).values({ profileId: input.profileId, criterionId: input.criterionId, title: input.title, riskLevel: input.riskLevel, ownerUserId: input.ownerUserId, dueAt: input.dueAt, resolutionEncrypted: input.resolution ? encryptPatientValue(input.resolution) : undefined, createdByUserId: ctx.user.id });
+    return { actionId: Number(inserted[0].insertId), officialAccreditation: "not_claimed" as const };
+  }),
+
+  gaharQualityIndicators: protectedProcedure.input(z.object({ profileId: z.number().int().positive(), organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive() })).query(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    const profile = (await db.select({ id: gaharReadinessProfiles.id }).from(gaharReadinessProfiles).where(and(eq(gaharReadinessProfiles.id, input.profileId), eq(gaharReadinessProfiles.organizationId, input.organizationId), eq(gaharReadinessProfiles.jurisdictionId, input.jurisdictionId), eq(gaharReadinessProfiles.branchId, input.branchId))).limit(1))[0];
+    if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "GAHAR readiness profile not found" });
+    return db.select().from(gaharQualityIndicators).where(eq(gaharQualityIndicators.profileId, input.profileId)).orderBy(desc(gaharQualityIndicators.periodEnd)).limit(500);
+  }),
+
+  submitGaharOfficial: protectedProcedure.input(z.object({ profileId: z.number().int().positive(), organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    throw new TRPCError({ code: "PRECONDITION_FAILED", message: "GAHAR official submission remains blocked until written authorization, endpoint specification, test environment, credentials, and acceptance evidence are provided" });
   }),
 });
