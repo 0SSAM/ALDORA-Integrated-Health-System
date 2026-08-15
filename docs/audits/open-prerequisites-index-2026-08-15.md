@@ -32,7 +32,7 @@ The current codebase has strict organization, branch, and jurisdiction guards; r
 
 ## Deliberately absent workflows
 
-Standalone invoice persistence/submission, product matching from prescription extraction, clinical-trials archive generation, and unverified country activation are not represented as completed functionality. This is intentional: the platform must not claim a regulated workflow that has no verified persistence contract, source evidence, or user instruction to activate it.
+Standalone invoice persistence/submission, product matching from prescription extraction, clinical-trials archive generation, and unverified country activation are not represented as completed functionality. The existing invoice boundary now additionally requires the shared eight-gate external-adapter readiness contract before any future submission path can proceed. This is intentional: the platform must not claim a regulated workflow that has no verified persistence contract, source evidence, or user instruction to activate it.
 
 ## Integrity rule
 

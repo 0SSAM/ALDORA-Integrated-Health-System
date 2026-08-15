@@ -1,4 +1,5 @@
 import { requireRegionalRule, type RegionalRuleSet } from "./regional-rules";
+import { externalAdapterReadiness, type ExternalAdapterReadinessInput } from "./external-adapter-policy";
 
 export type InvoiceDocument = {
   invoiceNumber: string;
@@ -11,6 +12,7 @@ export type InvoiceDocument = {
 
 export type InvoiceAdapter = {
   countryCode: string;
+  readiness: ExternalAdapterReadinessInput;
   submit: (document: InvoiceDocument) => Promise<{ externalId: string; status: "submitted" | "accepted" | "rejected" }>;
 };
 
@@ -20,6 +22,9 @@ export function requireInvoiceIntegration(rules: RegionalRuleSet, countryCode: s
   const endpoint = requireRegionalRule(rules, "invoicing", "endpoint");
   if (typeof endpoint !== "string" || endpoint.length < 1) throw new Error("Regional e-invoicing endpoint is missing");
   if (!adapter || adapter.countryCode !== countryCode) throw new Error("No verified e-invoicing adapter is registered for this country");
+  if (externalAdapterReadiness(adapter.readiness) !== "READY") {
+    throw new Error("E-invoicing adapter readiness is incomplete");
+  }
   return { endpoint, adapter };
 }
 
