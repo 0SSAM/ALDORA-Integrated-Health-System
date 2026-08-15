@@ -780,12 +780,12 @@
 
 # Comprehensive Integration Review
 
-- [ ] Audit end-to-end integration between authentication, organization/branch/jurisdiction scope, roles, and module navigation.
-- [ ] Audit server procedures and database boundaries for POS, inventory, prescriptions, catalog, customer care, call centre, procurement, reports, notifications, and offline workflows.
-- [ ] Audit frontend-to-backend contracts, loading/error/empty states, and real-versus-demo data boundaries.
-- [ ] Fix confirmed integration gaps without activating unverified regulatory, hardware, surveillance, or external-provider connectors.
-- [ ] Add or update integration regression tests and run TypeScript, Vitest, production build, and responsive visual verification.
-- [ ] Update integration documentation and save a new checkpoint/archive after all items are verified.
+- [x] Audit end-to-end integration between authentication, organization/branch/jurisdiction scope, roles, and module navigation.
+- [x] Audit server procedures and database boundaries for POS, inventory, prescriptions, catalog, customer care, call centre, procurement, reports, notifications, and offline workflows.
+- [x] Audit frontend-to-backend contracts, loading/error/empty states, and real-versus-demo data boundaries.
+- [x] Fix confirmed integration gaps without activating unverified regulatory, hardware, surveillance, or external-provider connectors.
+- [x] Add or update integration regression tests and run TypeScript, Vitest, production build, and responsive visual verification.
+- [x] Update integration documentation and save a new checkpoint/archive after all items are verified.
 
 
 # Confirmed Integration Gaps
