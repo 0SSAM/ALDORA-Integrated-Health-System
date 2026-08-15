@@ -6,7 +6,7 @@ ALDORA performs automated quality and security checks after every push and pull 
 
 ## Checks that run automatically
 
-The CI workflow runs a TypeScript check, unit and contract tests, workflow and configuration formatting validation, a production build, and a non-mutating post-build smoke check. It also runs CodeQL analysis and dependency-review checks for pull requests. Dependency audit results are surfaced as CI warnings while the current baseline is remediated; they must not be silently ignored.
+The CI workflow runs a TypeScript check, unit and contract tests, workflow and configuration formatting validation, a production build, and a non-mutating post-build smoke check. It also runs CodeQL analysis and dependency-review checks for pull requests. The production dependency audit is now a blocking gate at high severity; the previously identified high-severity production advisories were remediated and the resulting audit reports zero high or critical findings.
 
 ## Safe maintenance and repair boundary
 

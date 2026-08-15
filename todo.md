@@ -1166,7 +1166,12 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Validate the workflow locally, save the project checkpoint, and confirm synchronization with GitHub.
 
 # ALDORA CI Security and Maintenance Guardrails — 2026-08-15
-- [x] Add lint/format validation, dependency security audit, CodeQL analysis, and dependency review to CI. (Dependency audit is visible as a non-blocking warning until the existing high-severity baseline is remediated.)
+- [x] Add lint/format validation, dependency security audit, CodeQL analysis, and dependency review to CI. Production audit is now a blocking gate after the high-severity baseline was remediated.
 - [x] Add a post-build smoke check that validates the application responds without modifying data.
 - [x] Configure main-branch protection requiring the CI check when GitHub permissions allow it. (Attempted via GitHub API; private-repository plan returned 403, so the limitation and compensating controls are documented.)
 - [x] Document safe auto-maintenance boundaries: report and propose fixes automatically, but require review for security, data, permissions, or regulated changes; camera/microphone monitoring remains consent-gated and disabled by default.
+
+# Production Dependency High-Severity Remediation — 2026-08-15
+- [x] Inventory the nine high-severity production dependency findings and map each to its parent package and transitive path.
+- [x] Apply the smallest safe dependency updates or overrides and regenerate the lockfile.
+- [x] Re-run production audit, TypeScript, tests, build, and smoke check; document any residual advisory with a reason and remediation path.
