@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DemoWorkspace } from "@/components/DemoWorkspace";
 import { HardwareWorkspace } from "@/components/HardwareWorkspace";
 import { SupplyChainWorkspace } from "@/components/SupplyChainWorkspace";
+import { EgyptHealthcareWorkspace } from "@/components/EgyptHealthcareWorkspace";
 import { InsuranceWorkspace, OrganizationWorkspace, PromotionsWorkspace, ReportsWorkspace } from "@/components/IntegratedOperationsWorkspaces";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { describeSearchMatch, smartSearch } from "@/lib/smartSearch";
@@ -25,6 +26,7 @@ const modules = [
   { id: "supplyChain", label: "سلاسل الإمداد والتنبؤ", searchText: "supply chain procurement demand forecast reorder", icon: BarChart3 },
   { id: "prescriptions", label: "الوصفات الذكية", searchText: "prescriptions prescription ai pharmacist", icon: BrainCircuit },
   { id: "insurance", label: "التأمين والمطالبات", searchText: "insurance claims tpa payer", icon: ClipboardCheck },
+  { id: "egyptHealthcare", label: "المستشفيات والتأمين المصري", searchText: "egypt hospital government private universal health insurance claims", icon: Stethoscope },
   { id: "compliance", label: "الامتثال الإقليمي", searchText: "compliance regulatory egypt eta eda", icon: ShieldCheck },
   { id: "compounding", label: "التحضير الصيدلي", searchText: "compounding pharmacy bom", icon: FlaskConical },
   { id: "finance", label: "المالية والتقارير", searchText: "finance accounting reports", icon: WalletCards },
@@ -36,7 +38,7 @@ const modules = [
   { id: "hardware", label: "إعداد الأجهزة والمحاكاة", searchText: "hardware printers scanners simulation devices", icon: Settings2 },
 ];
 
-const organizationModules: Record<string, string[]> = { government: ["overview", "compliance", "finance", "people", "insurance"], pharmacy: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "customerCare", "callCentre", "catalog"], pharmacy_chain: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "finance", "people", "customerCare", "callCentre", "catalog"], distributor: ["overview", "inventory", "supplyChain", "promotions", "compliance", "finance", "people", "catalog"], insurer: ["overview", "insurance", "compliance", "finance", "people", "customerCare"], rehabilitation: ["overview", "prescriptions", "customerCare", "finance", "compliance", "people"], hospital: ["overview", "inventory", "prescriptions", "insurance", "compliance", "finance", "people", "customerCare"], laboratory: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare"], radiology: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare"] };
+const organizationModules: Record<string, string[]> = { government: ["overview", "compliance", "finance", "people", "insurance", "egyptHealthcare"], pharmacy: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "customerCare", "callCentre", "catalog"], pharmacy_chain: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "finance", "people", "customerCare", "callCentre", "catalog"], distributor: ["overview", "inventory", "supplyChain", "promotions", "compliance", "finance", "people", "catalog"], insurer: ["overview", "insurance", "compliance", "finance", "people", "customerCare"], rehabilitation: ["overview", "prescriptions", "customerCare", "finance", "compliance", "people"], hospital: ["overview", "inventory", "prescriptions", "insurance", "egyptHealthcare", "compliance", "finance", "people", "customerCare"], laboratory: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare"], radiology: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare"] };
 
 const metrics = [
   { label: "مبيعات اليوم", value: "—", hint: "تظهر بعد ربط قاعدة البيانات", icon: Receipt, tone: "bg-cyan-50 text-cyan-700" },
@@ -69,7 +71,7 @@ export default function Home() {
     if (!role) return modules.filter(item => item.id === "overview");
     const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], supplyChain: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], promotions: ["admin", "manager"], people: ["admin", "manager"], customerCare: ["admin", "manager", "pharmacist", "cashier"], callCentre: ["admin", "manager", "pharmacist", "cashier"], catalog: ["admin", "manager", "pharmacist"], hardware: ["admin", "manager"] };
     const scopedModuleIds = activeOrganizationType ? organizationModules[activeOrganizationType] : undefined;
-    return modules.filter(item => access[item.id]?.includes(role) && (!scopedModuleIds || item.id === "hardware" || scopedModuleIds.includes(item.id)));
+    return modules.filter(item => (access[item.id] ?? (item.id === "egyptHealthcare" ? ["admin", "manager", "pharmacist"] : [])).includes(role) && (!scopedModuleIds || item.id === "hardware" || scopedModuleIds.includes(item.id)));
   }, [role, activeOrganizationType, isDemo]);
   const activeModule = allowedModules.find(item => item.id === active) ?? allowedModules[0] ?? modules[0];
   const activeBranchId = localization.branchId;
@@ -142,6 +144,7 @@ function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { act
     catalog: { title: "كتالوج الأصناف", description: "بحث معزول حسب الدولة في الأدوية والتجميل والمستلزمات، مع مصدر ودرجة تحقق لكل صنف.", items: ["أدوية الدولة", "تجميل", "مستلزمات طبية"] },
     hardware: { title: "إعداد الأجهزة والمحاكاة", description: "اختيار موديلات الطابعات واتصالاتها واختبار الماسح والطابعة الحرارية دون جهاز فعلي.", items: ["موديلات ووسائط", "نوع الاتصال", "سجل محاكاة محلي"] },
     supplyChain: { title: "سلاسل الإمداد والتنبؤ", description: "توقع الطلب من المبيعات المسجلة ضمن الفرع والاختصاص المؤكدين، مع حالات جودة واضحة ومنع إصدار أمر شراء تلقائي.", items: ["سجل مبيعات فعلي", "مخزون مؤكد", "مراجعة بشرية"] },
+    egyptHealthcare: { title: "المستشفيات والتأمين المصري", description: "مسارات مصرية داخلية للمرافق والمقابلات والمطالبات؛ الإرسال الحكومي لا يتفعل دون اعتماد رسمي.", items: ["حكومي وخاص", "مقابلات وإحالات", "مطالبات وفشل آمن"] },
   };
   const panel = panels[active] ?? panels.overview;
   if (active === "compliance") return <RegionalComplianceWorkspace />;
@@ -151,6 +154,7 @@ function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { act
   if (active === "catalog") return <CatalogWorkspace />;
   if (active === "hardware") return <HardwareWorkspace />;
   if (active === "supplyChain") return <SupplyChainWorkspace branchId={branchId} jurisdictionId={jurisdictionId} demo={false} />;
+  if (active === "egyptHealthcare") return <EgyptHealthcareWorkspace organizationId={organizationId} branchId={branchId} jurisdictionId={jurisdictionId} />;
   if (active === "insurance") return <InsuranceWorkspace organizationId={organizationId} jurisdictionId={jurisdictionId} branchId={branchId} />;
   if (active === "finance") return <ReportsWorkspace organizationId={organizationId} jurisdictionId={jurisdictionId} branchId={branchId} />;
   if (active === "people") return <OrganizationWorkspace organizationId={organizationId} />;

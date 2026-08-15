@@ -518,3 +518,176 @@ export const authenticationEvents = mysqlTable("authentication_events", {
 export type InternalCredential = typeof internalCredentials.$inferSelect;
 export type InternalSession = typeof internalSessions.$inferSelect;
 export type AuthenticationEvent = typeof authenticationEvents.$inferSelect;
+
+
+/** Egypt internal hospital and payer foundation. External submission remains fail-closed. */
+export const healthcareFacilities = mysqlTable("healthcare_facilities", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId").notNull(),
+  facilityType: mysqlEnum("facilityType", ["government_hospital", "private_hospital", "primary_care", "laboratory", "radiology", "rehabilitation"]).notNull(),
+  licensingStatus: mysqlEnum("licensingStatus", ["unverified", "pending", "licensed", "suspended", "expired"]).default("unverified").notNull(),
+  accreditationStatus: mysqlEnum("accreditationStatus", ["not_ready", "readiness", "submitted", "accredited", "expired"]).default("not_ready").notNull(),
+  licenseReference: varchar("licenseReference", { length: 160 }),
+  accreditationReference: varchar("accreditationReference", { length: 160 }),
+  readinessEvidenceJson: text("readinessEvidenceJson"),
+  active: int("active").default(1).notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("healthcare_facilities_scope_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.facilityType) }));
+
+export const healthcarePatients = mysqlTable("healthcare_patients", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId").notNull(),
+  nationalIdHash: varchar("nationalIdHash", { length: 128 }),
+  localMedicalRecordNumber: varchar("localMedicalRecordNumber", { length: 80 }).notNull(),
+  fullNameEncrypted: text("fullNameEncrypted").notNull(),
+  dateOfBirthEncrypted: text("dateOfBirthEncrypted"),
+  sex: mysqlEnum("sex", ["female", "male", "intersex", "unknown"]).default("unknown").notNull(),
+  phoneHash: varchar("phoneHash", { length: 128 }),
+  consentStatus: mysqlEnum("consentStatus", ["pending", "granted", "withdrawn"]).default("pending").notNull(),
+  active: int("active").default(1).notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ mrnIdx: uniqueIndex("healthcare_patients_scope_mrn_idx").on(table.organizationId, table.branchId, table.localMedicalRecordNumber), nationalIdx: index("healthcare_patients_national_hash_idx").on(table.organizationId, table.nationalIdHash) }));
+
+export const healthcareEncounters = mysqlTable("healthcare_encounters", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId").notNull(),
+  patientId: int("patientId").notNull(),
+  facilityId: int("facilityId").notNull(),
+  encounterType: mysqlEnum("encounterType", ["primary_care", "outpatient", "emergency", "inpatient", "day_surgery", "telehealth", "follow_up"]).notNull(),
+  status: mysqlEnum("status", ["scheduled", "arrived", "in_progress", "referred", "admitted", "discharged", "cancelled"]).default("scheduled").notNull(),
+  attendingUserId: int("attendingUserId"),
+  chiefComplaintEncrypted: text("chiefComplaintEncrypted"),
+  clinicalSummaryEncrypted: text("clinicalSummaryEncrypted"),
+  startedAt: timestamp("startedAt"),
+  endedAt: timestamp("endedAt"),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ patientTimeIdx: index("healthcare_encounters_patient_time_idx").on(table.organizationId, table.branchId, table.patientId, table.createdAt), statusIdx: index("healthcare_encounters_status_idx").on(table.organizationId, table.branchId, table.status) }));
+
+export const healthcareAppointments = mysqlTable("healthcare_appointments", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId").notNull(),
+  patientId: int("patientId").notNull(),
+  facilityId: int("facilityId").notNull(),
+  clinicianUserId: int("clinicianUserId"),
+  specialty: varchar("specialty", { length: 120 }).notNull(),
+  status: mysqlEnum("status", ["requested", "confirmed", "checked_in", "completed", "cancelled", "no_show"]).default("requested").notNull(),
+  scheduledAt: timestamp("scheduledAt").notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ scheduleIdx: index("healthcare_appointments_schedule_idx").on(table.organizationId, table.branchId, table.scheduledAt, table.status) }));
+
+export const healthcareReferrals = mysqlTable("healthcare_referrals", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  fromBranchId: int("fromBranchId").notNull(),
+  toBranchId: int("toBranchId"),
+  patientId: int("patientId").notNull(),
+  encounterId: int("encounterId"),
+  specialty: varchar("specialty", { length: 120 }).notNull(),
+  reasonEncrypted: text("reasonEncrypted"),
+  status: mysqlEnum("status", ["requested", "accepted", "scheduled", "completed", "declined", "cancelled"]).default("requested").notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ referralIdx: index("healthcare_referrals_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.fromBranchId, table.status) }));
+
+export const insuranceMembers = mysqlTable("insurance_members", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  patientId: int("patientId").notNull(),
+  payerCode: varchar("payerCode", { length: 80 }).notNull(),
+  memberReferenceHash: varchar("memberReferenceHash", { length: 128 }).notNull(),
+  eligibilityStatus: mysqlEnum("eligibilityStatus", ["unknown", "pending", "active", "inactive", "expired", "blocked"]).default("unknown").notNull(),
+  coverageStart: timestamp("coverageStart"),
+  coverageEnd: timestamp("coverageEnd"),
+  sourceStatus: mysqlEnum("sourceStatus", ["internal", "verified_external", "unverified_external"]).default("internal").notNull(),
+  lastVerifiedAt: timestamp("lastVerifiedAt"),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ memberIdx: uniqueIndex("insurance_members_payer_member_idx").on(table.organizationId, table.payerCode, table.memberReferenceHash), patientIdx: index("insurance_members_patient_idx").on(table.organizationId, table.patientId) }));
+
+export const insuranceClaims = mysqlTable("insurance_claims", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId").notNull(),
+  patientId: int("patientId").notNull(),
+  memberId: int("memberId"),
+  encounterId: int("encounterId"),
+  payerCode: varchar("payerCode", { length: 80 }).notNull(),
+  claimNumber: varchar("claimNumber", { length: 120 }).notNull(),
+  status: mysqlEnum("status", ["draft", "ready", "submitted", "received", "under_review", "approved", "partially_approved", "rejected", "appealed", "paid", "reconciled", "cancelled"]).default("draft").notNull(),
+  credentialGate: mysqlEnum("credentialGate", ["not_configured", "test_ready", "production_ready"]).default("not_configured").notNull(),
+  totalAmount: decimal("totalAmount", { precision: 14, scale: 2 }).default("0").notNull(),
+  approvedAmount: decimal("approvedAmount", { precision: 14, scale: 2 }),
+  externalReference: varchar("externalReference", { length: 160 }),
+  claimJson: text("claimJson"),
+  responseJson: text("responseJson"),
+  idempotencyKey: varchar("idempotencyKey", { length: 180 }).notNull(),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ claimIdx: uniqueIndex("insurance_claims_scope_number_idx").on(table.organizationId, table.claimNumber), statusIdx: index("insurance_claims_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), idempotencyIdx: uniqueIndex("insurance_claims_idempotency_idx").on(table.idempotencyKey) }));
+
+export const insuranceClaimLines = mysqlTable("insurance_claim_lines", {
+  id: int("id").autoincrement().primaryKey(),
+  claimId: int("claimId").notNull(),
+  serviceCode: varchar("serviceCode", { length: 120 }).notNull(),
+  description: varchar("description", { length: 240 }).notNull(),
+  quantity: decimal("quantity", { precision: 12, scale: 3 }).default("1").notNull(),
+  requestedAmount: decimal("requestedAmount", { precision: 14, scale: 2 }).notNull(),
+  approvedAmount: decimal("approvedAmount", { precision: 14, scale: 2 }),
+  adjudicationStatus: mysqlEnum("adjudicationStatus", ["pending", "approved", "partially_approved", "rejected"]).default("pending").notNull(),
+  denialCode: varchar("denialCode", { length: 80 }),
+});
+
+export type HealthcareFacility = typeof healthcareFacilities.$inferSelect;
+export type HealthcarePatient = typeof healthcarePatients.$inferSelect;
+export type HealthcareEncounter = typeof healthcareEncounters.$inferSelect;
+export type InsuranceClaim = typeof insuranceClaims.$inferSelect;
+
+
+export const healthcareBeds = mysqlTable("healthcare_beds", {
+  id: int("id").autoincrement().primaryKey(), organizationId: int("organizationId").notNull(), jurisdictionId: int("jurisdictionId").notNull(), branchId: int("branchId").notNull(), facilityId: int("facilityId").notNull(), wardCode: varchar("wardCode", { length: 80 }).notNull(), bedCode: varchar("bedCode", { length: 80 }).notNull(), status: mysqlEnum("status", ["available", "occupied", "reserved", "blocked", "maintenance"]).default("available").notNull(), createdAt: timestamp("createdAt").defaultNow().notNull(), updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("healthcare_beds_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), uniqueBed: uniqueIndex("healthcare_beds_facility_bed_idx").on(table.facilityId, table.bedCode) }));
+
+export const healthcareAdmissions = mysqlTable("healthcare_admissions", {
+  id: int("id").autoincrement().primaryKey(), organizationId: int("organizationId").notNull(), jurisdictionId: int("jurisdictionId").notNull(), branchId: int("branchId").notNull(), patientId: int("patientId").notNull(), encounterId: int("encounterId").notNull(), bedId: int("bedId"), admissionType: mysqlEnum("admissionType", ["planned", "emergency", "observation", "transfer"]).notNull(), status: mysqlEnum("status", ["requested", "admitted", "on_leave", "discharged", "cancelled"]).default("requested").notNull(), admittedAt: timestamp("admittedAt"), dischargedAt: timestamp("dischargedAt"), dischargeSummaryEncrypted: text("dischargeSummaryEncrypted"), createdByUserId: int("createdByUserId").notNull(), createdAt: timestamp("createdAt").defaultNow().notNull(), updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("healthcare_admissions_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), patientIdx: index("healthcare_admissions_patient_idx").on(table.organizationId, table.patientId) }));
+
+export const healthcareClinicalOrders = mysqlTable("healthcare_clinical_orders", {
+  id: int("id").autoincrement().primaryKey(), organizationId: int("organizationId").notNull(), jurisdictionId: int("jurisdictionId").notNull(), branchId: int("branchId").notNull(), patientId: int("patientId").notNull(), encounterId: int("encounterId").notNull(), orderType: mysqlEnum("orderType", ["lab", "radiology", "medication", "procedure", "referral"]).notNull(), serviceCode: varchar("serviceCode", { length: 120 }).notNull(), status: mysqlEnum("status", ["requested", "scheduled", "in_progress", "resulted", "cancelled"]).default("requested").notNull(), resultEncrypted: text("resultEncrypted"), orderedByUserId: int("orderedByUserId").notNull(), createdAt: timestamp("createdAt").defaultNow().notNull(), updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("healthcare_orders_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), encounterIdx: index("healthcare_orders_encounter_idx").on(table.encounterId) }));
+
+export const insurancePayerContracts = mysqlTable("insurance_payer_contracts", {
+  id: int("id").autoincrement().primaryKey(), organizationId: int("organizationId").notNull(), jurisdictionId: int("jurisdictionId").notNull(), payerCode: varchar("payerCode", { length: 80 }).notNull(), contractReference: varchar("contractReference", { length: 120 }).notNull(), status: mysqlEnum("status", ["draft", "pending_review", "active", "suspended", "expired"]).default("draft").notNull(), credentialGate: mysqlEnum("credentialGate", ["not_configured", "test_ready", "production_ready"]).default("not_configured").notNull(), effectiveFrom: timestamp("effectiveFrom"), effectiveTo: timestamp("effectiveTo"), createdByUserId: int("createdByUserId").notNull(), createdAt: timestamp("createdAt").defaultNow().notNull(), updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("insurance_payer_contracts_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.status), refIdx: uniqueIndex("insurance_payer_contracts_ref_idx").on(table.organizationId, table.contractReference) }));
+
+export const insurancePreauthorizations = mysqlTable("insurance_preauthorizations", {
+  id: int("id").autoincrement().primaryKey(), organizationId: int("organizationId").notNull(), jurisdictionId: int("jurisdictionId").notNull(), branchId: int("branchId").notNull(), patientId: int("patientId").notNull(), encounterId: int("encounterId"), payerCode: varchar("payerCode", { length: 80 }).notNull(), requestNumber: varchar("requestNumber", { length: 120 }).notNull(), status: mysqlEnum("status", ["draft", "ready", "submitted", "received", "approved", "partially_approved", "rejected", "expired", "cancelled"]).default("draft").notNull(), credentialGate: mysqlEnum("credentialGate", ["not_configured", "test_ready", "production_ready"]).default("not_configured").notNull(), requestedAmount: decimal("requestedAmount", { precision: 14, scale: 2 }).default("0").notNull(), approvedAmount: decimal("approvedAmount", { precision: 14, scale: 2 }), externalReference: varchar("externalReference", { length: 160 }), idempotencyKey: varchar("idempotencyKey", { length: 180 }).notNull(), createdByUserId: int("createdByUserId").notNull(), createdAt: timestamp("createdAt").defaultNow().notNull(), updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("insurance_preauth_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), requestIdx: uniqueIndex("insurance_preauth_request_idx").on(table.organizationId, table.requestNumber), idemIdx: uniqueIndex("insurance_preauth_idempotency_idx").on(table.idempotencyKey) }));
+
+export const insuranceRemittances = mysqlTable("insurance_remittances", {
+  id: int("id").autoincrement().primaryKey(), organizationId: int("organizationId").notNull(), jurisdictionId: int("jurisdictionId").notNull(), branchId: int("branchId").notNull(), payerCode: varchar("payerCode", { length: 80 }).notNull(), remittanceReference: varchar("remittanceReference", { length: 120 }).notNull(), status: mysqlEnum("status", ["draft", "received", "under_reconciliation", "partially_reconciled", "reconciled", "disputed"]).default("draft").notNull(), credentialGate: mysqlEnum("credentialGate", ["not_configured", "test_ready", "production_ready"]).default("not_configured").notNull(), amount: decimal("amount", { precision: 14, scale: 2 }).default("0").notNull(), reconciliationJson: text("reconciliationJson"), createdByUserId: int("createdByUserId").notNull(), createdAt: timestamp("createdAt").defaultNow().notNull(), updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("insurance_remittances_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), refIdx: uniqueIndex("insurance_remittances_ref_idx").on(table.organizationId, table.remittanceReference) }));
+
+export const insuranceAppeals = mysqlTable("insurance_appeals", {
+  id: int("id").autoincrement().primaryKey(), organizationId: int("organizationId").notNull(), jurisdictionId: int("jurisdictionId").notNull(), branchId: int("branchId").notNull(), claimId: int("claimId").notNull(), status: mysqlEnum("status", ["draft", "submitted", "under_review", "accepted", "rejected", "withdrawn"]).default("draft").notNull(), reasonEncrypted: text("reasonEncrypted"), externalReference: varchar("externalReference", { length: 160 }), credentialGate: mysqlEnum("credentialGate", ["not_configured", "test_ready", "production_ready"]).default("not_configured").notNull(), createdByUserId: int("createdByUserId").notNull(), createdAt: timestamp("createdAt").defaultNow().notNull(), updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("insurance_appeals_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), claimIdx: index("insurance_appeals_claim_idx").on(table.claimId) }));

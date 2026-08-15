@@ -169,6 +169,20 @@
       "when": 1786790164357,
       "tag": "0023_late_the_phantom",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1786791146270,
+      "tag": "0024_slow_tyrannus",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1786791431794,
+      "tag": "0025_woozy_starjammers",
+      "breakpoints": true
     }
   ]
 }

@@ -795,3 +795,21 @@
 - [x] Connect promotion list/create/approve workflows to an authorized workspace and expose statutory-cap/readiness states.
 - [x] Add a scoped organization-management entry point for authorized managers/admins, or document it as intentionally server-only.
 - [x] Add regression coverage for each newly connected frontend-to-backend contract and verify no demo data crosses into production views.
+
+
+# Hospital and Universal Health Insurance Status Review
+
+- [x] Audit government-hospital module coverage, workflows, roles, and data boundaries.
+- [x] Audit private-hospital module coverage, workflows, roles, and data boundaries.
+- [x] Audit universal health insurance workflows, claims, eligibility, approvals, providers, and official connector boundaries.
+- [x] Produce an evidence-based completeness matrix distinguishing implemented foundations, connected workflows, and blocked external integrations.
+
+
+# Egypt Hospital and Universal Health Insurance Completion
+
+- [x] Establish an Egypt evidence register for hospital licensing, health insurance, privacy, e-invoicing, medicines, labs, radiology, and official connector prerequisites.
+- [ ] Add government-hospital internal workflows: patient registry, encounters, appointments, admissions, wards/beds, emergency, orders/results, discharge, referrals, and role boundaries.
+- [ ] Add private-hospital internal workflows: the same clinical core plus packages, payer contracts, deposits, billing, approvals, and private-provider reporting boundaries.
+- [x] Expand universal health insurance internally: beneficiary eligibility, provider/payer contracts, preauthorization, claims, adjudication states, remittance/reconciliation, appeals, and audit.
+- [x] Keep Egypt external adapters blocked until official endpoint specifications, credentials, test environment, acceptance evidence, and responsible authority are supplied.
+- [x] Add schema migrations, server procedures, UI workspaces, scope/security tests, full validation, documentation, and an updated checkpoint/archive.

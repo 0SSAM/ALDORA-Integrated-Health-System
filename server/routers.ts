@@ -11,6 +11,7 @@ import { notificationsRouter } from "./routers/notifications";
 import { reportsRouter } from "./routers/reports";
 import { insuranceRouter } from "./routers/insurance";
 import { promotionsRouter } from "./routers/promotions";
+import { egyptHealthcareRouter } from "./routers/egypt-healthcare";
 import { getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, revokeInternalSession } from "./db";
 import { createInternalSessionToken, INTERNAL_LOCKOUT_MS, INTERNAL_MAX_FAILED_ATTEMPTS, INTERNAL_SESSION_COOKIE, INTERNAL_SESSION_TTL_MS, isLocked, normalizeInternalUsername, verifyInternalPassword } from "./domain/internal-auth";
 
@@ -76,6 +77,7 @@ export const appRouter = router({
   reports: reportsRouter,
   insurance: insuranceRouter,
   promotions: promotionsRouter,
+  egyptHealthcare: egyptHealthcareRouter,
 });
 
 export type AppRouter = typeof appRouter;
