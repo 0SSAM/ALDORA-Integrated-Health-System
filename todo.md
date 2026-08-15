@@ -1091,3 +1091,9 @@
 - [x] Run TypeScript, Vitest, production build, and desktop/mobile verification for invoice PDF/template work.
 
 Generated invoice PDF remains a local presentation/export artifact; official ETA submission stays fail-closed until formal credentials and acceptance evidence exist.
+
+# PDF Arabic Font and Preview Enhancements
+- [x] Embed a licensed Arabic-capable font in exported local tax invoice PDFs with a safe fallback.
+- [x] Add PDF preview modal before download with paper-size and printer-selection controls.
+- [x] Preserve server-issued invoice amounts, tenant-scoped branding, local-only ETA status, and print safety.
+- [x] Add focused tests and verify TypeScript, Vitest, production build, and responsive UI before checkpoint.
