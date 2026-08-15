@@ -1114,3 +1114,9 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add a role-safe bilingual connection-status and sync-progress indicator to the application workspace.
 - [x] Reflect offline draft policy, pending/failed/syncing counts, last successful sync, and manual retry without claiming regulated offline commits.
 - [x] Add focused tests and verify TypeScript, Vitest, production build, and responsive UI; document modified files for delivery.
+
+# Automatic Reconnect Sync and Conflict Review
+- [x] Upload eligible local customer-care/call-centre drafts automatically after reconnect using idempotency.
+- [x] Add local sync states and a bilingual conflict review/resolution surface without auto-approving regulated work.
+- [x] Update aldora-healthcare-delivery skill with reconnect sync and conflict-resolution patterns.
+- [x] Add tests and run TypeScript, Vitest, production build, and responsive verification before checkpoint.

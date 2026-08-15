@@ -5,8 +5,10 @@ export type OfflineDraft = {
   payload: unknown;
   regulated: boolean;
   createdAt: number;
-  status?: "queued" | "conflict" | "failed";
+  status?: "queued" | "syncing" | "conflict" | "failed";
   conflictReason?: string;
+  lastError?: string;
+  lastAttemptAt?: number;
 };
 
 const KEY = "bdf-offline-drafts";
@@ -108,8 +110,8 @@ export async function listDurableOfflineDrafts(): Promise<OfflineDraft[]> {
   }
 }
 
-export async function markOfflineDraftConflict(id: string, reason: string): Promise<void> {
-  const drafts = listOfflineDrafts().map(item => item.id === id ? { ...item, status: "conflict" as const, conflictReason: reason } : item);
+export async function updateOfflineDraft(id: string, patch: Pick<OfflineDraft, "status" | "conflictReason" | "lastError" | "lastAttemptAt">): Promise<void> {
+  const drafts = listOfflineDrafts().map(item => item.id === id ? { ...item, ...patch } : item);
   localStorage.setItem(KEY, JSON.stringify(drafts));
   try {
     const db = await openDb();
@@ -117,14 +119,18 @@ export async function markOfflineDraftConflict(id: string, reason: string): Prom
       const transaction = db.transaction(STORE_NAME, "readwrite");
       const store = transaction.objectStore(STORE_NAME);
       const get = store.get(id);
-      get.onsuccess = () => { if (get.result) store.put({ ...get.result, status: "conflict", conflictReason: reason }); };
+      get.onsuccess = () => { if (get.result) store.put({ ...get.result, ...patch }); };
       transaction.oncomplete = () => resolve();
-      transaction.onerror = () => reject(transaction.error ?? new Error("draft-conflict-failed"));
+      transaction.onerror = () => reject(transaction.error ?? new Error("draft-update-failed"));
     });
     db.close();
   } catch {
-    // localStorage fallback already contains the auditable conflict state
+    // localStorage fallback already contains the auditable state
   }
+}
+
+export async function markOfflineDraftConflict(id: string, reason: string): Promise<void> {
+  await updateOfflineDraft(id, { status: "conflict", conflictReason: reason, lastError: reason, lastAttemptAt: Date.now() });
 }
 
 async function persistDraft(item: OfflineDraft) {

@@ -7,10 +7,10 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useLocalization } from "@/contexts/LocalizationContext";
-import { listDurableOfflineDrafts, removeOfflineDraft, type OfflineDraft } from "@/lib/offlineQueue";
+import { listDurableOfflineDrafts, removeOfflineDraft, updateOfflineDraft, type OfflineDraft } from "@/lib/offlineQueue";
 import { Activity, AlertCircle, AlertTriangle, ArrowLeftRight, BarChart3, Bell, Boxes, BrainCircuit, Building2, CheckCircle2, ChevronLeft, ClipboardCheck, Database, FileText, FlaskConical, HeartPulse, Keyboard, LayoutDashboard, LockKeyhole, Menu, PackageSearch, PhoneCall, Plus, PlugZap, Receipt, Search, Settings2, ShieldCheck, ShoppingCart, Stethoscope, Ticket, UploadCloud, UserRound, Users, WalletCards, X } from "lucide-react";
 import { skipToken } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HardwareWorkspace } from "@/components/HardwareWorkspace";
 import { SupplyChainWorkspace } from "@/components/SupplyChainWorkspace";
 import { EgyptHealthcareWorkspace } from "@/components/EgyptHealthcareWorkspace";
@@ -83,6 +83,8 @@ export default function Home() {
   const organizationTypeLabels: Record<string, string> = { government: "جهة حكومية", pharmacy: "صيدلية فردية", pharmacy_chain: "سلسلة صيدليات", distributor: "شركة توزيع دواء", insurer: "شركة تأمين طبي", rehabilitation: "مركز تأهيل وعلاج طبيعي", hospital: "مستشفى", laboratory: "معمل تحاليل", radiology: "مركز أشعة" };
   const activeOrganizationType = organizationsQuery.data?.find(item => item.id === selectedOrganizationId)?.organizationType;
   const replayDraft = trpc.erp.offlineDrafts.replay.useMutation({ onSuccess: () => { void serverDrafts.refetch(); } });
+  const enqueueDraft = trpc.erp.offlineDrafts.enqueue.useMutation();
+  const syncInFlight = useRef(false);
   const [active, setActive] = useState(() => typeof window !== "undefined" && window.location.pathname === "/sales" ? "pos" : "overview");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -144,14 +146,45 @@ export default function Home() {
   }, [role, user]);
 
   useEffect(() => {
-    const onOnline = () => setOnline(true);
+    const refreshDrafts = async () => {
+      const drafts = await listDurableOfflineDrafts().catch(() => [] as OfflineDraft[]);
+      setOfflineDrafts(drafts);
+      return drafts;
+    };
+    const syncEligibleDrafts = async () => {
+      if (!online || !user || syncInFlight.current) return;
+      syncInFlight.current = true;
+      try {
+        const drafts = await refreshDrafts();
+        for (const draft of drafts) {
+          if (draft.status === "conflict" || draft.status === "failed" || !["customerCare", "callCentre"].includes(draft.module)) continue;
+          await updateOfflineDraft(draft.id, { status: "syncing", lastAttemptAt: Date.now(), lastError: undefined, conflictReason: undefined });
+          setOfflineDrafts(current => current.map(item => item.id === draft.id ? { ...item, status: "syncing", lastAttemptAt: Date.now() } : item));
+          try {
+            await enqueueDraft.mutateAsync({ idempotencyKey: draft.idempotencyKey, module: draft.module as "customerCare" | "callCentre", payload: draft.payload });
+            removeOfflineDraft(draft.id);
+            setOfflineDrafts(current => current.filter(item => item.id !== draft.id));
+          } catch (error) {
+            const message = error instanceof Error ? error.message : "sync-failed";
+            const isConflict = message.toLowerCase().includes("conflict") || message.toLowerCase().includes("scope") || message.toLowerCase().includes("validation");
+            await updateOfflineDraft(draft.id, { status: isConflict ? "conflict" : "failed", conflictReason: isConflict ? "تعارض أو تغير في نطاق السجل؛ يلزم مراجعة يدوية." : undefined, lastError: message, lastAttemptAt: Date.now() });
+            setOfflineDrafts(current => current.map(item => item.id === draft.id ? { ...item, status: isConflict ? "conflict" : "failed", conflictReason: isConflict ? "تعارض أو تغير في نطاق السجل؛ يلزم مراجعة يدوية." : undefined, lastError: message } : item));
+          }
+        }
+        await refreshDrafts();
+        void serverDrafts.refetch();
+      } finally {
+        syncInFlight.current = false;
+      }
+    };
+    const onOnline = () => { setOnline(true); void syncEligibleDrafts(); };
     const onOffline = () => setOnline(false);
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
     navigator.serviceWorker?.controller?.postMessage({ type: "ALDO_SYNC_STATUS" });
-    void listDurableOfflineDrafts().then(setOfflineDrafts).catch(() => setOfflineDrafts([]));
+    void syncEligibleDrafts();
     return () => { window.removeEventListener("online", onOnline); window.removeEventListener("offline", onOffline); };
-  }, []);
+  }, [online, user, serverDrafts, enqueueDraft]);
 
   if (loading) return <div dir="rtl" className="aldo-loading-shell relative grid min-h-screen place-items-center overflow-hidden bg-[#f4f7fb] px-6 text-slate-600"><div className="aldo-loading-orb aldo-loading-orb-one" aria-hidden="true" /><div className="aldo-loading-orb aldo-loading-orb-two" aria-hidden="true" /><div className="relative z-10 flex w-full max-w-sm flex-col items-center rounded-[2rem] border border-white/80 bg-white/75 px-8 py-10 text-center shadow-[0_24px_80px_rgba(13,27,42,0.12)] backdrop-blur-xl"><div className="aldo-brand-mark grid h-16 w-16 place-items-center rounded-[1.35rem] shadow-lg shadow-cyan-900/10" aria-label="ألدورا"><svg viewBox="0 0 48 48" role="img" aria-hidden="true" className="h-10 w-10"><path d="M24 4 40 10v12c0 10.5-6.7 18.2-16 22-9.3-3.8-16-11.5-16-22V10L24 4Z" fill="#0d1b2a" opacity=".92"/><path d="M24 12c-5.5 3.8-8.5 8.1-8.5 12.9 0 5.6 3.8 9.5 8.5 11.1 4.7-1.6 8.5-5.5 8.5-11.1C32.5 20.1 29.5 15.8 24 12Z" fill="#9ff2e4"/><path d="M24 18c-2.4 2.5-3.6 4.8-3.6 7.1 0 2.4 1.4 4.2 3.6 5.2 2.2-1 3.6-2.8 3.6-5.2 0-2.3-1.2-4.6-3.6-7.1Z" fill="#19c5d1"/></svg></div><p className="mt-5 text-lg font-bold tracking-tight text-[#0d1b2a]">ألدورا | منظومة الرعاية الصحية المتكاملة</p><p className="mt-2 text-sm text-slate-500">جارٍ التحقق من جلسة الدخول…</p><div className="mt-6 h-1.5 w-40 overflow-hidden rounded-full bg-slate-100"><div className="aldo-loading-bar h-full w-1/2 rounded-full bg-gradient-to-l from-cyan-500 to-teal-300" /></div></div></div>;
 
@@ -172,7 +205,7 @@ export default function Home() {
         <div className="mx-auto max-w-[1500px] space-y-6 p-4 sm:p-8">
           {isShowcaseSession && <Card className="border-amber-200 bg-amber-50/80 shadow-sm" role="status"><CardContent className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-bold text-amber-950">مساحة عرض استثمارية · Investor Showcase</p><p className="mt-1 text-sm leading-6 text-amber-900">أنت تعمل داخل مؤسسة عرض معزولة. البيانات اصطناعية، والعمليات التجريبية لا تغيّر أرصدة الإنتاج ولا تتصل بجهات خارجية.</p></div><Badge variant="outline" className="w-fit border-amber-300 bg-white text-amber-900">محاكاة غير إنتاجية</Badge></CardContent></Card>}
           <IntegrationStatusStrip />
-          <OfflineStatusIndicator online={online} drafts={offlineDrafts} serverPendingCount={serverDrafts.data?.length ?? 0} onRefresh={async () => { await serverDrafts.refetch(); const latest = await listDurableOfflineDrafts(); setOfflineDrafts(latest); }} />
+          <OfflineStatusIndicator online={online} drafts={offlineDrafts} serverPendingCount={serverDrafts.data?.length ?? 0} onRefresh={async () => { await serverDrafts.refetch(); const latest = await listDurableOfflineDrafts(); setOfflineDrafts(latest); }} onRetryConflict={async () => { const latest = await listDurableOfflineDrafts(); setOfflineDrafts(latest); }} />
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{metrics.map(metric => { const Icon = metric.icon; return <Card key={metric.label} className="border-0 shadow-sm shadow-slate-200/60"><CardContent className="p-5"><div className="mb-5 flex items-start justify-between"><div className={cn("grid h-11 w-11 place-items-center rounded-2xl", metric.tone)}><Icon className="h-5 w-5" /></div><span className="text-xs font-medium text-slate-400">اليوم</span></div><p className="text-sm text-slate-500">{metric.label}</p><p className="mt-1 text-3xl font-bold tracking-tight">{metric.value}</p><p className="mt-2 text-xs text-slate-400">{metric.hint}</p></CardContent></Card>; })}</section>
           {shortcutsOpen && <Card className="border-cyan-100 bg-white shadow-sm shadow-slate-200/60" role="dialog" aria-modal="false" aria-labelledby="shortcuts-title"><CardHeader className="flex-row items-center justify-between space-y-0"><div><CardTitle id="shortcuts-title" className="flex items-center gap-2 text-lg"><Keyboard className="h-5 w-5 text-cyan-700" />الاختصارات الأساسية</CardTitle><p className="mt-1 text-sm text-slate-500">تعمل داخل التطبيق فقط، وتتوقف تلقائياً أثناء الكتابة في الحقول.</p></div><Button variant="ghost" size="sm" onClick={() => setShortcutsOpen(false)}>إغلاق</Button></CardHeader><CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{availableShortcuts.map(shortcut => <button key={shortcut.key} onClick={() => { activateShortcut(shortcut.module); setShortcutsOpen(false); }} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-right transition hover:border-cyan-300 hover:bg-cyan-50"><kbd className="min-w-10 rounded-lg border border-slate-300 bg-white px-2 py-1 text-center text-xs font-bold text-slate-700">{shortcut.key}</kbd><span><span className="block text-sm font-semibold text-slate-900">{shortcut.label}</span><span className="mt-1 block text-xs leading-5 text-slate-500">{shortcut.description}</span></span></button>)}</CardContent></Card>}
           {user && <Card className="border-cyan-100 bg-white shadow-sm shadow-slate-200/60"><CardHeader className="flex-row items-center justify-between space-y-0"><div><CardTitle className="text-lg">مساحة المؤسسة</CardTitle><p className="mt-1 text-sm text-slate-500">يعرض هذا النطاق المؤسسات المرتبطة بحسابك فقط. اختيار النطاق لا يمنح صلاحيات إضافية.</p></div><Badge variant="outline" className="border-cyan-200 bg-cyan-50 text-cyan-800">عزل مؤسسي</Badge></CardHeader><CardContent>{organizationsQuery.isLoading ? <p className="text-sm text-slate-500">جارٍ تحميل المؤسسات المصرح بها…</p> : organizationsQuery.data?.length ? <div className="flex flex-wrap items-center gap-3"><select value={selectedOrganizationId ?? ""} onChange={event => setSelectedOrganizationId(Number(event.target.value))} aria-label="اختيار المؤسسة" className="h-10 min-w-64 rounded-xl border border-slate-200 bg-white px-3 text-sm"><option value="" disabled>اختر المؤسسة</option>{organizationsQuery.data.map(organization => <option key={organization.id} value={organization.id}>{organization.displayName} · {organizationTypeLabels[organization.organizationType] ?? organization.organizationType}</option>)}</select><div className="rounded-xl bg-slate-50 px-4 py-2 text-xs text-slate-600">{organizationsQuery.data.find(item => item.id === selectedOrganizationId)?.countryCode ?? "—"} · الصلاحية خادمية</div></div> : <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">لا توجد مؤسسة نشطة مرتبطة بهذا الحساب حتى الآن. لا يتم إنشاء نطاق افتراضي أو منح وصول تلقائي.</div>}</CardContent></Card>}
