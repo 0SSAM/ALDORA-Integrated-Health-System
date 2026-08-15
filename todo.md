@@ -640,12 +640,12 @@
 - [x] Reduce the main client bundle by lazy-loading Home and Login behind a shared route fallback, and harden internal-auth parameter validation so malformed scrypt records or missing audit HMAC keys fail closed.
 
 # Interactive Demo Enhancement 2026-08-15
-- [ ] Replace the current read-only/demo landing behavior with an interactive demo workspace that exposes safe sample data for core ERP/CRM modules.
-- [ ] Add explicit demo-mode guardrails: synthetic data banner, no real persistence, no regulated submission, no external connector calls, and resettable demo state.
-- [ ] Add demo actions for browsing catalog, preparing a sample POS cart, reviewing a prescription workflow, viewing customer care/call-centre examples, and inspecting reports/alerts.
-- [ ] Add focused tests for demo-mode isolation, reset behavior, and blocked regulated/external mutations.
-- [ ] Verify desktop and mobile demo flows visually and run TypeScript, Vitest, and production build before checkpoint.
-- [ ] Document the demo entry path and the difference between simulated results and production integrations.
+- [x] Replace the current read-only/demo landing behavior with an interactive demo workspace that exposes safe sample data for core ERP/CRM modules.
+- [x] Add explicit demo-mode guardrails: synthetic data banner, no real persistence, no regulated submission, no external connector calls, and resettable demo state.
+- [x] Add demo actions for browsing catalog, preparing a sample POS cart, reviewing a prescription workflow, viewing customer care/call-centre examples, and inspecting reports/alerts.
+- [x] Add focused tests for demo-mode isolation, reset behavior, and blocked regulated/external mutations.
+- [x] Verify desktop and mobile demo flows visually and run TypeScript, Vitest, and production build before checkpoint.
+- [x] Document the demo entry path and the difference between simulated results and production integrations.
 
 # Interactive Demo Enhancement
 
