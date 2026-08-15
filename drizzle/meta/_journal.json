@@ -239,6 +239,13 @@
       "when": 1786811223427,
       "tag": "0033_solid_santa_claus",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1786812253177,
+      "tag": "0034_steady_ghost_rider",
+      "breakpoints": true
     }
   ]
 }

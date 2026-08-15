@@ -1065,3 +1065,11 @@
 - [x] Review and implement VAT/tax invoice foundations with jurisdiction-scoped tax profiles, invoice numbering, tax breakdown, correction/credit-note controls, and auditability; keep ETA/e-invoice exchange fail-closed pending credentials/specifications.
 - [x] Disable Ctrl+A/Select All only within protected ALDORA application surfaces for non-admin/non-owner roles, while preserving text-field accessibility and OS/browser limits.
 - [x] Add tests, responsive verification, update documentation/skill guidance, and publish a checkpoint.
+
+# Sales Returns and Tax Invoice Workspace 2026-08-15
+
+- [x] Review current sales, invoice, numbering, VAT, audit, and authorization contracts before adding a parallel financial path.
+- [x] Add scoped server contracts for return preview, eligibility checks, approval, refund/exchange/credit-note outcomes, and tax invoice issuance.
+- [x] Enforce original-invoice linkage, quantity limits, duplicate protection, jurisdiction tax profile, rounding, numbering, and audit events.
+- [x] Add a bilingual sales workspace for return processing and tax-invoice preview/issuance with clear fail-closed states.
+- [x] Add focused tests, full validation, responsive screenshots, documentation/skill updates, and publish a checkpoint.

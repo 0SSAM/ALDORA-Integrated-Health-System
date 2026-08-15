@@ -125,6 +125,47 @@ export const saleItems = mysqlTable("sale_items", {
   unitPrice: decimal("unitPrice", { precision: 14, scale: 2 }).notNull(),
 });
 
+export const salesReturns = mysqlTable("sales_returns", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  branchId: int("branchId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  originalSaleId: int("originalSaleId").notNull(),
+  originalSaleItemId: int("originalSaleItemId"),
+  quantity: decimal("quantity", { precision: 14, scale: 3 }).notNull(),
+  reasonCode: varchar("reasonCode", { length: 80 }).notNull(),
+  disposition: mysqlEnum("disposition", ["refund", "exchange", "credit_note", "rejected", "pending_review"]).default("pending_review").notNull(),
+  status: mysqlEnum("status", ["preview", "approved", "completed", "rejected", "cancelled"]).default("preview").notNull(),
+  amount: decimal("amount", { precision: 14, scale: 2 }).notNull(),
+  taxAmount: decimal("taxAmount", { precision: 14, scale: 2 }).default("0").notNull(),
+  notes: varchar("notes", { length: 500 }),
+  createdByUserId: int("createdByUserId").notNull(),
+  approvedByUserId: int("approvedByUserId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("sales_returns_scope_status_idx").on(table.organizationId, table.branchId, table.jurisdictionId, table.status), saleIdx: index("sales_returns_sale_idx").on(table.originalSaleId) }));
+
+export const taxInvoices = mysqlTable("tax_invoices", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  branchId: int("branchId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  saleId: int("saleId"),
+  returnId: int("returnId"),
+  invoiceNumber: varchar("invoiceNumber", { length: 80 }).notNull(),
+  invoiceType: mysqlEnum("invoiceType", ["sales", "credit_note", "debit_note"]).notNull(),
+  currencyCode: varchar("currencyCode", { length: 8 }).notNull(),
+  subtotal: decimal("subtotal", { precision: 14, scale: 2 }).notNull(),
+  vatAmount: decimal("vatAmount", { precision: 14, scale: 2 }).notNull(),
+  totalAmount: decimal("totalAmount", { precision: 14, scale: 2 }).notNull(),
+  status: mysqlEnum("status", ["draft", "issued_local", "submitted_blocked", "accepted", "rejected", "cancelled"]).default("draft").notNull(),
+  externalSubmissionGate: mysqlEnum("externalSubmissionGate", ["not_configured", "test_ready", "production_ready"]).default("not_configured").notNull(),
+  correctionOfInvoiceId: int("correctionOfInvoiceId"),
+  createdByUserId: int("createdByUserId").notNull(),
+  issuedAt: timestamp("issuedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ numberScopeIdx: uniqueIndex("tax_invoices_scope_number_idx").on(table.organizationId, table.branchId, table.jurisdictionId, table.invoiceNumber), scopeStatusIdx: index("tax_invoices_scope_status_idx").on(table.organizationId, table.branchId, table.jurisdictionId, table.status), saleIdx: index("tax_invoices_sale_idx").on(table.saleId) }));
+
 export const auditLogs = mysqlTable("audit_logs", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId"),

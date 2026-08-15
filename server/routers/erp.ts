@@ -3,7 +3,7 @@ import { parse as parseCookie } from "cookie";
 import { createHash } from "node:crypto";
 import { and, desc, eq, gte, inArray, isNull, like, lt, or, sql } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, ePrescriptions, ePrescriptionLines, healthcarePatients, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships, auditLogs } from "../../drizzle/schema";
+import { prescriptionIntakes, ePrescriptions, ePrescriptionLines, healthcarePatients, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, salesReturns, taxInvoices, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships, auditLogs } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -24,6 +24,8 @@ import { evaluatePromotion } from "../domain/promotion-policy";
 import { assertCatalogIntakeReady } from "../domain/catalog-intake-policy";
 import { assertDeviceTrustReady } from "../domain/device-trust-policy";
 import { hashAuditRecord } from "../domain/internal-auth";
+import { assertVatInvoiceReady, calculateVatInvoice } from "../domain/vat-invoice-policy";
+import { assessConsumerReturn, assertReturnPolicyConfigured } from "../domain/consumer-returns-policy";
 
 async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
   if (role === "admin") return null;
@@ -295,6 +297,33 @@ export const erpRouter = router({
           });
           return { saleId: result, jurisdictionId: assignment.jurisdictionId, status: "COMMITTED" as const };
         } catch { throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Sale could not be completed safely" }); }
+      }),
+    previewReturn: protectedProcedure
+      .input(z.object({ branchId: z.number().int().positive(), saleId: z.number().int().positive(), quantity: z.number().positive(), amount: z.number().nonnegative(), taxAmount: z.number().nonnegative().default(0), reason: z.enum(["defect", "wrong_item", "change_of_mind", "expired_or_damaged", "recall", "other"]), daysSinceSale: z.number().nonnegative(), itemSealed: z.boolean(), itemDispensed: z.boolean(), invoiceReferencePresent: z.boolean(), evidencePresent: z.boolean(), notes: z.string().max(500).optional() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb(); if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
+        const organizationId = await getBranchOrganizationId(db, input.branchId); const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
+        let rules: any = null; try { rules = profile?.taxProfile ? JSON.parse(profile.taxProfile) : null; } catch { rules = null; }
+        const decision = assessConsumerReturn({ reason: input.reason, daysSinceSale: input.daysSinceSale, itemSealed: input.itemSealed, itemDispensed: input.itemDispensed, invoiceReferencePresent: input.invoiceReferencePresent, evidencePresent: input.evidencePresent }, rules?.returns ?? null);
+        if (decision === "BLOCKED") throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Return is not eligible under the verified jurisdiction policy" });
+        const created = await db.insert(salesReturns).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, originalSaleId: input.saleId, quantity: input.quantity.toFixed(3), reasonCode: input.reason, disposition: decision === "REQUIRES_AUTHORITY_REVIEW" ? "pending_review" : "refund", status: "preview", amount: input.amount.toFixed(2), taxAmount: input.taxAmount.toFixed(2), notes: input.notes, createdByUserId: ctx.user.id });
+        return { returnId: Number(created[0].insertId), decision, status: "PREVIEW" as const, jurisdictionId: assignment.jurisdictionId };
+      }),
+    issueLocalTaxInvoice: protectedProcedure
+      .input(z.object({ branchId: z.number().int().positive(), saleId: z.number().int().positive().optional(), returnId: z.number().int().positive().optional(), invoiceNumber: z.string().min(3).max(80), invoiceType: z.enum(["sales", "credit_note", "debit_note"]), currencyCode: z.string().min(3).max(8), lines: z.array(z.object({ sku: z.string().min(1).max(80), quantity: z.number().positive(), unitPrice: z.number().nonnegative(), discountAmount: z.number().nonnegative().optional(), vatRate: z.number().min(0).max(100), exempt: z.boolean().default(false) })).min(1) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb(); if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        if (!input.saleId && !input.returnId) throw new TRPCError({ code: "BAD_REQUEST", message: "Tax invoice must reference a sale or approved return" });
+        const assignment = (await db.select().from(branchJurisdictions).where(eq(branchJurisdictions.branchId, input.branchId)).limit(1))[0];
+        try { assertBranchAssignmentReady(assignment); await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId); await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, assignment.jurisdictionId); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Scoped branch access rejected" }); }
+        const organizationId = await getBranchOrganizationId(db, input.branchId); const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, assignment.jurisdictionId)).limit(1))[0];
+        let tax: any = null; try { tax = profile?.taxProfile ? JSON.parse(profile.taxProfile) : null; } catch { tax = null; }
+        try { assertVatInvoiceReady(tax); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Verified VAT registration and tax rules are required; official submission remains fail-closed" }); }
+        let calculated; try { calculated = calculateVatInvoice(tax, input.lines.map(line => ({ sku: line.sku, quantity: line.quantity, unitPrice: line.unitPrice, discountAmount: line.discountAmount, vatRule: { code: "scope", rate: line.vatRate, exempt: line.exempt, verified: tax.ratesVerified } }))); } catch { throw new TRPCError({ code: "BAD_REQUEST", message: "Tax invoice calculation rejected the request" }); }
+        const created = await db.insert(taxInvoices).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, saleId: input.saleId, returnId: input.returnId, invoiceNumber: input.invoiceNumber, invoiceType: input.invoiceType, currencyCode: calculated.currencyCode, subtotal: calculated.subtotal.toFixed(2), vatAmount: calculated.vatAmount.toFixed(2), totalAmount: calculated.total.toFixed(2), status: "issued_local", externalSubmissionGate: "not_configured", createdByUserId: ctx.user.id, issuedAt: new Date() });
+        return { invoiceId: Number(created[0].insertId), status: "ISSUED_LOCAL" as const, externalSubmission: "BLOCKED_UNTIL_ETA_CREDENTIALS" as const, ...calculated };
       }),
   }),
   schedule: router({
