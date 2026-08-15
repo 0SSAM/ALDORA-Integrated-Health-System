@@ -874,3 +874,13 @@
 - [x] Verify each candidate's license, commercial-use terms, language coverage, release freshness, authentication complexity, and rate limits from primary sources.
 - [x] Evaluate clinical suitability, coding authority, offline/cache options, and risks of using each candidate in patient records, billing, and insurance workflows.
 - [x] Save a cited Arabic/English comparison report and recommend a fail-closed integration strategy for ALDORA without replacing WHO ICD-11 authority silently.
+
+
+# Reusable Healthcare Research Skill and NLM ICD-10-CM Connector
+
+- [x] Plan and package the reusable healthcare research, source-validation, licensing, fail-closed integration, and evidence-reporting skill.
+- [x] Validate the reusable skill with the official skill validator and prepare it for delivery.
+- [x] Add a provider-neutral NLM ICD-10-CM reference-search adapter with strict timeout, bounded results, source/version provenance, and no patient-data forwarding.
+- [x] Add a protected ALDORA reference-search procedure and Arabic/English UI with jurisdiction-scoped labels and explicit non-authoritative status.
+- [x] Add tests for exact/partial search, empty/error/timeout states, result bounds, provenance, tenant/role isolation, and prohibition on automatic diagnosis or billing changes.
+- [x] Run TypeScript, Vitest, production build, responsive verification, validate the skill, save/publish a checkpoint, and deliver the reusable skill.

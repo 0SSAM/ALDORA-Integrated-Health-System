@@ -1,8 +1,10 @@
 import { COOKIE_NAME } from "@shared/const";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getSessionCookieOptions, isSecureRequest } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { searchNlmIcd10Cm } from "./domain/nlm-icd10";
 import { erpRouter } from "./routers/erp";
 import { regionalRouter } from "./routers/regional";
 import { organizationsRouter } from "./routers/organizations";
@@ -95,6 +97,16 @@ export const appRouter = router({
   insurance: insuranceRouter,
   promotions: promotionsRouter,
   egyptHealthcare: egyptHealthcareRouter,
+  reference: router({
+    nlmIcd10CmSearch: protectedProcedure.input(z.object({ terms: z.string().min(2).max(120), count: z.number().int().min(1).max(50).optional() })).query(async ({ ctx, input }) => {
+      if (!["admin", "manager", "pharmacist"].includes(ctx.user.role)) throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك صلاحية البحث السريري المرجعي." });
+      return {
+        authority: "reference-only" as const,
+        warning: "NLM ICD-10-CM is a US reference source and does not finalize diagnoses, claims, or billing.",
+        results: await searchNlmIcd10Cm(input.terms, { count: input.count }),
+      };
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

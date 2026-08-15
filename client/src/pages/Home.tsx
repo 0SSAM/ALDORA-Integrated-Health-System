@@ -16,6 +16,7 @@ import { SupplyChainWorkspace } from "@/components/SupplyChainWorkspace";
 import { EgyptHealthcareWorkspace } from "@/components/EgyptHealthcareWorkspace";
 import { InsuranceWorkspace, OrganizationWorkspace, PromotionsWorkspace, ReportsWorkspace } from "@/components/IntegratedOperationsWorkspaces";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { NlmIcd10ReferencePanel } from "@/components/NlmIcd10ReferencePanel";
 import { describeSearchMatch, smartSearch } from "@/lib/smartSearch";
 
 const modules = [
@@ -33,11 +34,12 @@ const modules = [
   { id: "people", label: "الموظفون والفروع", searchText: "people hr employees branches", icon: Users },
   { id: "customerCare", label: "خدمة العملاء", searchText: "customer care crm patients", icon: UserRound },
   { id: "callCentre", label: "مركز الاتصال", searchText: "call center support tickets", icon: PhoneCall },
-  { id: "catalog", label: "كتالوج الأصناف", searchText: "catalog medicines cosmetics supplies products", icon: Database },
+    { id: "catalog", label: "كتالوج الأصناف", searchText: "catalog medicines cosmetics supplies products", icon: Database },
+    { id: "icd10", label: "بحث التشخيص المرجعي", searchText: "icd 10 icd10 diagnosis disease coding NLM", icon: Stethoscope },
   { id: "hardware", label: "إعداد الأجهزة والمحاكاة", searchText: "hardware printers scanners simulation devices", icon: Settings2 },
 ];
 
-const organizationModules: Record<string, string[]> = { government: ["overview", "compliance", "finance", "people", "insurance", "egyptHealthcare"], pharmacy: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "customerCare", "callCentre", "catalog"], pharmacy_chain: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "finance", "people", "customerCare", "callCentre", "catalog"], distributor: ["overview", "inventory", "supplyChain", "promotions", "compliance", "finance", "people", "catalog"], insurer: ["overview", "insurance", "compliance", "finance", "people", "customerCare"], rehabilitation: ["overview", "prescriptions", "customerCare", "finance", "compliance", "people"], hospital: ["overview", "inventory", "prescriptions", "insurance", "egyptHealthcare", "compliance", "finance", "people", "customerCare"], laboratory: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare"], radiology: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare"] };
+const organizationModules: Record<string, string[]> = { government: ["overview", "compliance", "finance", "people", "insurance", "egyptHealthcare", "icd10"], pharmacy: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "customerCare", "callCentre", "catalog", "icd10"], pharmacy_chain: ["overview", "pos", "inventory", "supplyChain", "prescriptions", "insurance", "promotions", "compliance", "finance", "people", "customerCare", "callCentre", "catalog", "icd10"], distributor: ["overview", "inventory", "supplyChain", "promotions", "compliance", "finance", "people", "catalog"], insurer: ["overview", "insurance", "compliance", "finance", "people", "customerCare", "icd10"], rehabilitation: ["overview", "prescriptions", "customerCare", "finance", "compliance", "people", "icd10"], hospital: ["overview", "inventory", "prescriptions", "insurance", "egyptHealthcare", "compliance", "finance", "people", "customerCare", "icd10"], laboratory: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare", "icd10"], radiology: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare", "icd10"] };
 
 const metrics = [
   { label: "مبيعات اليوم", value: "—", hint: "تظهر بعد ربط قاعدة البيانات", icon: Receipt, tone: "bg-cyan-50 text-cyan-700" },
@@ -67,7 +69,7 @@ export default function Home() {
   const role = user?.role as "admin" | "manager" | "pharmacist" | "cashier" | "user" | undefined;
   const allowedModules = useMemo(() => {
     if (!role) return modules.filter(item => item.id === "overview");
-    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], supplyChain: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], promotions: ["admin", "manager"], people: ["admin", "manager"], customerCare: ["admin", "manager", "pharmacist", "cashier"], callCentre: ["admin", "manager", "pharmacist", "cashier"], catalog: ["admin", "manager", "pharmacist"], hardware: ["admin", "manager"] };
+    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], supplyChain: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], promotions: ["admin", "manager"], people: ["admin", "manager"], customerCare: ["admin", "manager", "pharmacist", "cashier"], callCentre: ["admin", "manager", "pharmacist", "cashier"], catalog: ["admin", "manager", "pharmacist"], icd10: ["admin", "manager", "pharmacist"], hardware: ["admin", "manager"] };
     const scopedModuleIds = activeOrganizationType ? organizationModules[activeOrganizationType] : undefined;
     return modules.filter(item => (access[item.id] ?? (item.id === "egyptHealthcare" ? ["admin", "manager", "pharmacist"] : [])).includes(role) && (!scopedModuleIds || item.id === "hardware" || scopedModuleIds.includes(item.id)));
   }, [role, activeOrganizationType]);
@@ -139,6 +141,7 @@ function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { act
     customerCare: { title: "خدمة العملاء", description: "ملفات العملاء، الموافقات، المتابعة، والشكاوى مع سجل قابل للتدقيق.", items: ["ملف عميل", "متابعة علاجية", "موافقة وخصوصية"] },
     callCentre: { title: "مركز الاتصال", description: "استقبال المكالمات وتوزيع التذاكر ومواعيد إعادة الاتصال دون حفظ تسجيلات حساسة تلقائياً.", items: ["تذكرة جديدة", "أولوية وتصعيد", "موعد متابعة"] },
     catalog: { title: "كتالوج الأصناف", description: "بحث معزول حسب الدولة في الأدوية والتجميل والمستلزمات، مع مصدر ودرجة تحقق لكل صنف.", items: ["أدوية الدولة", "تجميل", "مستلزمات طبية"] },
+    icd10: { title: "بحث التشخيص المرجعي", description: "بحث مساعد في ICD-10-CM من NLM الأمريكي؛ لا يعتمد تشخيصاً نهائياً ولا يغير المطالبات أو الفواتير.", items: ["NLM Clinical Tables", "إصدار 2026", "مرجع US فقط"] },
     hardware: { title: "إعداد الأجهزة والمحاكاة", description: "اختيار موديلات الطابعات واتصالاتها واختبار الماسح والطابعة الحرارية دون جهاز فعلي.", items: ["موديلات ووسائط", "نوع الاتصال", "سجل محاكاة محلي"] },
     supplyChain: { title: "سلاسل الإمداد والتنبؤ", description: "توقع الطلب من المبيعات المسجلة ضمن الفرع والاختصاص المؤكدين، مع حالات جودة واضحة ومنع إصدار أمر شراء تلقائي.", items: ["سجل مبيعات فعلي", "مخزون مؤكد", "مراجعة بشرية"] },
     egyptHealthcare: { title: "المستشفيات والتأمين المصري", description: "مسارات مصرية داخلية للمرافق والمقابلات والمطالبات؛ الإرسال الحكومي لا يتفعل دون اعتماد رسمي.", items: ["حكومي وخاص", "مقابلات وإحالات", "مطالبات وفشل آمن"] },
@@ -149,6 +152,7 @@ function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { act
   if (active === "customerCare") return <CustomerCareWorkspace />;
   if (active === "callCentre") return <CallCentreWorkspace />;
   if (active === "catalog") return <CatalogWorkspace />;
+  if (active === "icd10") return <NlmIcd10ReferencePanel />;
   if (active === "hardware") return <HardwareWorkspace />;
   if (active === "supplyChain") return <SupplyChainWorkspace branchId={branchId} jurisdictionId={jurisdictionId} />;
   if (active === "egyptHealthcare") return <EgyptHealthcareWorkspace organizationId={organizationId} branchId={branchId} jurisdictionId={jurisdictionId} />;
