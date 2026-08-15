@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
 const Home = lazy(() => import("@/pages/Home"));
+const Welcome = lazy(() => import("@/pages/Welcome"));
 const Login = lazy(() => import("@/pages/Login"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 import { Route, Switch } from "wouter";
@@ -16,7 +17,8 @@ function Router() {
       <Switch>
       <Route path={"/login"} component={Login} />
       <Route path={"/sales"} component={Home} />
-      <Route path={"/"} component={Home} />
+      <Route path={"/workspace"} component={Home} />
+      <Route path={"/"} component={Welcome} />
       <Route path={"/404"}>
         <Suspense fallback={<RouteLoadingState />}>
           <NotFound />

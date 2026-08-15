@@ -681,3 +681,10 @@
 - [x] Ensure Demo mode opens interactive module workspaces instead of read-only overview content.
 - [x] Add tests for language persistence, RTL/LTR switching, and Demo entry visibility/guardrails.
 - [x] Verify login, Demo, responsive layouts, TypeScript, Vitest, and production build before checkpoint.
+
+# Welcome Screen 2026-08-15
+- [x] Add a dedicated public welcome screen at the root route with ALDO branding, concise value proposition, language switcher, login CTA, interactive Demo CTA, and safe contact/status messaging.
+- [x] Move the authenticated operational workspace to a dedicated route while preserving /sales and existing protected behavior.
+- [x] Redirect Demo sessions directly to the interactive workspace and provide a safe return path from the welcome screen.
+- [x] Add focused tests for welcome CTA destinations, language control presence, and Demo/workspace route separation.
+- [x] Verify desktop/mobile visuals, RTL/LTR, TypeScript, Vitest, production build, and save a published checkpoint.
