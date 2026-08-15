@@ -613,3 +613,6 @@
 - [x] Harden external-adapter readiness with explicit endpoint contract, submission acknowledgement, retry, and audit requirements while keeping all unconfigured adapters blocked; 71 test files passed, 223 tests passed, and production build passed.
 - [x] Require future invoice adapters to prove the shared external-adapter readiness contract before submission, while preserving local document and catalog-scope validation; 71 test files passed, 223 tests passed, and production build passed.
 - [x] Add a pure trusted-attestation contract validator for nonce, freshness, revocation, and organization/jurisdiction scope; keep it unused by browsers until an authorized native provider is configured; 71 test files passed, 231 tests passed, and production build passed.
+- [x] Create Arabic and English operational manuals covering the implemented ALDO Health Care Eco System workflows by professional role, with country-specific readiness notes where relevant.
+- [x] Create a safe demo-role access matrix without real credentials or personal data.
+- [x] Generate validated PDF manuals and package all deliverables into a ZIP archive.
