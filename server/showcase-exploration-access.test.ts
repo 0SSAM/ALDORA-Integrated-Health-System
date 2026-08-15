@@ -40,4 +40,15 @@ describe("showcase exploration access", () => {
     expect(source).toContain("const retreatShowcaseTour");
     expect(trpcBoundary).toContain("showcase_mutation_simulated");
   });
+
+  it("keeps barcode and return walkthroughs local, labelled, and non-persistent", () => {
+    expect(source).toContain("مسح باركود تجريبي");
+    expect(source).toContain("DEMO-622300-VC1000");
+    expect(source).toContain("لا تُفتح الكاميرا ولا يُستخدم أي جهاز");
+    expect(source).toContain("لم يُنشأ سطر فاتورة، ولم يُخصم أي مخزون");
+    expect(source).toContain("محاكاة مرتجع مبيعات");
+    expect(source).toContain("DEMO-CN-2026-1042-R1");
+    expect(source).toContain("لا يصدر إشعار، ولا يعاد صنف إلى المخزون");
+    expect(trpcBoundary).toContain("هذه العملية محاكاة فقط ولا تُحفظ من حساب العرض.");
+  });
 });

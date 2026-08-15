@@ -1337,3 +1337,10 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add the sale scenario to the Arabic showcase tour with progress, back/next, dismiss, and no mutation or stock deduction.
 - [x] Add a permanently visible, accessible «إعادة بدء الجولة» action in the showcase sidebar only.
 - [x] Add focused coverage for the restart control and no-save/no-deduction sale walkthrough boundary; validate with TypeScript, Vitest, build, and a mobile screenshot. Validation: TypeScript, production build, 348 passing tests with 9 safely skipped, and mobile capture.
+
+# Guided Showcase Return and Barcode Simulation — 2026-08-16
+
+- [x] Define a read-only return walkthrough from invoice lookup through reason selection, consumer-rights/tax-note review, and return-note preview.
+- [x] Add a barcode scan simulation to the showcase POS surface with a labelled demo code, product/batch verification, and no camera, persistence, or stock movement.
+- [x] Add both read-only flows to the Arabic showcase tour with progress controls and explicit no-save safety language.
+- [x] Add focused regression coverage for the simulated barcode and return path plus the server-side mutation block; validate with TypeScript, Vitest, build, and a mobile screenshot. Validation: TypeScript, production build, 349 passing tests with 9 safely skipped, and mobile capture.
