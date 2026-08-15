@@ -1305,4 +1305,4 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Register the login-health scheduled endpoint before the static/Vite fallthrough and document the production scheduling prerequisite.
 - [x] Add focused regression tests for the showcase trial boundary, login success UX, and scheduled handler authentication/health response.
 - [x] Run TypeScript, Vitest, production build, and responsive login verification before the next checkpoint.
-- [ ] Create and verify the production Heartbeat job after the deployed callback is confirmed reachable.
+- [x] Create and verify the production Heartbeat job after the deployed callback is confirmed reachable. Task UID: `i2xXRmbB233gsrfeuEqS68`; enabled schedule: `0 */5 * * * *` UTC.
