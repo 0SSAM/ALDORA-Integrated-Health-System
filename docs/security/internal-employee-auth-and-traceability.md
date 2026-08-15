@@ -2,7 +2,7 @@
 
 ## Purpose
 
-ALDO Health Care Eco System now distinguishes three identity paths: OAuth for the owner or platform administration, internal username/password authentication for organization employees, and a controlled demo mode without reusable credentials. These paths are intentionally not interchangeable.
+ألدورا | منظومة الرعاية الصحية المتكاملة now distinguishes three identity paths: OAuth for the owner or platform administration, internal username/password authentication for organization employees, and a controlled demo mode without reusable credentials. These paths are intentionally not interchangeable.
 
 ## Internal employee login
 

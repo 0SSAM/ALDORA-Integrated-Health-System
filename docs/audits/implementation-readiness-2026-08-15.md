@@ -1,4 +1,4 @@
-# ALDO Health Care Eco System — Implementation Readiness
+# ألدورا | منظومة الرعاية الصحية المتكاملة — Implementation Readiness
 
 ## Purpose
 

@@ -1,6 +1,6 @@
-# Ownership Notes — ALDO Health Care Eco System
+# Ownership Notes — ألدورا | منظومة الرعاية الصحية المتكاملة
 
-This project identity is being updated at the owner's request to **ALDO Health Care Eco System**.
+This project identity is being updated at the owner's request to **ألدورا | منظومة الرعاية الصحية المتكاملة**.
 
 The supplied CV identifies the professional owner/contributor as **Hossam Naeim Osman**, a pharmacist with experience in pharmacy operations, retail and hospital pharmacy, insurance, customer care, call-centre operations, branch management, inventory, and pharmacy systems.
 

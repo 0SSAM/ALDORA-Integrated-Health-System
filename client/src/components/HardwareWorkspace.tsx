@@ -41,7 +41,7 @@ export function buildDemoReceipt(modelId: string, barcode: string, media: string
     model: model?.name ?? "طابعة غير محددة",
     media,
     barcode: barcode.trim() || "8901234567890",
-    lines: ["ALDO Health Care Eco System", "DEMO RECEIPT — NOT A REAL SALE", "Paracetamol 500mg     42.00 EGP", "TOTAL                 42.00 EGP"],
+    lines: ["ألدورا | منظومة الرعاية الصحية المتكاملة", "DEMO RECEIPT — NOT A REAL SALE", "Paracetamol 500mg     42.00 EGP", "TOTAL                 42.00 EGP"],
   };
 }
 

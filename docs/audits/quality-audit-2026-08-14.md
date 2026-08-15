@@ -1,4 +1,4 @@
-# ALDO Health Care Eco System — Quality and Security Audit
+# ألدورا | منظومة الرعاية الصحية المتكاملة — Quality and Security Audit
 
 **Audit date:** 14 August 2026  
 **Scope:** Current managed project state after the `commitSale` catalog-evidence hardening milestone.  

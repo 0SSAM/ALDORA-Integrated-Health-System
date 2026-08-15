@@ -725,3 +725,12 @@
 - [x] Document operational response, evidence preservation, retention/deletion, incident review, and human oversight requirements.
 - [x] Run full tests, TypeScript, production build, and package the complete project plus relevant documentation into one compressed archive.
 - [x] Save and publish the anti-tampering and monitoring checkpoint.
+
+# Arabic Brand Rename and Language QA 2026-08-15
+
+- [x] Choose and apply a formal, modern, premium Arabic system name with an accurate English equivalent and short form.
+- [x] Replace old visible branding and metadata consistently across HTML, PWA manifest, app title, welcome screen, workspace, documentation, and generated delivery references.
+- [x] Perform Arabic RTL and English LTR copyediting of visible user-facing strings, correcting spelling, grammar, punctuation, terminology, and capitalization without changing security meaning.
+- [x] Review main routes and user-facing states for stale names, awkward translations, missing language labels, and inconsistent terminology.
+- [x] Run focused language/branding tests, full Vitest, TypeScript, production build, and responsive visual checks.
+- [x] Save and publish the renamed, language-reviewed checkpoint.

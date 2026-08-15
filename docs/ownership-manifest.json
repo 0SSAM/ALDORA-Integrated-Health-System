@@ -1,10 +1,10 @@
 {
   "schema": "aldo-ownership-manifest/v1",
-  "product": "ALDO Health Care Eco System",
-  "productSlug": "aldo-health-care-eco-system",
+  "product": "ألدورا | منظومة الرعاية الصحية المتكاملة",
+  "productSlug": "aldora-integrated-health-system",
   "ownerDeclaredBy": "Hossam Naeim Osman",
   "notice": "Owner-declared provenance record; obtain professional legal review for registration, licensing, and enforcement.",
-  "copyright": "© 2026 ALDO Health Care Eco System",
+  "copyright": "© 2026 ألدورا | ALDORA Integrated Health System",
   "repositoryProject": "bdf-pharma-erp",
   "licenseStatus": "project-controlled; do not redistribute without owner authorization",
   "fingerprintAlgorithm": "sha256",

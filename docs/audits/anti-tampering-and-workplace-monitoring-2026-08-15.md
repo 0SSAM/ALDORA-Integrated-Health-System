@@ -1,4 +1,4 @@
-# ALDO Health Care Eco System — Anti-Tampering and Workplace Monitoring Policy
+# ألدورا | منظومة الرعاية الصحية المتكاملة — Anti-Tampering and Workplace Monitoring Policy
 
 **Date:** 2026-08-15
 

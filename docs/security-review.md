@@ -2,7 +2,7 @@
 
 ## Scope and conclusion
 
-This review covers the implemented BDF Pharma ERP vertical slice: managed OAuth session handling, server-side role gates, POS discount and FEFO policy functions, prescription image intake, built-in vision extraction, pharmacist confirmation, scheduled inventory callbacks, branch-manager alert queueing, and audit hash helpers. The slice is suitable for controlled staging review after official integration credentials and branch data are configured. It is not a regulatory certification or a replacement for a production penetration test.
+This review covers the implemented ALDORA Integrated Health System vertical slice: managed OAuth session handling, server-side role gates, POS discount and FEFO policy functions, prescription image intake, built-in vision extraction, pharmacist confirmation, scheduled inventory callbacks, branch-manager alert queueing, and audit hash helpers. The slice is suitable for controlled staging review after official integration credentials and branch data are configured. It is not a regulatory certification or a replacement for a production penetration test.
 
 | Control area | Verification | Result | Remaining production action |
 |---|---|---|---|

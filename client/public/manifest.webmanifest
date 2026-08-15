@@ -1,7 +1,7 @@
 {
-  "name": "ALDO Health Care Eco System",
-  "short_name": "ALDO Health",
-  "description": "منصة رعاية صحية وصيدلية متعددة الدول",
+  "name": "ألدورا | منظومة الرعاية الصحية المتكاملة",
+  "short_name": "ألدورا",
+  "description": "منظومة رعاية صحية مؤسسية متعددة الدول",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#eef8f8",

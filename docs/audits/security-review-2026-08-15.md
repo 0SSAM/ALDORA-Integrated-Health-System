@@ -1,4 +1,4 @@
-# ALDO Health Care Eco System — Security Review
+# ألدورا | منظومة الرعاية الصحية المتكاملة — Security Review
 
 **Date:** 2026-08-15
 

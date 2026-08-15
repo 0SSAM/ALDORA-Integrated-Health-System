@@ -1,4 +1,4 @@
-# BDF Pharma ERP Architecture and Delivery Model
+# ألدورا | منظومة الرعاية الصحية المتكاملة — نموذج العمارة والتسليم
 
 ## Chosen delivery model
 

@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 
 const projectRoot = process.cwd();
 
-describe("ALDO product identity", () => {
+describe("ALDORA product identity", () => {
   it("uses the owner-approved product title without personal contact data", () => {
-    const title = process.env.VITE_APP_TITLE ?? "ALDO Health Care Eco System";
-    expect(title).toBe("ALDO Health Care Eco System");
+    const title = process.env.VITE_APP_TITLE ?? "ألدورا | منظومة الرعاية الصحية المتكاملة";
+    expect(title).toBe("ألدورا | منظومة الرعاية الصحية المتكاملة");
     expect(title).not.toMatch(/@|\+?\d{7,}/);
   });
 
@@ -16,7 +16,7 @@ describe("ALDO product identity", () => {
       readFileSync(`${projectRoot}/client/public/manifest.webmanifest`, "utf8"),
       readFileSync(`${projectRoot}/docs/ownership-manifest.json`, "utf8"),
     ].join("\n");
-    expect(publicIdentity).toContain("ALDO Health Care Eco System");
+    expect(publicIdentity).toContain("ألدورا | منظومة الرعاية الصحية المتكاملة");
     expect(publicIdentity).not.toMatch(/\b\d{9,14}\b/);
     expect(publicIdentity).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
     expect(publicIdentity).not.toContain("Hossam_Naeim_Osman_CV");

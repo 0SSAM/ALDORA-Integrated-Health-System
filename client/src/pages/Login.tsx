@@ -41,9 +41,9 @@ export default function Login() {
       <section className="relative m-auto grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/80 bg-white/85 shadow-[0_30px_100px_rgba(13,27,42,0.14)] backdrop-blur-xl lg:grid-cols-[1.05fr_.95fr]" aria-labelledby="login-title">
         <div className="flex flex-col justify-between bg-[#0d1b2a] p-8 text-white sm:p-12">
           <div>
-            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 to-teal-200 shadow-lg shadow-cyan-950/30" aria-label="ALDO logo"><ShieldCheck className="h-9 w-9 text-[#0d1b2a]" /></div>
-            <p className="mt-7 text-sm font-semibold tracking-[0.16em] text-cyan-200">ALDO HEALTH CARE ECO SYSTEM</p>
-            <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">منظومة رعاية صحية آمنة ومتعددة الجهات</h1>
+            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 to-teal-200 shadow-lg shadow-cyan-950/30" aria-label="شعار ألدورا"><ShieldCheck className="h-9 w-9 text-[#0d1b2a]" /></div>
+            <p className="mt-7 text-sm font-semibold tracking-[0.16em] text-cyan-200">ALDORA INTEGRATED HEALTH SYSTEM</p>
+            <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">منظومة الرعاية الصحية المتكاملة الآمنة</h1>
             <p className="mt-5 max-w-md text-sm leading-7 text-slate-300">دخول مؤسسي بصلاحيات مرتبطة بالفرع والجهة والاختصاص، مع سجل تدقيق للموظفين. لا توجد كلمات مرور تجريبية مشتركة.</p>
           </div>
           <div className="mt-12 grid gap-3 text-sm text-slate-300 sm:grid-cols-2"><div className="rounded-2xl border border-white/10 bg-white/5 p-4"><strong className="block text-white">حماية متعددة الطبقات</strong><span className="mt-1 block">جلسات، صلاحيات، وحظر محاولات متكررة.</span></div><div className="rounded-2xl border border-white/10 bg-white/5 p-4"><strong className="block text-white">تتبع آمن</strong><span className="mt-1 block">أحداث الدخول مرتبطة بسجل تدقيق قابل للتحقق.</span></div></div>
