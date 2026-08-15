@@ -606,3 +606,6 @@
 - [x] Refresh the open-prerequisites index with the exact remaining unchecked items after the database-test skip, preserving each blocker and its required prerequisite.
 
 - [x] Create and validate the dated source-safe Egyptian medicine workbook with 28-column medicine schema, coverage/limitations, field dictionary, source register, and import instructions; validation passed with zero medicine product rows and one explicit non-record status row.
+
+- [x] Add adaptive client performance defaults: conservative React Query caching, lazy-load non-critical routes/components, and avoid repeated session-storage work on every request without changing auth behavior.
+- [x] Include client-side unit tests in Vitest so the session-header cache test runs in CI and local regression checks.

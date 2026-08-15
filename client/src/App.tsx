@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/NotFound";
+import { lazy, Suspense } from "react";
+const NotFound = lazy(() => import("@/pages/NotFound"));
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -12,9 +13,17 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
+      <Route path={"/404"}>
+        <Suspense fallback={<RouteLoadingState />}>
+          <NotFound />
+        </Suspense>
+      </Route>
       {/* Final fallback route */}
-      <Route component={NotFound} />
+      <Route>
+        <Suspense fallback={<RouteLoadingState />}>
+          <NotFound />
+        </Suspense>
+      </Route>
     </Switch>
   );
 }
@@ -23,6 +32,14 @@ function Router() {
 // - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+
+function RouteLoadingState() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-sm text-muted-foreground">
+      جاري تحميل الصفحة…
+    </main>
+  );
+}
 
 function App() {
   return (
