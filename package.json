@@ -12,6 +12,8 @@
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
+    "test:lifecycle": "vitest run server/integration/test-database-safety.test.ts server/integration/test-database-secret.test.ts server/integration/test-database-lifecycle.test.ts server/integration/organization-scope.test.ts server/integration/schema-boundary.test.ts --no-file-parallelism",
+    "db:test:migrate": "tsx scripts/run-test-database-migrations.ts",
     "db:push": "drizzle-kit generate && drizzle-kit migrate"
   },
   "dependencies": {

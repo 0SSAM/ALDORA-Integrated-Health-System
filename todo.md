@@ -325,6 +325,7 @@
 - [x] Reconcile the deployed database migration baseline with the repository migration journal without recreating existing tables; the Drizzle root contains 22 SQL files matching 22 journal entries, while runtime database verification remains non-destructive.
 
 على الرغم من نجاح اختبارات السياسة وتحقق قاعدة البيانات الحالية، يجب عدم اعتبار العزل الكامل مكتملاً قبل ربط كل الجداول المستقبلية واختبارات التكامل الفعلية.
+
 - [x] Create an initial source-linked regulatory prerequisite register for Saudi Arabia, Egypt, and the UAE, with explicit activation gates and no unsupported compliance claims.
 - [x] Documented as BLOCKED: source-linked expansion requires current primary sources, effective dates, local licences, credentials, and acceptance criteria.
 - [x] Add an opt-in schema-boundary harness that runs only with TEST_DATABASE_URL and never connects to production implicitly; it verifies regulated NOT NULL scope and global-record nullability without writing data.
@@ -430,6 +431,7 @@
 - [x] Complete the current production-audit cycle for the implemented security, UX, and integration surfaces; remaining database, regulatory, credential, and assistive-technology gaps are explicitly tracked rather than claimed complete.
 
 # Audit Notes
+
 - The development network log showed analytics response bodies being retained by the browser debug collector. The collector now records metadata only and stores a fixed privacy-policy marker instead of response payloads.
 - [x] Add router-contract regression coverage for cross-country catalog and report access denial; persisted disposable-database lifecycle remains pending
 - [x] Persist report delivery attempts and create scoped in-app notification audit records while keeping external channels disabled (migration 0020; TypeScript and focused tests passed)
@@ -631,6 +633,7 @@
 - [x] Add the internal login UI, focused security tests, TypeScript/build verification, and documentation explaining how internal permissions connect to healthcare and medicine traceability; 74 test files passed, 239 tests passed, build passed, and /login was visually verified.
 
 # Comprehensive Cross-System Review 2026-08-15
+
 - [x] Review authentication, authorization, tenant/branch/jurisdiction isolation, session lifecycle, and audit integrity across implemented routes.
 - [x] Review regulated workflows, offline boundaries, medicine traceability, Data Matrix, encryption, and external-adapter fail-closed behavior.
 - [x] Review frontend routes, accessibility, RTL/mobile behavior, performance, error/loading states, and user-facing wording.
@@ -640,6 +643,7 @@
 - [x] Reduce the main client bundle by lazy-loading Home and Login behind a shared route fallback, and harden internal-auth parameter validation so malformed scrypt records or missing audit HMAC keys fail closed.
 
 # Interactive Demo Enhancement 2026-08-15
+
 - [x] Replace the current read-only/demo landing behavior with an interactive demo workspace that exposes safe sample data for core ERP/CRM modules.
 - [x] Add explicit demo-mode guardrails: synthetic data banner, no real persistence, no regulated submission, no external connector calls, and resettable demo state.
 - [x] Add demo actions for browsing catalog, preparing a sample POS cart, reviewing a prescription workflow, viewing customer care/call-centre examples, and inspecting reports/alerts.
@@ -683,6 +687,7 @@
 - [x] Verify login, Demo, responsive layouts, TypeScript, Vitest, and production build before checkpoint.
 
 # Welcome Screen 2026-08-15
+
 - [x] Add a dedicated public welcome screen at the root route with ALDO branding, concise value proposition, language switcher, login CTA, interactive Demo CTA, and safe contact/status messaging.
 - [x] Move the authenticated operational workspace to a dedicated route while preserving /sales and existing protected behavior.
 - [x] Redirect Demo sessions directly to the interactive workspace and provide a safe return path from the welcome screen.
@@ -690,6 +695,7 @@
 - [x] Verify desktop/mobile visuals, RTL/LTR, TypeScript, Vitest, production build, and save a published checkpoint.
 
 # Multilingual Smart Search 2026-08-15
+
 - [x] Add deterministic Arabic/English text normalization for catalog and searchable operational labels.
 - [x] Add Arabic-English keyboard-layout correction with conservative candidate scoring and no silent mutation of user input.
 - [x] Add cross-language search matching for names, IDs, ingredients, categories, and source text where indexed locally.
@@ -698,6 +704,7 @@
 - [x] Verify performance, RTL/LTR behavior, TypeScript, Vitest, production build, and save a published checkpoint.
 
 # Egyptian and Arab Pharmacopeia References 2026-08-15
+
 - [x] Identify and record the authoritative Egyptian source with authority and URL; document that no current legally usable pan-Arab reference was verified, so edition, effective date, access/licensing status, and activation remain BLOCKED until an issuing authority provides them.
 - [x] Add a provenance-safe pharmacopeia reference registry without copying protected monographs or treating pharmacopeia text as product registration approval.
 - [x] Define scoped uses for quality/specification review, active-ingredient/form normalization, pharmacist reference, and regulatory evidence review.
@@ -768,7 +775,6 @@
 - [x] Run full Vitest, TypeScript, production build, responsive visual verification, and save/publish the application checkpoint.
 - [x] Prepare the updated complete project archive if the user requests a downloadable bundle after this change.
 
-
 # Current Forecast Integration TODO
 
 - [x] Complete the reusable `aldora-healthcare-delivery` skill and validate its frontmatter/content.
@@ -776,7 +782,6 @@
 - [x] Preserve fail-closed behavior when branch/jurisdiction scope, history, or verified inventory inputs are unavailable.
 - [x] Add focused tests for forecast sales-history scope and real-data UI transformation.
 - [x] Run TypeScript, Vitest, production build, responsive checks, and refresh the delivery ZIP archive.
-
 
 # Comprehensive Integration Review
 
@@ -787,7 +792,6 @@
 - [x] Add or update integration regression tests and run TypeScript, Vitest, production build, and responsive visual verification.
 - [x] Update integration documentation and save a new checkpoint/archive after all items are verified.
 
-
 # Confirmed Integration Gaps
 
 - [x] Connect the real insurance request workflow to an authenticated workspace with scoped list/create/transition states and fail-closed messaging.
@@ -796,14 +800,12 @@
 - [x] Add a scoped organization-management entry point for authorized managers/admins, or document it as intentionally server-only.
 - [x] Add regression coverage for each newly connected frontend-to-backend contract and verify no demo data crosses into production views.
 
-
 # Hospital and Universal Health Insurance Status Review
 
 - [x] Audit government-hospital module coverage, workflows, roles, and data boundaries.
 - [x] Audit private-hospital module coverage, workflows, roles, and data boundaries.
 - [x] Audit universal health insurance workflows, claims, eligibility, approvals, providers, and official connector boundaries.
 - [x] Produce an evidence-based completeness matrix distinguishing implemented foundations, connected workflows, and blocked external integrations.
-
 
 # Egypt Hospital and Universal Health Insurance Completion
 
@@ -814,7 +816,6 @@
 - [x] Keep Egypt external adapters blocked until official endpoint specifications, credentials, test environment, acceptance evidence, and responsible authority are supplied.
 - [x] Add schema migrations, server procedures, UI workspaces, scope/security tests, full validation, documentation, and an updated checkpoint/archive.
 
-
 # GAHAR and Egypt Hospital Accreditation Readiness
 
 - [x] Research and record current official GAHAR accreditation domains, standards, manuals, and evidence requirements with source dates and URLs.
@@ -824,7 +825,6 @@
 - [x] Keep official submission, accreditation decision, and any external data exchange fail-closed until authorized specifications and credentials exist.
 - [x] Add tests, documentation, visual verification, and checkpoint/archive after implementation.
 
-
 # Remove Demo Mode and Demo Account
 
 - [x] Remove demo-mode entry points, buttons, routes, session flags, and demo-only navigation.
@@ -832,7 +832,6 @@
 - [x] Remove demo fixtures, synthetic workspace data, demo-only assets, and demo wording while preserving legitimate empty states.
 - [x] Audit internal employee and owner authentication, role guards, and production data boundaries after removal.
 - [x] Add regression tests, run TypeScript, Vitest, production build, responsive verification, and save a checkpoint.
-
 
 # Employee and Owner Login Recovery
 
@@ -842,7 +841,6 @@
 - [x] Improve Arabic/English login validation errors and visible loading/submission states without exposing credentials or sensitive authentication details.
 - [x] Add focused authentication and password-recovery regression tests, then run TypeScript, Vitest, production build, and responsive browser verification.
 - [x] Save and publish a checkpoint after all login and recovery items are verified.
-
 
 # Verified Recovery Channel and 2FA
 
@@ -855,7 +853,6 @@
 - [x] Existing recovery and authentication regression coverage is complete; provider/OTP-specific tests are deferred with the provider implementation and no external connector is active.
 - [x] TypeScript, Vitest, production build, responsive verification, and checkpoint validation completed for the currently enabled authentication and research scope; deferred integrations remain fail-closed.
 
-
 # ICD-11 Clinical Coding Integration
 
 - [x] WHO ICD-11 browser/API source, release, licensing, language coverage, and update obligations were researched and recorded; activation remains blocked by unavailable credentials.
@@ -867,14 +864,12 @@
 - [x] ICD-11 refresh/version activation remains deferred; the required evidence, approval, rollback, and stale-version fail-closed design is documented for future implementation.
 - [x] Research-scope documentation, TypeScript/build health, responsive verification, and a published checkpoint are complete; ICD-11 runtime tests await authorized implementation.
 
-
 # Alternative Disease Classification Sources
 
 - [x] Identify free or open alternatives for disease classification and terminology lookup, including official national/open datasets and public APIs.
 - [x] Verify each candidate's license, commercial-use terms, language coverage, release freshness, authentication complexity, and rate limits from primary sources.
 - [x] Evaluate clinical suitability, coding authority, offline/cache options, and risks of using each candidate in patient records, billing, and insurance workflows.
 - [x] Save a cited Arabic/English comparison report and recommend a fail-closed integration strategy for ALDORA without replacing WHO ICD-11 authority silently.
-
 
 # Reusable Healthcare Research Skill and NLM ICD-10-CM Connector
 
@@ -885,7 +880,6 @@
 - [x] Add tests for exact/partial search, empty/error/timeout states, result bounds, provenance, tenant/role isolation, and prohibition on automatic diagnosis or billing changes.
 - [x] Run TypeScript, Vitest, production build, responsive verification, validate the skill, save/publish a checkpoint, and deliver the reusable skill.
 
-
 # NLM Reference Search Cache and Skill Iteration
 
 - [x] Define a bounded, provider-scoped cache policy for NLM reference results, including TTL, key normalization, stale behavior, and privacy boundaries.
@@ -894,7 +888,6 @@
 - [x] Verify cache hit/miss, expiration, source failure, concurrent requests, tenant isolation, and response provenance through tests.
 - [x] Run TypeScript, Vitest, production build, responsive verification, validate the skill, and save/publish a checkpoint.
 
-
 # Admin-Only NLM Cache Refresh
 
 - [x] Update the reusable ALDORA skill with an admin-only cache invalidation workflow, audit requirements, and UI/server separation.
@@ -902,7 +895,6 @@
 - [x] Add an Arabic/English manual refresh button visible only to administrators, with loading, success, failure, and last-retrieved/version status.
 - [x] Add regression tests proving non-admin denial, audit behavior, cache invalidation, refresh success/failure, and no automatic diagnosis or billing mutation.
 - [x] Run TypeScript, Vitest, production build, responsive verification, validate the reusable skill, and save/publish a checkpoint.
-
 
 # Isolated Investor Showcase Account
 
@@ -913,14 +905,11 @@
 - [x] Add investor contact CTA without exposing personal contact data, plus Arabic/English showcase guidance.
 - [x] Add authentication, tenant-isolation, authorization, and UI regression tests; run TypeScript, Vitest, build, responsive verification, and save/publish a checkpoint.
 
-
 - [x] Confirmed deployment model: investor showcase account runs on the same site but is bound to a separate showcase organization and isolated scope.
 - [x] Confirmed showcase account must not use test/test credentials; use a strong managed credential with controlled rotation.
 
-
 - [x] Confirmed showcase credential choice: username `test` with a strong managed password, not `test/test`.
 - [x] Confirmed same-site showcase scope: separate organization, labeled non-production data, trial permissions, no delete/export/production/sensitive-connector access.
-
 
 - [x] Enforce server-side showcase simulation mode so sales, stock movements, receipts, invoices, claims, and other mutations cannot alter production balances or persistent production records.
 - [x] Block external connectors, notifications, exports, deletion, and irreversible actions for showcase sessions, with explicit simulation audit events.
@@ -928,6 +917,7 @@
 - [x] Add regression tests proving showcase transactions never cross organization boundaries or mutate production balances.
 
 # Investor Showcase TODO
+
 - [x] Create isolated ALDORA Investor Showcase organization, branch, and test account records
 - [x] Populate showcase-only synthetic products, inventory, and sales data
 - [x] Verify showcase login, scope isolation, and server-side mutation simulation guard
@@ -937,6 +927,7 @@
 - [x] Switch tamper-evident audit signing from short JWT_SECRET to validated AUDIT_SIGNING_KEY and pass its regression test
 
 # Comprehensive ALDORA Audit TODO
+
 - [x] Audit repository architecture, runtime boundaries, schema, migrations, routes, UI, and dependency risks.
 - [x] Audit authentication, session lifecycle, password recovery, audit signing, CSRF, rate limits, secrets, tenant isolation, and role permissions.
 - [x] Audit healthcare data protection, PHI boundaries, consent, retention, exports, logs, uploads, backups, and external connectors.
@@ -973,7 +964,6 @@
 - [x] Add regression tests for notice visibility, tooltip accessibility, fail-closed 2FA/recovery states, role/scope protection, and no external activation.
 - [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.
 
-
 # Connector and Accreditation Control Center 2026-08-15
 
 - [x] Define a central connector registry model with government and insurance providers, jurisdiction, organization scope, readiness state, required prerequisites, and last reviewed metadata.
@@ -982,7 +972,6 @@
 - [x] Add accessible tooltips and clear actions for reviewing prerequisites without presenting deferred connectors as active.
 - [x] Add regression tests for admin-only access, organization/jurisdiction scope, credential redaction, fail-closed activation, and readiness-state rendering.
 - [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.
-
 
 # Connector Filters and Accreditation Audit Log 2026-08-15
 
@@ -994,7 +983,6 @@
 - [x] Add regression tests for filter combinations, invalid filters, admin-only access, scope isolation, audit integrity, and secret redaction.
 - [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.
 
-
 # Accreditation Expiry and Status Alerts 2026-08-15
 
 - [x] Define bilingual alert policy for expiring, expired, and status-changed government/insurance accreditations, including severity and lead-time thresholds.
@@ -1003,7 +991,6 @@
 - [x] Add visible bilingual alert center and summary indicators to the connector dashboard with loading, empty, error, unread, and acknowledged states.
 - [x] Add regression tests for expiry thresholds, status changes, admin-only access, scope isolation, deduplication, acknowledgment, and fail-closed external delivery.
 - [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.
-
 
 # Egyptian Healthcare Catalog Research Expansion 2026-08-15
 
@@ -1017,7 +1004,6 @@
 - [x] Add or update a controlled catalog-intake path for reviewed records, preserving jurisdiction, organization scope, source evidence, and approval status.
 - [x] Run validation tests and provide downloadable research/data deliverables with a clear distinction between verified, commercial-reference, and pending-review records.
 
-
 # Catalog Approval and E-Prescription 2026-08-15
 
 - [x] Create a reusable skill for Egyptian healthcare catalog research, provenance, licensing, normalization, validation, review, and controlled import.
@@ -1029,7 +1015,6 @@
 - [x] Add prescription identity, verification, patient retrieval ID, dispensing status, partial dispensing, cancellation/expiry, and duplicate-dispense protections without exposing unnecessary PHI.
 - [x] Keep governmental, insurer, e-prescription exchange, SMS/email, and regulated integrations fail-closed until official specifications, credentials, sandbox, and acceptance evidence are provided.
 - [x] Add regression tests, run TypeScript, Vitest, production build, responsive visual verification, validate the skill, and save/publish a checkpoint.
-
 
 # Local Starter Catalog Import Clarification 2026-08-15
 
@@ -1093,12 +1078,14 @@
 Generated invoice PDF remains a local presentation/export artifact; official ETA submission stays fail-closed until formal credentials and acceptance evidence exist.
 
 # PDF Arabic Font and Preview Enhancements
+
 - [x] Embed a licensed Arabic-capable font in exported local tax invoice PDFs with a safe fallback.
 - [x] Add PDF preview modal before download with paper-size and printer-selection controls.
 - [x] Preserve server-issued invoice amounts, tenant-scoped branding, local-only ETA status, and print safety.
 - [x] Add focused tests and verify TypeScript, Vitest, production build, and responsive UI before checkpoint.
 
 # Comprehensive Security, Resilience, Migration, and Documentation Review
+
 - [x] Audit and strengthen discreet ownership/provenance protection for ALDO/ALDORA without claiming that code alone creates legal ownership rights.
 - [x] Produce a current cross-module capability and integration-harmony audit with implemented, partial, blocked, and deferred boundaries.
 - [x] Verify online/offline and weak-connection behavior; preserve fail-closed treatment for regulated mutations and document supported offline drafts.
@@ -1111,21 +1098,25 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Run focused/full tests, TypeScript, production build, documentation validation, and responsive verification before checkpoint.
 
 # Offline Connection and Sync Indicator
+
 - [x] Add a role-safe bilingual connection-status and sync-progress indicator to the application workspace.
 - [x] Reflect offline draft policy, pending/failed/syncing counts, last successful sync, and manual retry without claiming regulated offline commits.
 - [x] Add focused tests and verify TypeScript, Vitest, production build, and responsive UI; document modified files for delivery.
 
 # Automatic Reconnect Sync and Conflict Review
+
 - [x] Upload eligible local customer-care/call-centre drafts automatically after reconnect using idempotency.
 - [x] Add local sync states and a bilingual conflict review/resolution surface without auto-approving regulated work.
 - [x] Update aldora-healthcare-delivery skill with reconnect sync and conflict-resolution patterns.
 - [x] Add tests and run TypeScript, Vitest, production build, and responsive verification before checkpoint.
 
 # Reusable Reconnect Sync Skill
+
 - [x] Create and validate a standalone reusable skill for reconnect-triggered draft synchronization and conflict review.
 - [x] Deliver the generated SKILL.md as a downloadable skill artifact.
 
 # Retrospective Completion Review
+
 - [x] Build a requirement-by-requirement matrix from the user's comprehensive request, mapping implemented, partial, deferred, blocked, and unverified items to evidence files.
 - [x] Identify and implement remaining in-project ownership/provenance and governance safeguards that are technically feasible without making legal guarantees.
 - [x] Identify and implement remaining feasible gaps in offline/online operation, backup/restore, migration, weak-network resilience, performance, platform support, and module integration.
@@ -1133,66 +1124,79 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Run final verification and deliver a concise completed/remaining/external-prerequisites report.
 
 # ALDORA Official Overview Document — 2026-08-15
+
 - [x] Create one formal Arabic/English document combining the ALDORA naming explanation and system philosophy/operation guidance.
 - [x] Add print-friendly visual diagrams and restrained presentation effects without making unsupported claims.
 - [x] Validate and deliver the single downloadable document file.
 
 # ALDORA Official Overview Expansion — 2026-08-15
+
 - [x] Add a formal bilingual section defining the healthcare sectors ALDORA is designed to serve.
 - [x] Map the platform modules and operating role to each target sector without claiming unsupported live integrations.
 - [x] Re-export, validate, checkpoint, and directly deliver the updated document.
 
 # ALDORA Full Project Archive — 2026-08-15
+
 - [x] Inventory project files and define safe archive exclusions for secrets, environment files, generated dependencies, and runtime logs.
 - [x] Build one complete ZIP archive containing source code, tests, documentation, diagrams, migrations, configuration, and lockfiles.
 - [x] Verify archive integrity, manifest, and absence of secret files before direct delivery.
 
 # Enduro Raw Local Setup PDF — 2026-08-15
+
 - [x] Create a formal Arabic local-setup guide titled «إعدادات التشغيل المحلي لنظام ALDORA» based on the provided setup instructions.
 - [x] Generate and verify a print-ready PDF with clear headings, tables, commands, and security notes.
 - [x] Deliver the PDF directly as a downloadable attachment.
 
 # ALDORA Local Setup PDF Title Correction — 2026-08-15
+
 - [x] Use the corrected title «إعدادات التشغيل المحلي لنظام ALDORA» and filename for the final PDF.
 
 # ALDORA Account Access Sheet — 2026-08-15
+
 - [x] Confirm which account identifiers and roles are documented, without exposing password hashes or unverified secrets.
 - [x] Create a secure account sheet that identifies the test username and explains how its password is provisioned or reset.
 - [x] Verify and deliver the account sheet directly to the user.
 
 # ALDORA Continuous Integration — 2026-08-15
+
 - [x] Review package scripts and existing GitHub workflow configuration.
 - [x] Add a GitHub Actions workflow for TypeScript checks, tests, and production build on push and pull request.
 - [x] Validate the workflow locally, save the project checkpoint, and confirm synchronization with GitHub.
 
 # ALDORA CI Security and Maintenance Guardrails — 2026-08-15
+
 - [x] Add lint/format validation, dependency security audit, CodeQL analysis, and dependency review to CI. Production audit is now a blocking gate after the high-severity baseline was remediated.
 - [x] Add a post-build smoke check that validates the application responds without modifying data.
 - [x] Configure main-branch protection requiring the CI check when GitHub permissions allow it. (Attempted via GitHub API; private-repository plan returned 403, so the limitation and compensating controls are documented.)
 - [x] Document safe auto-maintenance boundaries: report and propose fixes automatically, but require review for security, data, permissions, or regulated changes; camera/microphone monitoring remains consent-gated and disabled by default.
 
 # Production Dependency High-Severity Remediation — 2026-08-15
+
 - [x] Inventory the nine high-severity production dependency findings and map each to its parent package and transitive path.
 - [x] Apply the smallest safe dependency updates or overrides and regenerate the lockfile.
 - [x] Re-run production audit, TypeScript, tests, build, and smoke check; document any residual advisory with a reason and remediation path.
 
 # Dependabot Security Updates Skill — 2026-08-15
+
 - [x] Verify repository, branch, existing Dependabot configuration, and GitHub security-update availability.
 - [x] Enable Dependabot security updates and configure safe dependency update grouping/scheduling without auto-merging major changes.
 - [x] Create and validate a reusable skill documenting Dependabot activation, CI gates, verification, and failure-safe rollback guidance.
 
 # ALDORA Local-Ready Archive Refresh — 2026-08-15
+
 - [x] Inventory the latest project files, CI, Dependabot, security policy, tests, and documentation for safe packaging.
 - [x] Add or refresh local setup instructions and a placeholder environment template without real secrets. (Added LOCAL_SETUP.md; real environment files remain excluded by design.)
 - [x] Build one complete updated ZIP archive and verify integrity, manifest, and absence of secrets or generated dependencies.
 - [x] Validate the documented local startup sequence, save the project checkpoint, and deliver the ZIP directly.
 
 # Direct ZIP Delivery Correction — 2026-08-15
+
 - [x] Locate and verify the actual updated ALDORA ZIP archive path and integrity. Verified `/home/ubuntu/ALDORA-local-ready-2026-08-15.zip` with `unzip -t` and confirmed inclusion of the showcase repair, review report, setup guide, and environment template.
 - [x] Rebuild the archive if the direct file is missing or stale. Rebuilt after the showcase repair while excluding secrets, local environment files, Git metadata, dependencies, logs, and build artifacts.
 - [x] Attach the ZIP file itself directly to the user, not a project-version link. Prepared for direct delivery with the completed checkpoint version linked separately for hosted review.
 
 # Comprehensive System Review and Showcase Login Fix — 2026-08-15
+
 - [x] Diagnose the test account failure in the deployed application, including secret configuration, authentication flow, and environment parity. Root cause: the isolated showcase branch was missing its jurisdiction binding, so scope creation failed closed.
 - [x] Correct the confirmed root cause and add regression coverage without exposing test credentials. Added idempotent isolated-scope reconciliation plus managed-secret hash reconciliation at startup; focused local login passes.
 - [x] Audit application health, security controls, CI, dependency state, multi-tenant safeguards, offline boundaries, and integration fail-closed behavior. Full suite passes: 100 files/329 tests, 5 safely skipped; TypeScript, production build, and blocking production audit pass.
@@ -1202,3 +1206,10 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add regression coverage proving that an incomplete showcase scope is repaired safely and cannot fall back to production scope.
 - [x] Review the remaining Partial/Deferred matrix items. CRM omnichannel/call-centre delivery, official government and insurer integrations, production backup operations, source-specific migration, clinical/tax approvals, independent penetration testing, and device field acceptance remain external or deployment-specific prerequisites and are explicitly fail-closed rather than falsely marked complete.
 - [x] Rebuild and integrity-check the local-ready project archive after the showcase repair, excluding secrets, local environments, Git metadata, dependencies, logs, and build artifacts.
+
+# Isolated Database Lifecycle Testing — 2026-08-15
+- [x] Inspect the current test-database guard, schema lifecycle helpers, Vitest configuration, and CI workflow for isolation gaps. The original guard accepted unlabelled database names and lifecycle coverage was absent.
+- [x] Enforce an explicit non-production `TEST_DATABASE_URL` and safety marker before any lifecycle test may connect, migrate, create, or remove data. The guard now requires a MySQL-family non-production host, non-root user, database name marked `test`/`ci`/`sandbox`, `TEST_DATABASE_ISOLATED=true`, and lifecycle consent.
+- [x] Add deterministic lifecycle coverage that provisions only scoped test records, verifies cleanup, and fails closed when isolation evidence is absent. The probe uses only a temporary table, rolls back, drops it, and verifies that no persistent probe table exists.
+- [ ] Configure the continuous-integration workflow to run the lifecycle suite only when the isolated test database is available, never against the application database.
+- [x] Document local and CI setup, validation evidence, and the residual operational prerequisite for supplying an isolated database endpoint in `docs/testing/isolated-database-lifecycle.md`.

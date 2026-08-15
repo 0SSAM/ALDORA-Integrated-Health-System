@@ -58,6 +58,54 @@ jobs:
       - name: Post-build smoke check
         run: ./scripts/ci-smoke.sh
 
+  database-lifecycle:
+    name: Isolated database lifecycle
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: aldora_ci_test
+          MYSQL_USER: aldora_ci_runner
+          MYSQL_PASSWORD: aldora_ci_only
+          MYSQL_ROOT_PASSWORD: ephemeral_root_only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -pephemeral_root_only"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DATABASE_URL: mysql://aldora_ci_runner:aldora_ci_only@127.0.0.1:3306/aldora_ci_test
+      TEST_DATABASE_URL: mysql://aldora_ci_runner:aldora_ci_only@127.0.0.1:3306/aldora_ci_test
+      TEST_DATABASE_ISOLATED: "true"
+      TEST_DATABASE_LIFECYCLE: enabled
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations to the isolated service database
+        run: pnpm db:test:migrate
+
+      - name: Run database lifecycle tests
+        run: pnpm test:lifecycle
+
   codeql:
     name: CodeQL security analysis
     runs-on: ubuntu-latest
