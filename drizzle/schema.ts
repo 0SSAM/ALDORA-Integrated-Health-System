@@ -88,6 +88,8 @@ export const sales = mysqlTable("sales", {
   discountValidation: varchar("discountValidation", { length: 40 }).notNull(),
   paymentMethod: mysqlEnum("paymentMethod", ["cash", "meeza", "instapay", "insurance"]).notNull(),
   etaStatus: mysqlEnum("etaStatus", ["pending", "submitted", "valid", "invalid"]).default("pending").notNull(),
+  saleStatus: mysqlEnum("saleStatus", ["completed", "voided", "cancelled"]).default("completed").notNull(),
+  recordMode: mysqlEnum("recordMode", ["production", "demo"]).default("production").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, table => ({ invoiceIdx: uniqueIndex("sales_invoice_idx").on(table.invoiceNumber), branchDateIdx: index("sales_branch_date_idx").on(table.branchId, table.createdAt) }));
 

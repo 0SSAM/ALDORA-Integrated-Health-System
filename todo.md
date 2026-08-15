@@ -758,15 +758,15 @@
 
 # Actual Sales Forecast Integration and Reusable Skill
 
-- [ ] Review the implemented sales schema and forecast policy to define the authorized aggregation boundary for actual sales.
-- [ ] Add server-side actual-sales aggregation by organization, branch, jurisdiction, product, and time bucket with exclusion of cancelled, voided, demo, and unauthorized records.
-- [ ] Connect the aggregation to the demand forecast and reorder dashboard with data-quality states, source timestamps, and no-data fail-closed behavior.
-- [ ] Add tests for tenant/branch isolation, status filtering, time-window boundaries, duplicate/idempotency handling, and forecast input provenance.
-- [ ] Document that recommendations remain decision support and never create purchase orders without authorized approval.
-- [ ] Create a reusable skill package describing the secure healthcare ERP review, fail-closed implementation, testing, visual verification, checkpoint, and archive workflow.
-- [ ] Validate the reusable skill with the official skill validator and deliver its SKILL.md.
-- [ ] Run full Vitest, TypeScript, production build, responsive visual verification, and save/publish the application checkpoint.
-- [ ] Prepare the updated complete project archive if the user requests a downloadable bundle after this change.
+- [x] Review the implemented sales schema and forecast policy to define the authorized aggregation boundary for actual sales.
+- [x] Add server-side actual-sales aggregation by organization, branch, jurisdiction, product, and time bucket with exclusion of cancelled, voided, demo, and unauthorized records.
+- [x] Connect the aggregation to the demand forecast and reorder dashboard with data-quality states, source timestamps, and no-data fail-closed behavior.
+- [x] Add tests for tenant/branch isolation, status filtering, time-window boundaries, duplicate/idempotency handling, and forecast input provenance.
+- [x] Document that recommendations remain decision support and never create purchase orders without authorized approval.
+- [x] Create a reusable skill package describing the secure healthcare ERP review, fail-closed implementation, testing, visual verification, checkpoint, and archive workflow.
+- [x] Validate the reusable skill with the official skill validator and deliver its SKILL.md.
+- [x] Run full Vitest, TypeScript, production build, responsive visual verification, and save/publish the application checkpoint.
+- [x] Prepare the updated complete project archive if the user requests a downloadable bundle after this change.
 
 
 # Current Forecast Integration TODO

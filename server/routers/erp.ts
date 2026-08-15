@@ -111,7 +111,7 @@ export const erpRouter = router({
         const organizationId = await getBranchOrganizationId(db, input.branchId);
         if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Sales history is outside the active organization scope" });
         const start = new Date(Date.now() - (input.historyDays - 1) * 24 * 60 * 60 * 1000);
-        const filters = [eq(sales.organizationId, organizationId), eq(sales.branchId, input.branchId), eq(sales.jurisdictionId, input.jurisdictionId), gte(sales.createdAt, start)];
+        const filters = [eq(sales.organizationId, organizationId), eq(sales.branchId, input.branchId), eq(sales.jurisdictionId, input.jurisdictionId), eq(sales.saleStatus, "completed"), eq(sales.recordMode, "production"), gte(sales.createdAt, start)];
         const rows = await db.select({ productId: saleItems.productId, day: sql<string>`DATE(${sales.createdAt})`, units: sql<string>`SUM(${saleItems.quantity})` }).from(saleItems).innerJoin(sales, eq(saleItems.saleId, sales.id)).where(and(...filters, ...(input.productIds?.length ? [inArray(saleItems.productId, input.productIds)] : []))).groupBy(saleItems.productId, sql`DATE(${sales.createdAt})`);
         const dayKeys = Array.from({ length: input.historyDays }, (_, index) => { const day = new Date(start.getTime() + index * 24 * 60 * 60 * 1000); return day.toISOString().slice(0, 10); });
         const byProduct = new Map<number, Map<string, number>>();
@@ -221,7 +221,7 @@ export const erpRouter = router({
         }
         try {
           const result = await db.transaction(async (tx) => {
-            const inserted = await tx.insert(sales).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, cashierId: ctx.user.id, invoiceNumber: input.invoiceNumber, subtotal: subtotal.toFixed(2), discountAmount: input.discountAmount.toFixed(2), totalAmount: (subtotal - input.discountAmount).toFixed(2), discountValidation: "MOH_7_PERCENT", paymentMethod: input.paymentMethod, etaStatus: "pending" });
+            const inserted = await tx.insert(sales).values({ organizationId, branchId: input.branchId, jurisdictionId: assignment.jurisdictionId, cashierId: ctx.user.id, invoiceNumber: input.invoiceNumber, subtotal: subtotal.toFixed(2), discountAmount: input.discountAmount.toFixed(2), totalAmount: (subtotal - input.discountAmount).toFixed(2), discountValidation: "MOH_7_PERCENT", paymentMethod: input.paymentMethod, etaStatus: "pending", saleStatus: "completed", recordMode: "production" });
             const saleId = Number(inserted[0].insertId);
             await tx.insert(saleItems).values(checkedItems.map((item) => ({ saleId, productId: item.productId, batchId: item.batchId, unit: item.unit, quantity: item.quantity.toFixed(3), unitPrice: item.unitPrice.toFixed(2) })));
             for (const item of checkedItems) { const updatedBatch = await tx.update(inventoryBatches).set({ quantityOnHand: (item.remaining - item.quantity).toFixed(3) }).where(and(eq(inventoryBatches.id, item.batchId), eq(inventoryBatches.organizationId, organizationId), eq(inventoryBatches.branchId, input.branchId), eq(inventoryBatches.jurisdictionId, assignment.jurisdictionId))).execute(); if (Number(updatedBatch[0]?.affectedRows ?? 0) !== 1) throw new Error("Inventory batch could not be reserved"); }
