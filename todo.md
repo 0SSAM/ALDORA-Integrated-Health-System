@@ -961,3 +961,14 @@
 - [x] Reduce initial JavaScript payload with safe vendor code-splitting and verify production build output.
 
 - [x] Trust forwarded host and protocol headers only when the request originates from the configured loopback proxy; add regression tests for direct-client spoofing.
+
+# Integration Status Notices and Authentication Settings 2026-08-15
+
+- [x] Add visible Arabic/English notices for government and insurance integrations that are currently closed pending official credentials, specifications, sandbox verification, and acceptance evidence.
+- [x] Add accessible tooltips explaining why government and insurance features are fail-closed and what prerequisite unlocks them, without implying official integration is active.
+- [x] Add a protected authentication settings workspace for 2FA and password recovery readiness, clearly separating configured, deferred, and unavailable states.
+- [x] Add 2FA setup/status UI with fail-closed enrollment boundaries, no fake QR/OTP secrets, and explicit requirement for an approved TOTP or institutional provider policy.
+- [x] Add password-recovery channel settings UI ready for an institutional email provider, without exposing or generating real recovery tokens in the browser.
+- [x] Add Arabic/English loading, success, error, deferred, and unavailable states for the new settings and integration notices.
+- [x] Add regression tests for notice visibility, tooltip accessibility, fail-closed 2FA/recovery states, role/scope protection, and no external activation.
+- [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.

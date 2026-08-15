@@ -28,6 +28,13 @@ export const appRouter = router({
       role: ctx.user.role,
       expiresAt: ctx.internalSession?.session.expiresAt ?? null,
     } : { authenticated: false as const }),
+    securityReadiness: protectedProcedure.query(() => ({
+      twoFactorState: "deferred" as const,
+      recoveryChannelState: "deferred" as const,
+      emailProviderConfigured: false as const,
+      externalActivation: "blocked" as const,
+      reason: "لا توجد قناة بريد أو OTP مؤسسية موثقة حالياً؛ تبقى الأسرار والرموز والتسليم الخارجي مغلقة بأمان.",
+    })),
     internalLogin: publicProcedure.input(z.object({ username: z.string().min(3).max(80), password: z.string().min(1).max(200) })).mutation(async ({ ctx, input }) => {
       const username = normalizeInternalUsername(input.username);
       const credential = await getInternalCredentialByUsername(username);
