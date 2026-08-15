@@ -1253,13 +1253,13 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Do not close the task if GitHub access prevents observable CI verification; request reconnection instead. The blocker is preserved explicitly in the audit and final summary.
 
 # GitHub Repository Migration Verification — 2026-08-15
-- [ ] Verify access to the migrated repository `ALDO-Health-Care-Eco-System` and confirm its exact owner/name.
-- [ ] Inspect the migrated workflow definitions and recent GitHub Actions runs without reading secret values.
-- [ ] Run or follow the MySQL disposable-service lifecycle job and record its observable result.
-- [ ] Update the documented CI repository reference and close the prior access blocker only when evidence is available.
+- [x] Verify access to the migrated repository `ALDO-Health-Care-Eco-System` and confirm its exact owner/name.
+- [x] Inspect the migrated workflow definitions and recent GitHub Actions runs without reading secret values.
+- [x] Run or follow the MySQL disposable-service lifecycle job and record its observable result.
+- [x] Update the documented CI repository reference and close the prior access blocker only when evidence is available.
 
-- [ ] Fix CI disposable MySQL schema drift by adding the missing nullable branches.jurisdictionId migration, regression coverage, and external GitHub verification.
-- [ ] Package and integrity-check the final local-ready ALDORA archive after CI verification.
-- [ ] Resolve CI compatibility blockers revealed by the migrated repository: TypeScript 6 rejecting deprecated baseUrl and dependency-review unsupported on the current private repository plan, while retaining visible security evidence.
-- [ ] Add an explicit post-migration schema assertion/repair in the isolated test runner so CI fails with the missing table/column name and never proceeds with a partially compatible disposable schema.
-- [ ] Add the remaining missing jurisdictionId columns discovered by schema comparison for customer_profiles and call_tickets, generate/apply the next MySQL migration, and rerun isolated CI.
+- [x] Fix CI disposable MySQL schema drift by adding the missing nullable branches.jurisdictionId migration, regression coverage, and external GitHub verification.
+- [x] Package and integrity-check the final local-ready ALDORA archive after CI verification.
+- [x] Resolve CI compatibility blockers revealed by the migrated repository: TypeScript 6 rejecting deprecated baseUrl and dependency-review unsupported on the current private repository plan, while retaining visible security evidence.
+- [x] Add an explicit post-migration schema assertion/repair in the isolated test runner so CI fails with the missing table/column name and never proceeds with a partially compatible disposable schema.
+- [x] Add the remaining missing jurisdictionId columns discovered by schema comparison for customer_profiles and call_tickets, generate/apply the next MySQL migration, and rerun isolated CI.
