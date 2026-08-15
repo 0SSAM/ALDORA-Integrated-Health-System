@@ -87,10 +87,18 @@ export function assertPrescriptionConfirmed(status: "UPLOADED" | "PENDING_REVIEW
   return true as const;
 }
 
-export function validatePrescriptionUpload(input: { mimeType: string; byteLength: number }) {
+export function validatePrescriptionUpload(input: { mimeType: string; byteLength: number; bytes?: Uint8Array }) {
   const allowed = new Set(["image/jpeg", "image/png", "image/webp"]);
   if (!allowed.has(input.mimeType)) throw new Error("Unsupported prescription image type");
+  if (!Number.isSafeInteger(input.byteLength) || input.byteLength <= 0) throw new Error("Prescription image is empty or invalid");
   if (input.byteLength > 8 * 1024 * 1024) throw new Error("Prescription image must be 8MB or smaller");
+  if (input.bytes) {
+    const bytes = input.bytes;
+    const jpeg = input.mimeType === "image/jpeg" && bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    const png = input.mimeType === "image/png" && bytes.length >= 8 && bytes.slice(0, 8).every((value, index) => value === [137, 80, 78, 71, 13, 10, 26, 10][index]);
+    const webp = input.mimeType === "image/webp" && bytes.length >= 12 && String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]) === "RIFF" && String.fromCharCode(bytes[8], bytes[9], bytes[10], bytes[11]) === "WEBP";
+    if (!(jpeg || png || webp)) throw new Error("Prescription image signature does not match MIME type");
+  }
   return true as const;
 }
 

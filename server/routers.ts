@@ -1,6 +1,6 @@
 import { COOKIE_NAME } from "@shared/const";
 import { z } from "zod";
-import { getSessionCookieOptions } from "./_core/cookies";
+import { getSessionCookieOptions, isSecureRequest } from "./_core/cookies";
 import { createDemoToken, demoCookieOptions, DEMO_COOKIE_NAME } from "./_core/demo";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
@@ -47,13 +47,13 @@ export const appRouter = router({
       const token = createInternalSessionToken();
       await createInternalSession({ token, userId: credential.userId, ...scope, expiresAt: new Date(now.getTime() + INTERNAL_SESSION_TTL_MS) });
       await recordAuthenticationEvent({ username, userId: credential.userId, ...scope, eventType: "login_success", source: "internal" });
-      ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: ctx.req.secure, maxAge: INTERNAL_SESSION_TTL_MS, path: "/" });
+      ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), maxAge: INTERNAL_SESSION_TTL_MS, path: "/" });
       return { success: true as const, mode: "internal" as const, scope };
     }),
     internalLogout: publicProcedure.mutation(async ({ ctx }) => {
       const token = ctx.req.cookies?.[INTERNAL_SESSION_COOKIE];
       if (token) await revokeInternalSession(token);
-      ctx.res.clearCookie(INTERNAL_SESSION_COOKIE, { httpOnly: true, sameSite: "lax", secure: ctx.req.secure, maxAge: 0, path: "/" });
+      ctx.res.clearCookie(INTERNAL_SESSION_COOKIE, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), maxAge: 0, path: "/" });
       return { success: true as const };
     }),
     startDemo: publicProcedure.mutation(({ ctx }) => {

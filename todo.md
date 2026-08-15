@@ -705,3 +705,13 @@
 - [x] Add fail-closed tests for missing source, stale edition, missing license, wrong jurisdiction, and unverified product claims.
 - [x] Update Arabic/English operational documentation with pharmacopeia usage boundaries and run TypeScript, Vitest, build, and visual checks.
 - [x] Save and publish the verified implementation; keep unavailable official sources and credentials explicitly open.
+
+# Security Hardening Review 2026-08-15
+
+- [x] Audit and harden HTTP security headers, transport security, clickjacking protection, MIME sniffing, referrer policy, and browser capability policy.
+- [x] Audit authentication/session cookies, CSRF boundaries, OAuth/internal-auth separation, logout/revocation, throttling, and sensitive error disclosure.
+- [x] Audit tRPC/API input validation, organization/branch/jurisdiction authorization, IDOR/cross-tenant access, and regulated-entrypoint fail-closed behavior.
+- [x] Audit upload/storage handling, prescription files, path/key safety, MIME/size validation, and sensitive-data exposure.
+- [x] Add automated security regression tests for the hardened controls and attack-boundary cases.
+- [x] Run TypeScript, Vitest, production build, dependency/security checks, and document residual risks and external operational prerequisites.
+- [ ] Save and publish the security-hardening checkpoint with a dated security review report.

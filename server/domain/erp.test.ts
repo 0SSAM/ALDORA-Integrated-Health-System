@@ -56,10 +56,12 @@ describe("ERP domain services", () => {
     expect(() => validateInventorySchedulePolicy({ role: "admin", path: "/api/other", cron: "0 0 6 * * *" })).toThrow(/path/);
   });
 
-  it("rejects invalid prescription uploads", () => {
+  it("rejects invalid prescription uploads and mismatched file signatures", () => {
     expect(() => validatePrescriptionUpload({ mimeType: "application/pdf", byteLength: 100 })).toThrow(/Unsupported/);
     expect(() => validatePrescriptionUpload({ mimeType: "image/png", byteLength: 8 * 1024 * 1024 + 1 })).toThrow(/8MB/);
-    expect(validatePrescriptionUpload({ mimeType: "image/png", byteLength: 128 })).toBe(true);
+    expect(() => validatePrescriptionUpload({ mimeType: "image/png", byteLength: 0 })).toThrow(/empty/);
+    expect(() => validatePrescriptionUpload({ mimeType: "image/png", byteLength: 4, bytes: new Uint8Array([0, 1, 2, 3]) })).toThrow(/signature/);
+    expect(validatePrescriptionUpload({ mimeType: "image/png", byteLength: 8, bytes: new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]) })).toBe(true);
   });
 
   it("creates and verifies a tamper-evident audit hash chain", () => {
