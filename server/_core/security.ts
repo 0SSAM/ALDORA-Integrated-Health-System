@@ -70,7 +70,11 @@ export function isTrustedMutationRequest(req: Request): SecurityDecision {
   // The public WebDev reverse proxy may terminate TLS before the app receives
   // the request, so accept either scheme for the *current Host* without trusting
   // forwarded host/protocol headers supplied by a direct client.
-  if ((originHeader || refererHeader) && (!supplied || (!hostBoundOrigins.has(supplied) && supplied !== expected))) {
+  const browserSameOrigin = secFetchSite === "same-origin" && Boolean(originHeader || refererHeader);
+  if (
+    (originHeader || refererHeader) &&
+    (!supplied || (!hostBoundOrigins.has(supplied) && supplied !== expected && !browserSameOrigin))
+  ) {
     return { allowed: false, status: 403, reason: "request origin rejected" };
   }
   return { allowed: true };
