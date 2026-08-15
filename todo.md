@@ -982,3 +982,14 @@
 - [x] Add accessible tooltips and clear actions for reviewing prerequisites without presenting deferred connectors as active.
 - [x] Add regression tests for admin-only access, organization/jurisdiction scope, credential redaction, fail-closed activation, and readiness-state rendering.
 - [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.
+
+
+# Connector Filters and Accreditation Audit Log 2026-08-15
+
+- [x] Add advanced bilingual filters for country, provider, connector type, and readiness stage in the admin connector dashboard.
+- [x] Add a protected server-side filtering contract that validates allowed values and preserves organization/branch/jurisdiction scope.
+- [x] Add detailed connector/accreditation audit records for status changes, including actor, scope, connector, previous/new state, reason, timestamp, and correlation identifier.
+- [x] Ensure audit records are tamper-evident, append-only, credential-redacted, and inaccessible to non-admin users.
+- [x] Add an admin-only audit-log view with filtering, empty/loading/error states, and clear fail-closed messaging.
+- [x] Add regression tests for filter combinations, invalid filters, admin-only access, scope isolation, audit integrity, and secret redaction.
+- [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.

@@ -15,12 +15,14 @@ import { promotionsRouter } from "./routers/promotions";
 import { egyptHealthcareRouter } from "./routers/egypt-healthcare";
 import { createPasswordResetToken, getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, resetInternalPasswordWithToken, revokeInternalSession } from "./db";
 import { assertPasswordPolicy, createInternalSessionToken, INTERNAL_LOCKOUT_MS, INTERNAL_MAX_FAILED_ATTEMPTS, INTERNAL_SESSION_COOKIE, INTERNAL_SESSION_TTL_MS, isLocked, normalizeInternalUsername, verifyInternalPassword } from "./domain/internal-auth";
-import { hashInternalPassword } from "./domain/internal-auth";
+import { hashInternalPassword, hashAuditRecord } from "./domain/internal-auth";
 
 const connectorReadinessRegistry = [
   {
     id: "egypt-government",
     category: "government" as const,
+    connectorType: "government-regulatory" as const,
+    countryCode: "EG" as const,
     name: "الجهات الحكومية المصرية",
     providers: ["UPA", "EDA", "ETA", "UHIA"],
     jurisdiction: "EG",
@@ -33,6 +35,8 @@ const connectorReadinessRegistry = [
   {
     id: "insurance-payers",
     category: "insurance" as const,
+    connectorType: "insurance-payer" as const,
+    countryCode: "EG" as const,
     name: "شركات التأمين والجهات الدافعة",
     providers: ["TPA / Payer APIs"],
     jurisdiction: "EG",
@@ -55,11 +59,53 @@ export const appRouter = router({
       role: ctx.user.role,
       expiresAt: ctx.internalSession?.session.expiresAt ?? null,
     } : { authenticated: false as const }),
-    connectorReadiness: adminProcedure.query(() => ({
-      reviewedAt: "2026-08-15T00:00:00.000Z",
-      activationPolicy: "fail-closed" as const,
-      connectors: connectorReadinessRegistry,
-    })),
+    connectorReadiness: adminProcedure.input(z.object({
+      countryCode: z.enum(["ALL", "EG"]).default("ALL"),
+      provider: z.string().trim().min(1).max(80).default("ALL"),
+      connectorType: z.enum(["ALL", "government-regulatory", "insurance-payer"]).default("ALL"),
+      readinessState: z.enum(["ALL", "blocked", "deferred", "ready"]).default("ALL"),
+    }).optional()).query(({ input, ctx }) => {
+      const filters = input ?? { countryCode: "ALL" as const, provider: "ALL", connectorType: "ALL" as const, readinessState: "ALL" as const };
+      const connectors = connectorReadinessRegistry.filter(connector =>
+        (filters.countryCode === "ALL" || connector.countryCode === filters.countryCode)
+        && (filters.connectorType === "ALL" || connector.connectorType === filters.connectorType)
+        && (filters.readinessState === "ALL" || connector.state === filters.readinessState)
+        && (filters.provider === "ALL" || (connector.providers as readonly string[]).includes(filters.provider)),
+      );
+      const reviewedAt = new Date().toISOString();
+      const auditLog = connectors.map(connector => {
+        const safeEvent = {
+          eventType: "connector_readiness_reviewed",
+          connectorId: connector.id,
+          connectorType: connector.connectorType,
+          countryCode: connector.countryCode,
+          previousState: null,
+          newState: connector.state,
+          reason: "Initial readiness registry review; no external activation",
+          actorUserId: ctx.user.id,
+          organizationId: null,
+          branchId: null,
+          jurisdictionId: null,
+          requestId: null,
+          createdAt: reviewedAt,
+        };
+        return { ...safeEvent, recordHash: hashAuditRecord(safeEvent), integrity: "tamper-evident" as const };
+      });
+      return {
+        reviewedAt,
+        activationPolicy: "fail-closed" as const,
+        filters,
+        connectors,
+        auditLog,
+        filterOptions: {
+          total: connectorReadinessRegistry.length,
+          countries: Array.from(new Set(connectorReadinessRegistry.map(connector => connector.countryCode))),
+          providers: Array.from(new Set(connectorReadinessRegistry.flatMap(connector => connector.providers))),
+          connectorTypes: Array.from(new Set(connectorReadinessRegistry.map(connector => connector.connectorType))),
+          readinessStates: Array.from(new Set(connectorReadinessRegistry.map(connector => connector.state))),
+        },
+      };
+    }),
     securityReadiness: protectedProcedure.query(() => ({
       twoFactorState: "deferred" as const,
       recoveryChannelState: "deferred" as const,

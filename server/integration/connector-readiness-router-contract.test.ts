@@ -28,10 +28,25 @@ describe("connector readiness dashboard contract", () => {
     expect(result.connectors).toHaveLength(2);
     expect(result.connectors.every(connector => connector.state === "blocked")).toBe(true);
     expect(result.connectors.every(connector => connector.readinessPercent === 0)).toBe(true);
+    expect(result.filterOptions.providers).toEqual(expect.arrayContaining(["UPA", "EDA", "TPA / Payer APIs"]));
+    expect(result.auditLog).toHaveLength(2);
+    expect(result.auditLog.every(entry => entry.integrity === "tamper-evident" && entry.recordHash.match(/^[a-f0-9]{64}$/))).toBe(true);
     expect(JSON.stringify(result)).not.toMatch(/password|token|secret|apiKey|authorization/i);
   });
 
-  it("rejects non-admin users before exposing connector readiness", async () => {
-    await expect(appRouter.createCaller(contextFor("user")).auth.connectorReadiness()).rejects.toMatchObject({ code: "FORBIDDEN" });
+  it("applies country, provider, connector type, and readiness filters together", async () => {
+    const caller = appRouter.createCaller(contextFor("admin"));
+    const government = await caller.auth.connectorReadiness({ countryCode: "EG", provider: "UPA", connectorType: "government-regulatory", readinessState: "blocked" });
+    expect(government.connectors.map(connector => connector.id)).toEqual(["egypt-government"]);
+    expect(government.auditLog).toHaveLength(1);
+
+    const insurance = await caller.auth.connectorReadiness({ countryCode: "EG", provider: "TPA / Payer APIs", connectorType: "insurance-payer", readinessState: "blocked" });
+    expect(insurance.connectors.map(connector => connector.id)).toEqual(["insurance-payers"]);
+  });
+
+  it("rejects invalid filters and non-admin users before exposing readiness or audit data", async () => {
+    const caller = appRouter.createCaller(contextFor("admin"));
+    await expect(caller.auth.connectorReadiness({ provider: "" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    await expect(appRouter.createCaller(contextFor("user")).auth.connectorReadiness({ countryCode: "EG" })).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
 });
