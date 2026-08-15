@@ -1273,3 +1273,10 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Ensure managed showcase reconciliation clears stale failed-attempt lockout for the isolated `test` account and add regression coverage without affecting production accounts.
 
 - [x] Fix successful internal-login navigation so the employee showcase account lands on `/workspace`, not the public welcome page, and add regression coverage for the redirect contract.
+
+# Production Readiness Review — 2026-08-16
+
+- [x] Inventory remaining runtime, security, schema, dependency, CI, and module-integration risks.
+- [x] Run the complete automated validation suite, production build, audit checks, and targeted live-flow checks.
+- [x] Fix each verified defect or conflict safely and add regression coverage; document issues that require external credentials or official integrations.
+- [x] Revalidate the repaired system, confirm no unchecked review items remain, and save a final checkpoint.
