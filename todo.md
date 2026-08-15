@@ -655,3 +655,11 @@
 - [x] Add Demo reset action and explicit fail-closed/no-external-submission messaging.
 - [x] Add unit coverage for Demo discount limits and synthetic catalog search.
 - [x] Validate TypeScript, production build, full Vitest regression, and desktop visual routes.
+
+# Hardware Integration Review
+
+- [x] Audit printer support, including receipt, A4/label, barcode/Data Matrix, network, USB, Bluetooth, and browser/PWA limitations.
+- [x] Audit scanner support, including keyboard-wedge barcode scanners, camera scanning, document scanners, and Data Matrix workflows.
+- [x] Audit monitoring support, including cold-chain sensors, CCTV/access-control boundaries, device health, and alert delivery.
+- [x] Define fail-closed hardware adapter contracts and a local bridge requirement where browser APIs are insufficient.
+- [x] Add tests and documentation for hardware integration readiness without claiming unsupported device connectivity.
