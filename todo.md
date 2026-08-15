@@ -1136,3 +1136,8 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Create one formal Arabic/English document combining the ALDORA naming explanation and system philosophy/operation guidance.
 - [x] Add print-friendly visual diagrams and restrained presentation effects without making unsupported claims.
 - [x] Validate and deliver the single downloadable document file.
+
+# ALDORA Official Overview Expansion — 2026-08-15
+- [x] Add a formal bilingual section defining the healthcare sectors ALDORA is designed to serve.
+- [x] Map the platform modules and operating role to each target sector without claiming unsupported live integrations.
+- [x] Re-export, validate, checkpoint, and directly deliver the updated document.

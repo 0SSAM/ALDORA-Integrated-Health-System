@@ -57,6 +57,41 @@
 
 #callout([المبدأ الحاكم | Governing principle], [كل عملية منظمة يجب أن تكون مرتبطة بالمؤسسة والفرع والاختصاص، وأن تتحول إلى مسودة واضحة أو تتوقف بأمان عند غياب الاتصال أو الاعتماد أو الدليل المطلوب. / Every regulated action is organization-, branch-, and jurisdiction-scoped and becomes an explicit draft or stops safely when connectivity, authorization, or required evidence is missing.])
 
+= أين تعمل ALDORA؟ | Where Does ALDORA Operate?
+
+#ar[
+  صُممت *ALDORA* لتكون منصة تشغيل صحية متكاملة، وليست برنامجاً محصوراً في الصيدليات فقط. وهي تجمع بين إدارة العمليات، ونقاط البيع، والمخزون، والوصفات، الفوترة، خدمة العملاء، المتابعة، التقارير، التدقيق، والجاهزية للتكاملات الرسمية. ويختلف نطاق التفعيل حسب نوع المؤسسة وصلاحياتها واللوائح المعتمدة في الدولة أو الاختصاص.
+]
+
+#en[
+  *ALDORA* is designed as an integrated healthcare operations platform, not as a pharmacy-only application. It combines operations management, POS, inventory, prescriptions, invoicing, customer care, follow-up, reporting, auditability, and readiness boundaries for official integrations. The activated scope varies by institution type, permissions, and the applicable jurisdictional rules.
+]
+
+#table(
+  columns: (1.7fr, 2.5fr, 2.1fr),
+  inset: 7pt,
+  align: (left, left, left),
+  [*القطاع الصحي*], [*ما الذي يقدمه النظام للقطاع؟*], [*Healthcare role*],
+  [الصيدليات الفردية], [إدارة الأصناف والدفعات والمخزون، المبيعات، المرتجعات، الفواتير المحلية، الوصفات، العملاء، الطباعة، وسجل التدقيق.], [Pharmacy ERP, POS, inventory, prescriptions, returns, invoices, and audit trail.],
+  [سلاسل الصيدليات والفروع], [إدارة متعددة الفروع مع عزل المؤسسة والفرع، التحويلات، التنبيهات، المؤشرات، وتوحيد السياسات مع اختلاف الاختصاص.], [Multi-branch operations, scoped access, transfers, alerts, KPIs, and policy coordination.],
+  [المستشفيات الحكومية والخاصة], [أساس تشغيلي للصيدلية والمخزون والوصفات وخدمة المرضى والتقارير، مع إبقاء الربط الحكومي أو التأميني مغلقاً حتى الاعتماد الرسمي.], [Pharmacy, inventory, prescription, patient-service, and reporting foundations; official links remain approval-gated.],
+  [الموزعون وشركات التوريد], [كتالوج ذو مصدر، دفعات وصلاحية، متابعة التوريد، نقاط إعادة الطلب، وسجل حركة الأصناف بين الجهات والفروع.], [Provenance-aware catalog, batches, expiry, procurement visibility, reorder planning, and movement traceability.],
+  [شركات التأمين والجهات الدافعة], [أساس لتصنيف المطالبات ومتابعة دورة التأمين، دون الادعاء بوجود اتصال حي مع شركة أو منصة تأمين قبل توفير الاعتماد.], [Insurance lifecycle and claim-classification foundations; live payer connectivity requires credentials and approval.],
+  [معامل التحاليل ومراكز التأهيل], [إدارة العملاء أو المرضى، المواعيد وسياق الخدمة، المتابعة، مركز الاتصال، السجلات التشغيلية، والتنبيهات وفق نطاق المؤسسة.], [Patient/customer operations, follow-up, call-centre foundations, and alerts within the organization scope.],
+  [شركات الأدوية والمستلزمات], [إدارة الكتالوج، الشركات المصنعة، المصادر، التحقق والمراجعة، التوريد، وتتبع الأصناف والمستلزمات الطبية والتجميلية.], [Catalog governance, manufacturers, provenance, review, procurement, and medical/cosmetic supply traceability.],
+  [الجهات الحكومية والرقابية], [لوحات جاهزية وأدلة تدقيق وحزم قواعد قابلة للمراجعة، مع بقاء الاتصال والتنفيذ الرسميين متوقفين على الصلاحيات والمواصفات المعتمدة.], [Readiness dashboards, audit evidence, and reviewable rule packs; official execution remains authority-gated.],
+)
+
+#ar[
+  وبصيغة عملية، يمكن تقديم ALDORA باعتبارها *طبقة التشغيل والإدارة والتتبع* التي تربط الموظفين والفروع والبيانات والعمليات داخل المؤسسة الصحية. وهي لا تستبدل الجهة التنظيمية أو شركة التأمين أو نظام الحكومة، بل تهيئ المؤسسة لإدارة أعمالها داخلياً بطريقة منظمة، ثم تفتح التكاملات الخارجية عندما تصبح المتطلبات القانونية والفنية متاحة.
+]
+
+#en[
+  In practical terms, ALDORA is the *operating, management, and traceability layer* connecting staff, branches, data, and workflows inside a healthcare organization. It does not replace a regulator, payer, or government system; it prepares the organization to operate coherently and opens external integrations only when legal and technical prerequisites become available.
+]
+
+#callout([الإجابة المختصرة | Short answer], [ALDORA is designed for pharmacies, pharmacy chains, hospitals, distributors, insurers and payers, laboratories, rehabilitation centers, pharmaceutical and medical-supply companies, and public-sector healthcare operations—using a modular scope that activates only what the organization is authorized and prepared to operate. / صُممت ALDORA للصيدليات وسلاسلها والمستشفيات والموزعين والتأمين والمعامل ومراكز التأهيل وشركات الأدوية والمستلزمات والجهات الصحية العامة، بنطاق معياري لا يفعّل إلا ما تسمح به صلاحيات المؤسسة واستعدادها.])
+
 = ماذا يعني اسم ALDORA؟ | What Does ALDORA Mean?
 
 #ar[
