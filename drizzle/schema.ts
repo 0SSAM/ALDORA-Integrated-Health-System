@@ -691,3 +691,27 @@ export const insuranceRemittances = mysqlTable("insurance_remittances", {
 export const insuranceAppeals = mysqlTable("insurance_appeals", {
   id: int("id").autoincrement().primaryKey(), organizationId: int("organizationId").notNull(), jurisdictionId: int("jurisdictionId").notNull(), branchId: int("branchId").notNull(), claimId: int("claimId").notNull(), status: mysqlEnum("status", ["draft", "submitted", "under_review", "accepted", "rejected", "withdrawn"]).default("draft").notNull(), reasonEncrypted: text("reasonEncrypted"), externalReference: varchar("externalReference", { length: 160 }), credentialGate: mysqlEnum("credentialGate", ["not_configured", "test_ready", "production_ready"]).default("not_configured").notNull(), createdByUserId: int("createdByUserId").notNull(), createdAt: timestamp("createdAt").defaultNow().notNull(), updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, table => ({ scopeIdx: index("insurance_appeals_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), claimIdx: index("insurance_appeals_claim_idx").on(table.claimId) }));
+
+
+/** Internal private-hospital billing foundation; payer and tax submission remain fail-closed. */
+export const hospitalBillingAccounts = mysqlTable("hospital_billing_accounts", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId").notNull(),
+  facilityId: int("facilityId").notNull(),
+  patientId: int("patientId").notNull(),
+  encounterId: int("encounterId"),
+  payerType: mysqlEnum("payerType", ["self_pay", "insurance", "government", "employer"]).notNull(),
+  packageCode: varchar("packageCode", { length: 120 }),
+  status: mysqlEnum("status", ["draft", "pending_approval", "approved", "partially_paid", "paid", "disputed", "cancelled"]).default("draft").notNull(),
+  approvalStatus: mysqlEnum("approvalStatus", ["not_required", "pending", "approved", "rejected"]).default("pending").notNull(),
+  depositAmount: decimal("depositAmount", { precision: 14, scale: 2 }).default("0").notNull(),
+  billedAmount: decimal("billedAmount", { precision: 14, scale: 2 }).default("0").notNull(),
+  paidAmount: decimal("paidAmount", { precision: 14, scale: 2 }).default("0").notNull(),
+  externalInvoiceGate: mysqlEnum("externalInvoiceGate", ["not_configured", "test_ready", "production_ready"]).default("not_configured").notNull(),
+  notesEncrypted: text("notesEncrypted"),
+  createdByUserId: int("createdByUserId").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ scopeIdx: index("hospital_billing_scope_status_idx").on(table.organizationId, table.jurisdictionId, table.branchId, table.status), patientIdx: index("hospital_billing_patient_idx").on(table.organizationId, table.patientId) }));

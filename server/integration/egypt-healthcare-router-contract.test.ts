@@ -27,6 +27,9 @@ describe("Egypt healthcare router contract", () => {
     expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.preauthorizations");
     expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.remittances");
     expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.appeals");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.billingAccounts");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.createBillingAccount");
+    expect(appRouter._def.procedures).toHaveProperty("egyptHealthcare.transitionBillingAccount");
   });
 
   it("keeps the external submission gate explicit in the router source contract", async () => {

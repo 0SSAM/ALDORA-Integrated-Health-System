@@ -4,7 +4,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { branches, branchJurisdictions, healthcareAdmissions, healthcareAppointments, healthcareBeds, healthcareClinicalOrders, healthcareEncounters, healthcareFacilities, healthcarePatients, healthcareReferrals, insuranceAppeals, insuranceClaims, insuranceMembers, insurancePayerContracts, insurancePreauthorizations, insuranceRemittances, jurisdictionProfiles, organizationMemberships } from "../../drizzle/schema";
+import { branches, branchJurisdictions, healthcareAdmissions, healthcareAppointments, healthcareBeds, healthcareClinicalOrders, healthcareEncounters, healthcareFacilities, healthcarePatients, healthcareReferrals, hospitalBillingAccounts, insuranceAppeals, insuranceClaims, insuranceMembers, insurancePayerContracts, insurancePreauthorizations, insuranceRemittances, jurisdictionProfiles, organizationMemberships } from "../../drizzle/schema";
 
 const facilityType = z.enum(["government_hospital", "private_hospital", "primary_care", "laboratory", "radiology", "rehabilitation"]);
 const claimStatus = z.enum(["draft", "ready", "submitted", "received", "under_review", "approved", "partially_approved", "rejected", "appealed", "paid", "reconciled", "cancelled"]);
@@ -191,6 +191,29 @@ export const egyptHealthcareRouter = router({
     const db = dbOrThrow(await getDb());
     await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
     return db.select({ id: insuranceAppeals.id, claimId: insuranceAppeals.claimId, status: insuranceAppeals.status, credentialGate: insuranceAppeals.credentialGate, externalReference: insuranceAppeals.externalReference, createdAt: insuranceAppeals.createdAt }).from(insuranceAppeals).where(and(eq(insuranceAppeals.organizationId, input.organizationId), eq(insuranceAppeals.jurisdictionId, input.jurisdictionId), eq(insuranceAppeals.branchId, input.branchId))).orderBy(desc(insuranceAppeals.updatedAt)).limit(200);
+  }),
+
+  billingAccounts: protectedProcedure.input(z.object({ organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive() })).query(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    return db.select({ id: hospitalBillingAccounts.id, facilityId: hospitalBillingAccounts.facilityId, patientId: hospitalBillingAccounts.patientId, encounterId: hospitalBillingAccounts.encounterId, payerType: hospitalBillingAccounts.payerType, packageCode: hospitalBillingAccounts.packageCode, status: hospitalBillingAccounts.status, approvalStatus: hospitalBillingAccounts.approvalStatus, depositAmount: hospitalBillingAccounts.depositAmount, billedAmount: hospitalBillingAccounts.billedAmount, paidAmount: hospitalBillingAccounts.paidAmount, externalInvoiceGate: hospitalBillingAccounts.externalInvoiceGate }).from(hospitalBillingAccounts).where(and(eq(hospitalBillingAccounts.organizationId, input.organizationId), eq(hospitalBillingAccounts.jurisdictionId, input.jurisdictionId), eq(hospitalBillingAccounts.branchId, input.branchId))).orderBy(desc(hospitalBillingAccounts.updatedAt)).limit(200);
+  }),
+
+  createBillingAccount: protectedProcedure.input(z.object({ organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), branchId: z.number().int().positive(), facilityId: z.number().int().positive(), patientId: z.number().int().positive(), encounterId: z.number().int().positive().optional(), payerType: z.enum(["self_pay", "insurance", "government", "employer"]), packageCode: z.string().max(120).optional(), depositAmount: z.string().regex(/^\\d+(\\.\\d{1,2})?$/).optional(), billedAmount: z.string().regex(/^\\d+(\\.\\d{1,2})?$/).optional() })).mutation(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, input.organizationId, input.jurisdictionId, input.branchId);
+    const inserted = await db.insert(hospitalBillingAccounts).values({ ...input, depositAmount: input.depositAmount ?? "0", billedAmount: input.billedAmount ?? "0", createdByUserId: ctx.user.id, externalInvoiceGate: "not_configured" });
+    return { billingAccountId: Number(inserted[0].insertId), externalInvoiceSubmission: "blocked" as const };
+  }),
+
+  transitionBillingAccount: protectedProcedure.input(z.object({ billingAccountId: z.number().int().positive(), toStatus: z.enum(["draft", "pending_approval", "approved", "partially_paid", "paid", "disputed", "cancelled"]), approvalStatus: z.enum(["not_required", "pending", "approved", "rejected"]).optional() })).mutation(async ({ ctx, input }) => {
+    const db = dbOrThrow(await getDb());
+    const row = (await db.select().from(hospitalBillingAccounts).where(eq(hospitalBillingAccounts.id, input.billingAccountId)).limit(1))[0];
+    if (!row) throw new TRPCError({ code: "NOT_FOUND", message: "Hospital billing account not found" });
+    await assertEgyptScope(db, ctx.user.id, ctx.user.role, row.organizationId, row.jurisdictionId, row.branchId);
+    if (["approved", "paid"].includes(input.toStatus) && ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN", message: "Authorized approval is required" });
+    await db.update(hospitalBillingAccounts).set({ status: input.toStatus, approvalStatus: input.approvalStatus ?? row.approvalStatus }).where(and(eq(hospitalBillingAccounts.id, row.id), eq(hospitalBillingAccounts.organizationId, row.organizationId), eq(hospitalBillingAccounts.branchId, row.branchId)));
+    return { success: true, status: input.toStatus, externalInvoiceSubmission: "blocked" as const };
   }),
 
   transitionClaim: protectedProcedure.input(z.object({ claimId: z.number().int().positive(), toStatus: claimStatus, externalReference: z.string().max(160).optional() })).mutation(async ({ ctx, input }) => {

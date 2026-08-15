@@ -21,7 +21,8 @@ export function EgyptHealthcareWorkspace({ organizationId, branchId, jurisdictio
   const preauthorizations = trpc.egyptHealthcare.preauthorizations.useQuery(scope, { enabled });
   const remittances = trpc.egyptHealthcare.remittances.useQuery(scope, { enabled });
   const appeals = trpc.egyptHealthcare.appeals.useQuery(scope, { enabled });
-  const queries = [facilities, encounters, claims, beds, admissions, clinicalOrders, payerContracts, preauthorizations, remittances, appeals];
+  const billingAccounts = trpc.egyptHealthcare.billingAccounts.useQuery(scope, { enabled });
+  const queries = [facilities, encounters, claims, beds, admissions, clinicalOrders, payerContracts, preauthorizations, remittances, appeals, billingAccounts];
 
   if (!enabled) return <Card><CardContent className="p-6 text-sm text-amber-800">يلزم اختيار مؤسسة وفرع واختصاص مصر قبل قراءة بيانات المستشفى أو التأمين.</CardContent></Card>;
   const blocked = queries.find(query => query.error);
@@ -39,9 +40,10 @@ export function EgyptHealthcareWorkspace({ organizationId, branchId, jurisdictio
       <CountCard title="التفويضات" value={loading ? "…" : preauthorizations.data?.length ?? 0} detail="تفويضات داخلية قابلة للتدقيق" />
       <CountCard title="عقود الجهات الدافعة" value={loading ? "…" : payerContracts.data?.length ?? 0} detail="لا تفعيل خارجي تلقائي" />
       <CountCard title="التسويات والتظلمات" value={loading ? "…" : `${remittances.data?.length ?? 0} / ${appeals.data?.length ?? 0}`} detail="تسويات / تظلمات" />
+      <CountCard title="حسابات الفوترة" value={loading ? "…" : billingAccounts.data?.length ?? 0} detail="باقات ودفعات واعتماد داخلي" />
     </div>
     <Card><CardHeader><CardTitle className="text-sm">حالة التشغيل الداخلي</CardTitle></CardHeader><CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-      {[...(facilities.data ?? []).map(item => ({ label: item.facilityType, detail: `ترخيص: ${item.licensingStatus} · اعتماد: ${item.accreditationStatus}` })), ...(admissions.data ?? []).slice(0, 4).map(item => ({ label: `تنويم #${item.id}`, detail: `الحالة: ${item.status} · النوع: ${item.admissionType}` })), ...(clinicalOrders.data ?? []).slice(0, 4).map(item => ({ label: `${item.orderType} · ${item.serviceCode}`, detail: `حالة الأمر: ${item.status}` }))].map((item, index) => <div key={`${item.label}-${index}`} className="rounded-xl border border-slate-100 p-3 text-sm"><p className="font-medium">{item.label}</p><p className="mt-1 text-xs text-slate-500">{item.detail}</p></div>)}
+      {[...(facilities.data ?? []).map(item => ({ label: item.facilityType, detail: `ترخيص: ${item.licensingStatus} · اعتماد: ${item.accreditationStatus}` })), ...(billingAccounts.data ?? []).slice(0, 4).map(item => ({ label: `فوترة #${item.id} · ${item.payerType}`, detail: `الباقة: ${item.packageCode ?? "غير محددة"} · الحالة: ${item.status}` })), ...(admissions.data ?? []).slice(0, 4).map(item => ({ label: `تنويم #${item.id}`, detail: `الحالة: ${item.status} · النوع: ${item.admissionType}` })), ...(clinicalOrders.data ?? []).slice(0, 4).map(item => ({ label: `${item.orderType} · ${item.serviceCode}`, detail: `حالة الأمر: ${item.status}` }))].map((item, index) => <div key={`${item.label}-${index}`} className="rounded-xl border border-slate-100 p-3 text-sm"><p className="font-medium">{item.label}</p><p className="mt-1 text-xs text-slate-500">{item.detail}</p></div>)}
       {!facilities.data?.length && !admissions.data?.length && !clinicalOrders.data?.length && <p className="text-sm text-slate-500">لا توجد سجلات داخلية في هذا النطاق.</p>}
     </CardContent></Card>
   </div>;
