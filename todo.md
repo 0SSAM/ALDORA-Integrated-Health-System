@@ -1141,3 +1141,8 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add a formal bilingual section defining the healthcare sectors ALDORA is designed to serve.
 - [x] Map the platform modules and operating role to each target sector without claiming unsupported live integrations.
 - [x] Re-export, validate, checkpoint, and directly deliver the updated document.
+
+# ALDORA Full Project Archive — 2026-08-15
+- [x] Inventory project files and define safe archive exclusions for secrets, environment files, generated dependencies, and runtime logs.
+- [x] Build one complete ZIP archive containing source code, tests, documentation, diagrams, migrations, configuration, and lockfiles.
+- [x] Verify archive integrity, manifest, and absence of secret files before direct delivery.
