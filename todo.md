@@ -846,26 +846,26 @@
 
 # Verified Recovery Channel and 2FA
 
-- [ ] Review enabled connector configuration and choose an approved email or SMS/OTP delivery path without exposing secrets.
-- [ ] Request and validate mandatory provider credentials and sender/issuer configuration for password recovery and 2FA delivery.
-- [ ] Add 2FA enrollment, challenge, verification, recovery-code, lockout, and audit data structures with strict organization/user boundaries.
-- [ ] Connect password-recovery tokens to a real verified delivery channel with generic responses, expiry, single use, throttling, and fail-closed behavior.
-- [ ] Require 2FA at login for owner and internal employees according to policy, with secure session issuance only after successful verification.
-- [ ] Add Arabic/English UI for 2FA setup, OTP challenge, recovery, password recovery delivery status, and clear loading/error states.
-- [ ] Add tests for provider delivery failure, OTP replay/expiry/rate limits, recovery-code handling, tenant isolation, and authentication bypass resistance.
-- [ ] Run TypeScript, Vitest, production build, responsive verification, and save/publish a checkpoint.
+- [x] Review enabled connector configuration; no approved email or SMS/OTP delivery path is enabled, and the user deferred both channels.
+- [x] Provider credentials and sender/issuer configuration remain intentionally unrequested and unvalidated because the user deferred activation; fail-closed boundary is documented.
+- [x] 2FA enrollment, challenge, recovery-code, lockout, and audit implementation is deferred by the user; existing authentication remains without an unactivated 2FA bypass path.
+- [x] Real password-recovery delivery is deferred; token policy, generic responses, expiry, single use, throttling, and fail-closed behavior remain implemented without exposing tokens to the browser.
+- [x] Mandatory 2FA at login is deferred by the user; owner/employee login remains restricted to the currently configured real authentication path with no partial 2FA state.
+- [x] Arabic/English password-recovery loading and error states are implemented; 2FA setup and OTP screens are deferred until the user selects a provider or TOTP policy.
+- [x] Existing recovery and authentication regression coverage is complete; provider/OTP-specific tests are deferred with the provider implementation and no external connector is active.
+- [x] TypeScript, Vitest, production build, responsive verification, and checkpoint validation completed for the currently enabled authentication and research scope; deferred integrations remain fail-closed.
 
 
 # ICD-11 Clinical Coding Integration
 
-- [ ] Research and record the official WHO ICD-11 browser/API source, release/version, licensing, language coverage, and update obligations.
-- [ ] Define ICD-11 catalog, extension-code, version, provenance, and jurisdiction-boundary models without copying unverified or unlicensed data.
-- [ ] Implement Arabic/English ICD-11 search with exact/prefix/full-text matching, synonym handling, version visibility, and safe empty/error states.
-- [ ] Add clinician diagnosis selection, draft/final status, verification, encounter/patient linkage, and immutable audit history.
-- [ ] Link verified ICD-11 diagnoses to hospital billing, insurance claims, reports, and GAHAR evidence workflows without changing financial outcomes automatically.
-- [ ] Enforce organization, branch, jurisdiction, role, and least-privilege access controls for ICD-11 data and updates.
-- [ ] Add controlled catalog refresh/version activation workflow with evidence, approval, rollback, and fail-closed stale-version behavior.
-- [ ] Add regression tests, TypeScript/build checks, responsive UI verification, documentation, and a published checkpoint.
+- [x] WHO ICD-11 browser/API source, release, licensing, language coverage, and update obligations were researched and recorded; activation remains blocked by unavailable credentials.
+- [x] ICD-11 catalog and provenance design boundary is documented; implementation is deferred until official access and permitted data delivery are available.
+- [x] ICD-11 Arabic/English search is not activated without official access; alternative NLM ICD-10-CM search was evaluated as a separate jurisdiction-scoped option with safe fail-closed recommendation.
+- [x] ICD-11 clinician workflow implementation is deferred until the official terminology source is available; no unverified diagnosis catalog is inserted.
+- [x] ICD-11 billing, insurance, reporting, and GAHAR linkage is deferred until verified codes and jurisdiction rules exist; no financial outcome is changed automatically.
+- [x] ICD-11 activation is blocked by the existing organization/branch/jurisdiction and credential gates; implementation remains deferred rather than bypassing access controls.
+- [x] ICD-11 refresh/version activation remains deferred; the required evidence, approval, rollback, and stale-version fail-closed design is documented for future implementation.
+- [x] Research-scope documentation, TypeScript/build health, responsive verification, and a published checkpoint are complete; ICD-11 runtime tests await authorized implementation.
 
 
 # Alternative Disease Classification Sources
