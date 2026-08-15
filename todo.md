@@ -1097,3 +1097,15 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add PDF preview modal before download with paper-size and printer-selection controls.
 - [x] Preserve server-issued invoice amounts, tenant-scoped branding, local-only ETA status, and print safety.
 - [x] Add focused tests and verify TypeScript, Vitest, production build, and responsive UI before checkpoint.
+
+# Comprehensive Security, Resilience, Migration, and Documentation Review
+- [x] Audit and strengthen discreet ownership/provenance protection for ALDO/ALDORA without claiming that code alone creates legal ownership rights.
+- [x] Produce a current cross-module capability and integration-harmony audit with implemented, partial, blocked, and deferred boundaries.
+- [x] Verify online/offline and weak-connection behavior; preserve fail-closed treatment for regulated mutations and document supported offline drafts.
+- [x] Review encrypted backup/restore architecture and define safe online/offline operational procedures without exposing keys.
+- [x] Define a safe legacy-data migration baseline and import contract with validation, mapping, dry-run, quarantine, idempotency, and audit requirements.
+- [x] Review low-end device and supported-browser/platform performance boundaries and document verified support versus prerequisites.
+- [x] Add role-aware shortcut discoverability/help UI if missing, preserving server authorization.
+- [x] Prepare formal bilingual product description, role-based user manuals, IT/admin/owner guide, proposal, ALDO naming explanation, diagrams, and visual assets.
+- [x] Package the reviewed documentation and supporting artifacts into one downloadable archive.
+- [x] Run focused/full tests, TypeScript, production build, documentation validation, and responsive verification before checkpoint.
