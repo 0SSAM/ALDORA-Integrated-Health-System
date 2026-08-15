@@ -6,10 +6,11 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { describeSearchMatch, smartSearch } from "@/lib/smartSearch";
 import { HardwareWorkspace } from "@/components/HardwareWorkspace";
+import { SupplyChainWorkspace } from "@/components/SupplyChainWorkspace";
 import { AlertTriangle, BarChart3, Boxes, BrainCircuit, CheckCircle2, ClipboardCheck, FileText, FlaskConical, PackageSearch, PhoneCall, Receipt, RotateCcw, Search, ShieldCheck, ShoppingCart, Ticket, UserRound, Users, WalletCards, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type DemoModule = "overview" | "pos" | "inventory" | "prescriptions" | "insurance" | "compliance" | "compounding" | "finance" | "people" | "customerCare" | "callCentre" | "catalog" | "hardware";
+type DemoModule = "overview" | "pos" | "inventory" | "supplyChain" | "prescriptions" | "insurance" | "compliance" | "compounding" | "finance" | "people" | "customerCare" | "callCentre" | "catalog" | "hardware";
 
 type DemoCartItem = { id: string; name: string; price: number; quantity: number };
 type DemoTicket = { id: number; subject: string; priority: "عادي" | "مرتفع"; status: "جديدة" | "قيد المتابعة" };
@@ -42,6 +43,7 @@ const moduleLabels: Record<DemoModule, string> = {
   overview: "نظرة عامة",
   pos: "نقطة البيع",
   inventory: "المخزون و FEFO",
+  supplyChain: "سلاسل الإمداد والتوريد",
   prescriptions: "الوصفات الذكية",
   insurance: "التأمين والمطالبات",
   compliance: "الامتثال الإقليمي",
@@ -99,6 +101,8 @@ export function DemoWorkspace({ active, onNavigate }: { active: string; onNaviga
     switch (active as DemoModule) {
       case "pos":
         return <DemoPanel title="نقطة بيع تفاعلية" icon={ShoppingCart} description="جرّب السلة والحساب والحد الأقصى للخصم. زر الإتمام محاكاة فقط ولا ينشئ فاتورة أو حركة مخزون."><div className="grid gap-4 lg:grid-cols-[1.1fr_.9fr]"><div className="space-y-2">{catalogItems.map(item => <button key={item.id} onClick={() => addToCart({ id: item.id, name: item.name, price: item.id === "MED-001" ? 42 : item.id === "SUP-032" ? 18 : 65, quantity: 1 })} className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white p-3 text-right transition hover:border-cyan-300 hover:shadow-sm"><span><span className="block font-medium">{item.name}</span><span className="text-xs text-slate-500">{item.id} · {item.category}</span></span><span className="text-xs font-semibold text-cyan-700">إضافة</span></button>)}</div><div className="rounded-2xl bg-slate-50 p-4"><div className="mb-3 flex items-center justify-between"><p className="font-semibold">السلة المحلية</p><Badge variant="outline">{cart.length} أصناف</Badge></div>{cart.map(item => <div key={item.id} className="flex items-center justify-between border-b border-slate-200 py-2 text-sm"><span>{item.name} × {item.quantity}</span><span>{item.price * item.quantity} ج.م</span></div>)}<div className="mt-4 grid gap-2 text-sm"><label className="flex items-center justify-between gap-3">خصم تجريبي %<Input value={discount} onChange={event => setDiscount(event.target.value)} className="h-8 w-20 text-center" inputMode="decimal" /></label><p className="text-xs text-slate-500">المحرك يحد الخصم تلقائياً إلى ٧٪: {safeDiscount}%</p><div className="flex justify-between font-semibold"><span>الإجمالي التجريبي</span><span>{discountedTotal.toFixed(2)} ج.م</span></div><Button onClick={() => setCartStatus("تمت محاكاة التحقق: لا توجد فاتورة حقيقية ولا إرسال ETA")} className="mt-2 bg-[#0d1b2a]">تحقق من السلة</Button><Badge variant="outline" className="justify-center">{cartStatus}</Badge></div></div></div></DemoPanel>;
+      case "supplyChain":
+        return <DemoPanel title="سلاسل الإمداد والتوريد" icon={Boxes} description="تتبع أوامر التوريد والاستلام والدفعات والمخاطر في بيئة اصطناعية لا تنشئ حركة تشغيلية حقيقية."><SupplyChainWorkspace /></DemoPanel>;
       case "inventory":
         return <DemoPanel title="المخزون و FEFO" icon={Boxes} description="استعرض تشغيلات اصطناعية وجرب ترتيب الصرف حسب أقرب انتهاء دون تعديل مخزون حقيقي."><div className="space-y-3">{[{ batch: "DEMO-A24", expiry: "2026-09-18", quantity: 24, tone: "border-rose-200 bg-rose-50" }, { batch: "DEMO-B11", expiry: "2027-01-09", quantity: 60, tone: "border-amber-200 bg-amber-50" }, { batch: "DEMO-C07", expiry: "2027-06-22", quantity: 120, tone: "border-emerald-200 bg-emerald-50" }].map((batch, index) => <div key={batch.batch} className={cn("flex flex-col gap-2 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between", batch.tone)}><div><p className="font-semibold">{batch.batch} {index === 0 && <Badge className="mr-2 bg-rose-600">FEFO أولاً</Badge>}</p><p className="text-xs text-slate-600">انتهاء {batch.expiry} · كمية {batch.quantity} وحدة</p></div><span className="text-xs font-medium text-slate-700">حالة اصطناعية</span></div>)}<Button onClick={() => setInventoryStatus("تمت محاكاة الصرف من DEMO-A24 أولاً — لم يتغير مخزون حقيقي")} className="bg-[#0d1b2a]">محاكاة صرف FEFO</Button>{inventoryStatus && <Badge variant="outline">{inventoryStatus}</Badge>}</div></DemoPanel>;
       case "prescriptions":
@@ -134,6 +138,7 @@ function DemoOverview({ onNavigate }: { onNavigate: (module: DemoModule) => void
   const shortcuts: Array<{ id: DemoModule; title: string; description: string; icon: typeof ShoppingCart }> = [
     { id: "pos", title: "جرّب نقطة البيع", description: "سلة وحساب خصم FEFO/MOH محلي", icon: ShoppingCart },
     { id: "inventory", title: "افحص المخزون", description: "شاهد ترتيب التشغيلات حسب الانتهاء", icon: Boxes },
+    { id: "supplyChain", title: "تابع سلسلة الإمداد", description: "أوامر التوريد والاستلام والحجر", icon: Boxes },
     { id: "prescriptions", title: "راجع وصفة ذكية", description: "نتيجة رؤية اصطناعية مع بوابة صيدلي", icon: BrainCircuit },
     { id: "customerCare", title: "أنشئ ملف عميل", description: "تفاعل محلي مع حالة الموافقة", icon: UserRound },
     { id: "callCentre", title: "افتح تذكرة", description: "محاكاة دورة مركز الاتصال", icon: PhoneCall },

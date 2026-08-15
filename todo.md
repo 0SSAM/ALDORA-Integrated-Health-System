@@ -734,3 +734,14 @@
 - [x] Review main routes and user-facing states for stale names, awkward translations, missing language labels, and inconsistent terminology.
 - [x] Run focused language/branding tests, full Vitest, TypeScript, production build, and responsive visual checks.
 - [x] Save and publish the renamed, language-reviewed checkpoint.
+
+# Supply Chain and Procurement Tracking 2026-08-15
+
+- [x] Add scoped supply-chain policy covering suppliers, procurement orders, receipts, batches, expiry, transfers, returns, recalls, and delivery status.
+- [x] Add server-side validation for organization, branch, jurisdiction, supplier authorization, order state transitions, quantities, and batch traceability.
+- [x] Add supply-chain event/audit records for creation, approval, dispatch, receipt, discrepancy, quarantine, return, recall, and cancellation.
+- [x] Add supply-chain workspace with safe empty states, filters, multilingual search, traceability timeline, and risk indicators without fabricated operational data.
+- [x] Add tests for scope isolation, state transitions, FEFO/expiry boundaries, discrepancy handling, recall/quarantine, and tamper-evident audit linkage.
+- [x] Document real supplier/API/EDI/GS1/regulatory integration prerequisites and fail-closed boundaries.
+- [x] Run full Vitest, TypeScript, production build, visual verification, and package the complete project, documentation, and tests into one downloadable ZIP archive.
+- [ ] Save and publish the supply-chain checkpoint.
