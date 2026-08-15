@@ -714,4 +714,14 @@
 - [x] Audit upload/storage handling, prescription files, path/key safety, MIME/size validation, and sensitive-data exposure.
 - [x] Add automated security regression tests for the hardened controls and attack-boundary cases.
 - [x] Run TypeScript, Vitest, production build, dependency/security checks, and document residual risks and external operational prerequisites.
-- [ ] Save and publish the security-hardening checkpoint with a dated security review report.
+- [x] Save and publish the security-hardening checkpoint with a dated security review report.
+
+# Anti-Tampering and Workplace Monitoring Review 2026-08-15
+
+- [x] Add server-enforced tamper-evident event policy for authentication, authorization, configuration, catalog, inventory, POS, prescription, export, storage, and audit actions.
+- [x] Add detection and escalation policy for repeated failures, privilege changes, scope changes, record deletion/alteration, audit-chain breaks, clock anomalies, and suspicious bulk access without fabricating incidents.
+- [x] Add privacy-preserving camera/audio monitoring contract with consent, notice, purpose limitation, retention, access scope, masking, legal approval, and fail-closed adapter readiness.
+- [x] Add tests for anti-tampering event classification, alert thresholds, audit-chain integrity, privacy gates, and blocked unconfigured camera/audio adapters.
+- [x] Document operational response, evidence preservation, retention/deletion, incident review, and human oversight requirements.
+- [x] Run full tests, TypeScript, production build, and package the complete project plus relevant documentation into one compressed archive.
+- [ ] Save and publish the anti-tampering and monitoring checkpoint.
