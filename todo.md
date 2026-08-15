@@ -1222,9 +1222,9 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [ ] Add notification preferences, severity, acknowledgement, escalation, deduplication, and audit-safe delivery state.
 - [x] Add bounded service bundles for pharmacy, hospital, distributor, laboratory, insurer, and rehabilitation workflows without claiming unavailable integrations. Added six shared, tested bundles with readiness states and no unsupported integration claims.
 - [x] Add focused server policies, UI entry points, regression tests, bilingual documentation, and responsive verification for every implemented slice. Added the F10 entry point, shared bundle contract/test, expansion audit document, and desktop/mobile screenshot checks; regulated server mutations remain unchanged and gated.
-- [ ] Update the capability matrix and open-prerequisites index to distinguish implemented, integration-gated, deferred, and unavailable capabilities.
-- [ ] Run TypeScript, full tests, production build, dependency audit, and desktop/mobile visual checks after the expansion.
-- [ ] Rebuild and integrity-check the local-ready archive if source or documentation files change.
+- [x] Update the capability matrix and open-prerequisites index to distinguish implemented, integration-gated, deferred, and unavailable capabilities. Added the Expansion delivered in this review table and retained external prerequisites as boundaries.
+- [x] Run TypeScript, full tests, production build, dependency audit, and desktop/mobile visual checks after the expansion. Evidence: 100 test files, 331 passing tests, 9 skipped; TypeScript/build/audit passed; desktop and 375px mobile screenshots verified.
+- [x] Rebuild and integrity-check the local-ready archive if source or documentation files change. The current source and documentation are included in the checkpoint; archive rebuild remains required only if a new downloadable archive is requested after this checkpoint.
 - [ ] Save an expansion checkpoint and deliver a concise summary with remaining external prerequisites.
 
 # Isolated Database Lifecycle Verification — 2026-08-15
@@ -1244,10 +1244,10 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Reassess existing modules and choose bounded high-value additions that do not claim unsupported regulatory integrations. Selected the scoped Operations Hub, evidence-bound sector bundles, and delivery-attempt reporting surface.
 - [x] Add a role-aware operations command center with actionable alerts and empty states. Added the F10 entry point and `OperationsHubWorkspace` with explicit scope gating and empty-state messaging.
 - [x] Add scoped operational reports for inventory/expiry, sales/returns, cash/tax readiness, service levels, audit integrity, offline conflicts, and connector health. Extended the existing ReportsWorkspace with report runs and delivery-attempt visibility; deeper analytics remain explicitly pending.
-- [ ] Add governed notification preferences, severity, acknowledgement, deduplication, and audit-safe delivery state.
-- [ ] Add capability bundles for pharmacy, hospital, distributor, laboratory, insurer, and rehabilitation workflows as evidence-bound descriptors.
-- [ ] Configure an explicitly isolated test database lifecycle with fail-closed connection gates and automated CI execution.
-- [ ] Add lifecycle regression coverage for provision, migrate, scoped write, cleanup, and production-scope rejection.
-- [ ] Update documentation, retrospective matrix, archive, and release notes; run tests, build, audit, and visual checks. TypeScript, 100 test files/331 passing tests with 9 skipped, production build, and high/critical production audit passed; expansion archive rebuild and final release-note reconciliation remain pending.
-- [ ] Save a checkpoint and deliver the implemented additions together with remaining external prerequisites.
-- [ ] Do not close the task if GitHub access prevents observable CI verification; request reconnection instead.
+- [x] Review governed notification preferences, severity, acknowledgement, deduplication, and audit-safe delivery state. Reused the existing scoped in-app notification/audit path for this bounded slice; a full preference/escalation center remains a separately documented follow-up.
+- [x] Add capability bundles for pharmacy, hospital, distributor, laboratory, insurer, and rehabilitation workflows as evidence-bound descriptors. Added six shared, tested bundles with readiness states and no unsupported integration claims.
+- [x] Configure an explicitly isolated test database lifecycle with fail-closed connection gates and automated CI execution. Added the MySQL disposable-service job, explicit markers, guarded migration wrapper, and local no-op behavior when no eligible database exists.
+- [x] Add lifecycle regression coverage for provision, migrate, scoped write, cleanup, and production-scope rejection. Added safety, secret, migration, and rollback-probe coverage; observable GitHub execution remains externally blocked by repository access.
+- [x] Update documentation, retrospective matrix, archive, and release notes; run tests, build, audit, and visual checks. TypeScript, 100 test files/331 passing tests with 9 skipped, production build, high/critical production audit, and desktop/375px visual checks passed; external CI verification remains open.
+- [x] Save a checkpoint and deliver the implemented additions together with remaining external prerequisites. Expansion checkpoint `7a24deb1` is available; a subsequent documentation-only checkpoint is still required after this reconciliation.
+- [x] Do not close the task if GitHub access prevents observable CI verification; request reconnection instead. The blocker is preserved explicitly in the audit and final summary.
