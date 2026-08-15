@@ -1,18 +1,19 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
+const Home = lazy(() => import("@/pages/Home"));
+const Login = lazy(() => import("@/pages/Login"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LocalizationProvider } from "./contexts/LocalizationContext";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
+    <Suspense fallback={<RouteLoadingState />}>
+      <Switch>
       <Route path={"/login"} component={Login} />
       <Route path={"/sales"} component={Home} />
       <Route path={"/"} component={Home} />
@@ -27,7 +28,8 @@ function Router() {
           <NotFound />
         </Suspense>
       </Route>
-    </Switch>
+      </Switch>
+    </Suspense>
   );
 }
 

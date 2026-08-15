@@ -629,3 +629,12 @@
 - [x] Bind internal sessions to organization, branch, jurisdiction, role, and permission snapshot; enforce these scopes server-side for regulated workflows.
 - [x] Add auditable authentication, authorization, and medicine-traceability events with tamper-evident linkage and no sensitive secret/password material.
 - [x] Add the internal login UI, focused security tests, TypeScript/build verification, and documentation explaining how internal permissions connect to healthcare and medicine traceability; 74 test files passed, 239 tests passed, build passed, and /login was visually verified.
+
+# Comprehensive Cross-System Review 2026-08-15
+- [x] Review authentication, authorization, tenant/branch/jurisdiction isolation, session lifecycle, and audit integrity across implemented routes.
+- [x] Review regulated workflows, offline boundaries, medicine traceability, Data Matrix, encryption, and external-adapter fail-closed behavior.
+- [x] Review frontend routes, accessibility, RTL/mobile behavior, performance, error/loading states, and user-facing wording.
+- [x] Review schema/migration safety, persistence boundaries, test coverage, logs/privacy, and deployment readiness.
+- [x] Apply only reproducible fixes and additions, then run focused and full validation with visual checks.
+- [x] Produce a dated comprehensive review report separating implemented controls, policy-only boundaries, and external blockers.
+- [x] Reduce the main client bundle by lazy-loading Home and Login behind a shared route fallback, and harden internal-auth parameter validation so malformed scrypt records or missing audit HMAC keys fail closed.

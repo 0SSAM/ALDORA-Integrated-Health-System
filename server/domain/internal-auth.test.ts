@@ -3,6 +3,7 @@ import {
   INTERNAL_MAX_FAILED_ATTEMPTS,
   createInternalSessionToken,
   hashInternalPassword,
+  hashAuditRecord,
   isLocked,
   normalizeInternalUsername,
   verifyInternalPassword,
@@ -19,6 +20,19 @@ describe("internal employee authentication contract", () => {
     expect(hash).not.toContain(password);
     expect(verifyInternalPassword(password, hash)).toBe(true);
     expect(verifyInternalPassword("wrong password", hash)).toBe(false);
+  });
+
+  it("fails closed for malformed password records", () => {
+    expect(verifyInternalPassword("StrongEmployeePassword9", "scrypt$not-a-number$8$1$bad$bad")).toBe(false);
+    expect(verifyInternalPassword("StrongEmployeePassword9", "scrypt$16384$8$1$bad$bad")).toBe(false);
+  });
+
+  it("requires a configured audit signing key", () => {
+    const previous = process.env.JWT_SECRET;
+    delete process.env.JWT_SECRET;
+    expect(() => hashAuditRecord({ eventType: "test", createdAt: new Date().toISOString() })).toThrow(/Audit signing key/);
+    if (previous === undefined) delete process.env.JWT_SECRET;
+    else process.env.JWT_SECRET = previous;
   });
 
   it("uses a bounded lockout threshold", () => {

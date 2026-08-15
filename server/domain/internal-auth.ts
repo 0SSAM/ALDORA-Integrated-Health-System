@@ -41,14 +41,23 @@ export function hashInternalPassword(password: string, salt = randomBytes(16)) {
 }
 
 export function verifyInternalPassword(password: string, encoded: string) {
-  const parts = encoded.split("$");
-  if (parts.length !== 6 || parts[0] !== "scrypt") return false;
-  const [, n, r, p, saltText, expectedText] = parts;
-  const salt = Buffer.from(saltText, "base64url");
-  const expected = Buffer.from(expectedText, "base64url");
-  if (!salt.length || expected.length !== KEY_LENGTH) return false;
-  const actual = scryptSync(password, salt, expected.length, { N: Number(n), r: Number(r), p: Number(p) });
-  return timingSafeEqual(actual, expected);
+  try {
+    const parts = encoded.split("$");
+    if (parts.length !== 6 || parts[0] !== "scrypt") return false;
+    const [, nText, rText, pText, saltText, expectedText] = parts;
+    const n = Number(nText);
+    const r = Number(rText);
+    const p = Number(pText);
+    if (!Number.isInteger(n) || n < 2 ** 10 || n > 2 ** 20 || (n & (n - 1)) !== 0) return false;
+    if (!Number.isInteger(r) || r < 1 || r > 32 || !Number.isInteger(p) || p < 1 || p > 8) return false;
+    const salt = Buffer.from(saltText, "base64url");
+    const expected = Buffer.from(expectedText, "base64url");
+    if (salt.length < 16 || salt.length > 64 || expected.length !== KEY_LENGTH) return false;
+    const actual = scryptSync(password, salt, expected.length, { N: n, r, p });
+    return timingSafeEqual(actual, expected);
+  } catch {
+    return false;
+  }
 }
 
 export function createInternalSessionToken() {
@@ -60,7 +69,9 @@ export function hashSessionToken(token: string) {
 }
 
 export function hashAuditRecord(input: { previousHash?: string | null; eventType: string; userId?: number | null; username?: string | null; organizationId?: number | null; branchId?: number | null; jurisdictionId?: number | null; requestId?: string | null; createdAt: string }) {
-  return createHmac("sha256", process.env.JWT_SECRET ?? "missing-jwt-secret")
+  const auditKey = process.env.JWT_SECRET;
+  if (!auditKey || auditKey.length < 32) throw new Error("Audit signing key is not configured");
+  return createHmac("sha256", auditKey)
     .update(JSON.stringify(input))
     .digest("hex");
 }
