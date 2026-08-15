@@ -1154,3 +1154,8 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 
 # ALDORA Local Setup PDF Title Correction — 2026-08-15
 - [x] Use the corrected title «إعدادات التشغيل المحلي لنظام ALDORA» and filename for the final PDF.
+
+# ALDORA Account Access Sheet — 2026-08-15
+- [x] Confirm which account identifiers and roles are documented, without exposing password hashes or unverified secrets.
+- [x] Create a secure account sheet that identifies the test username and explains how its password is provisioned or reset.
+- [x] Verify and deliver the account sheet directly to the user.
