@@ -1120,3 +1120,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add local sync states and a bilingual conflict review/resolution surface without auto-approving regulated work.
 - [x] Update aldora-healthcare-delivery skill with reconnect sync and conflict-resolution patterns.
 - [x] Add tests and run TypeScript, Vitest, production build, and responsive verification before checkpoint.
+
+# Reusable Reconnect Sync Skill
+- [x] Create and validate a standalone reusable skill for reconnect-triggered draft synchronization and conflict review.
+- [x] Deliver the generated SKILL.md as a downloadable skill artifact.
