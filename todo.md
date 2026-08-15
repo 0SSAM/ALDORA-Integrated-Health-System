@@ -1350,3 +1350,10 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Define non-persistent cash and card settlement scenarios with invoice total, tendered amount/change, and a simulated card-approval result.
 - [x] Add an Arabic payment-choice step to the showcase sale walkthrough with clear selected-state feedback and explicit no-charge/no-save language.
 - [x] Add focused coverage proving the settlement is local-only and cannot create a financial, sale, or stock record; validate with TypeScript, Vitest, build, and a mobile screenshot. Validation: TypeScript, production build, six showcase-boundary tests, and mobile capture.
+
+# Guided Showcase Receipt and Reusable Skill — 2026-08-16
+
+- [x] Define a local-only end-of-tour receipt preview with clearly marked showcase status, tax/payment/return references, and browser-print-only output.
+- [x] Add accessible receipt preview and print controls to the showcase tour without creating, exporting, storing, or transmitting a real financial document.
+- [x] Create and validate a reusable skill documenting how to build secure, isolated, interactive product walkthroughs with sample data and non-persistent business simulations. Skill: `secure-showcase-walkthroughs`; official validation passed.
+- [x] Add focused regression coverage for the receipt no-save boundary; run TypeScript, Vitest, production build, mobile verification, and skill validation. Validation: 351 passing tests, 9 safely skipped, TypeScript/build passed, mobile capture completed.

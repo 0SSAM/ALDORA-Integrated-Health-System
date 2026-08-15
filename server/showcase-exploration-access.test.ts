@@ -62,4 +62,13 @@ describe("showcase exploration access", () => {
     expect(source).toContain("لا يُرسل طلب إلى بنك أو بوابة دفع، ولا تحفظ بيانات بطاقة");
     expect(trpcBoundary).toContain("showcase_mutation_simulated");
   });
+
+  it("keeps the end-of-tour receipt a labelled local preview with no financial document", () => {
+    expect(source).toContain("إيصال عرض تدريبي");
+    expect(source).toContain("DEMO-INV-2026-1042");
+    expect(source).toContain("غير صالح مالياً أو ضريبياً");
+    expect(source).toContain("طباعة الإيصال التجريبي محلياً");
+    expect(source).toContain("لا يُحفظ إيصال ولا يُرسل إلى طابعة أو خدمة خارجية");
+    expect(trpcBoundary).toContain("هذه العملية محاكاة فقط ولا تُحفظ من حساب العرض.");
+  });
 });
