@@ -29,6 +29,7 @@ export function useAuth(options?: UseAuthOptions) {
 
   const startDemo = useCallback(async () => {
     await startDemoMutation.mutateAsync();
+    if (typeof window !== "undefined") window.location.assign("/");
   }, [startDemoMutation]);
 
   const logoutMutation = trpc.auth.logout.useMutation({

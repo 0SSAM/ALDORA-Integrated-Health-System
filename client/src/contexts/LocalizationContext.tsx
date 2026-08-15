@@ -13,6 +13,7 @@ type ClientLocalization = {
   t: (key: string) => string;
   formatCurrency: (amount: number) => string;
   setCountry: (countryCode: string) => void;
+  setLanguage: (language: "ar" | "en") => void;
   branchId: number | null;
   jurisdictionId: number | null;
   branches: Array<{ id: number; nameAr: string; countryCode: string }>;
@@ -27,6 +28,13 @@ const dictionaries: Record<string, Record<string, string>> = {
     branch: "الفرع",
     country: "الدولة",
   },
+  en: {
+    pharmacy: "Pharmacy",
+    prescription: "Prescription",
+    invoice: "Invoice",
+    branch: "Branch",
+    country: "Country",
+  },
 };
 
 const countryDefaults: Record<string, { locale: string; currencyCode: string }> = {
@@ -36,17 +44,29 @@ const countryDefaults: Record<string, { locale: string; currencyCode: string }> 
   AE: { locale: "ar-AE", currencyCode: "AED" },
 };
 
+export function normalizeLanguage(value: string | null): "ar" | "en" {
+  return value === "en" ? "en" : "ar";
+}
+
 const LocalizationContext = createContext<ClientLocalization | null>(null);
 
 export function LocalizationProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const [languageOverride, setLanguageOverride] = useState<"ar" | "en">(() => {
+    if (typeof window === "undefined") return "ar";
+    return normalizeLanguage(window.localStorage.getItem("aldo-language"));
+  });
   const branchRegistry = trpc.regional.myBranchJurisdictions.useQuery(undefined, { enabled: Boolean(user), retry: false, refetchOnWindowFocus: false });
   const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
   const branches = useMemo(() => (branchRegistry.data ?? []).filter(item => item.branch && item.profile).map(item => ({ id: item.branch!.id, nameAr: item.branch!.nameAr, countryCode: item.profile!.countryCode })), [branchRegistry.data]);
   const confirmedBranch = branches.length ? (branchRegistry.data?.find(item => item.branch?.id === selectedBranchId && item.assignment?.jurisdictionId && item.profile?.active === 1) ?? branchRegistry.data?.find(item => item.assignment?.jurisdictionId && item.profile?.active === 1) ?? null) : null;
   const countryCode = confirmedBranch?.profile?.countryCode ?? "UNSET";
   const defaults = countryDefaults[countryCode] ?? { locale: "ar", currencyCode: "XXX" };
-  const language = defaults.locale.split("-")[0] ?? "ar";
+  const language = languageOverride;
+  const setLanguage = (nextLanguage: "ar" | "en") => {
+    setLanguageOverride(nextLanguage);
+    try { window.localStorage.setItem("aldo-language", nextLanguage); } catch {}
+  };
   const dictionary = dictionaries[language] ?? dictionaries.ar;
   const value = useMemo<ClientLocalization>(() => ({
     countryCode,
@@ -62,13 +82,14 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
       // Legal jurisdiction is controlled by the authenticated branch registry;
       // a client-side country toggle must never change regulated behavior.
     },
+    setLanguage,
     branchId: confirmedBranch?.branch?.id ?? null,
     jurisdictionId: confirmedBranch?.assignment?.jurisdictionId ?? null,
     branches,
     setBranchId: (branchId) => {
       if (branches.some(branch => branch.id === branchId)) setSelectedBranchId(branchId);
     },
-  }), [countryCode, defaults.currencyCode, defaults.locale, dictionary, language, confirmedBranch, branches]);
+  }), [countryCode, defaults.currencyCode, defaults.locale, dictionary, language, languageOverride, confirmedBranch, branches]);
 
   useEffect(() => {
     document.documentElement.lang = value.language;

@@ -672,3 +672,12 @@
 - [x] Keep simulator state local and visibly separate from production device adapters and regulated workflows.
 - [x] Add unit coverage for supported model/transport combinations, barcode validation, and simulator isolation.
 - [x] Verify responsive UI, TypeScript, Vitest, and production build before checkpoint.
+
+# Language Switcher and Demo Access Fix
+
+- [x] Add a visible Arabic/English language switcher to the public login and authenticated workspace chrome.
+- [x] Ensure language changes update direction and persist locally without exposing sensitive session data.
+- [x] Add a prominent Demo entry CTA and direct Demo workspace launch path from the safe login flow.
+- [x] Ensure Demo mode opens interactive module workspaces instead of read-only overview content.
+- [x] Add tests for language persistence, RTL/LTR switching, and Demo entry visibility/guardrails.
+- [x] Verify login, Demo, responsive layouts, TypeScript, Vitest, and production build before checkpoint.
