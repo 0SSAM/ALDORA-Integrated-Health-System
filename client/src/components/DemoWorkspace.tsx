@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { AlertTriangle, BarChart3, Boxes, BrainCircuit, CheckCircle2, ClipboardCheck, FileText, FlaskConical, PackageSearch, PhoneCall, Receipt, RotateCcw, Search, ShieldCheck, ShoppingCart, Ticket, UserRound, Users, WalletCards } from "lucide-react";
+import { HardwareWorkspace } from "@/components/HardwareWorkspace";
+import { AlertTriangle, BarChart3, Boxes, BrainCircuit, CheckCircle2, ClipboardCheck, FileText, FlaskConical, PackageSearch, PhoneCall, Receipt, RotateCcw, Search, ShieldCheck, ShoppingCart, Ticket, UserRound, Users, WalletCards, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
 
-type DemoModule = "overview" | "pos" | "inventory" | "prescriptions" | "insurance" | "compliance" | "compounding" | "finance" | "people" | "customerCare" | "callCentre" | "catalog";
+type DemoModule = "overview" | "pos" | "inventory" | "prescriptions" | "insurance" | "compliance" | "compounding" | "finance" | "people" | "customerCare" | "callCentre" | "catalog" | "hardware";
 
 type DemoCartItem = { id: string; name: string; price: number; quantity: number };
 type DemoTicket = { id: number; subject: string; priority: "عادي" | "مرتفع"; status: "جديدة" | "قيد المتابعة" };
@@ -50,6 +51,7 @@ const moduleLabels: Record<DemoModule, string> = {
   customerCare: "خدمة العملاء",
   callCentre: "مركز الاتصال",
   catalog: "كتالوج الأصناف",
+  hardware: "الأجهزة والمحاكاة",
 };
 
 export function DemoWorkspace({ active, onNavigate }: { active: string; onNavigate: (module: DemoModule) => void }) {
@@ -106,6 +108,8 @@ export function DemoWorkspace({ active, onNavigate }: { active: string; onNaviga
         return <DemoPanel title="مركز الاتصال" icon={PhoneCall} description="أنشئ تذاكر محلية، غيّر الأولوية، وتابع دورة الحالة دون حفظ تسجيلات أو اتصال بخدمة هاتفية."><div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]"><div className="space-y-3 rounded-2xl bg-slate-50 p-4"><Input value={ticketSubject} onChange={event => setTicketSubject(event.target.value)} placeholder="موضوع تذكرة تجريبية" aria-label="موضوع تذكرة تجريبية" /><Button onClick={() => { if (!ticketSubject.trim()) { setTicketStatus("اكتب موضوع التذكرة أولاً"); return; } setTickets(current => [{ id: Date.now(), subject: ticketSubject.trim(), priority: "عادي", status: "جديدة" }, ...current]); setTicketSubject(""); setTicketStatus("تم إنشاء تذكرة محلية اصطناعية"); }} className="w-full bg-[#0d1b2a]"><Ticket className="ml-2 h-4 w-4" />فتح تذكرة محلية</Button><Badge variant="outline">{ticketStatus}</Badge></div><div className="space-y-2">{tickets.map(ticket => <div key={ticket.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3"><div><p className="font-medium">#{ticket.id} · {ticket.subject}</p><p className="text-xs text-slate-500">{ticket.status} · {ticket.priority}</p></div><Button variant="ghost" size="sm" onClick={() => setTickets(current => current.map(item => item.id === ticket.id ? { ...item, status: item.status === "جديدة" ? "قيد المتابعة" : "جديدة" } : item))}>تبديل الحالة</Button></div>)}</div></div></DemoPanel>;
       case "catalog":
         return <DemoPanel title="كتالوج الأصناف" icon={PackageSearch} description="ابحث في ثلاثة أصناف اصطناعية توضح فصل الأدوية والتجميل والمستلزمات ومصدر كل سجل."><div className="flex items-center gap-2"><Search className="h-4 w-4 text-slate-400" /><Input value={search} onChange={event => setSearch(event.target.value)} placeholder="ابحث بالاسم أو SKU" aria-label="بحث أصناف Demo" /></div><div className="mt-4 grid gap-3 md:grid-cols-3">{filteredCatalog.map(item => <div key={item.id} className="rounded-xl border border-slate-200 p-4"><Badge variant="outline">{item.category}</Badge><p className="mt-3 font-medium">{item.name}</p><p className="mt-2 text-xs text-slate-500">{item.id} · {item.source}</p></div>)}{filteredCatalog.length === 0 && <p className="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-500 md:col-span-3">لا توجد نتائج في السجل الاصطناعي.</p>}</div></DemoPanel>;
+      case "hardware":
+        return <DemoPanel title="إعداد الأجهزة والمحاكاة" icon={Wrench} description="اختر موديل الطابعة والاتصال، ثم اختبر ماسح الباركود والطابعة الحرارية دون أجهزة فعلية."><HardwareWorkspace /></DemoPanel>;
       case "insurance":
         return <DemoPanel title="التأمين والمطالبات" icon={ClipboardCheck} description="جرّب انتقال مطالبة اصطناعية من الانتظار إلى المراجعة دون إرسالها إلى شركة تأمين."><div className="rounded-2xl border border-amber-200 bg-amber-50 p-5"><div className="flex items-start justify-between gap-3"><div><p className="font-semibold">مطالبة DEMO-CLM-204</p><p className="mt-1 text-sm text-slate-600">خدمة دوائية تجريبية · مزود TPA اصطناعي</p></div><Badge variant="outline">{claimStatus}</Badge></div><Button onClick={() => setClaimStatus("تمت محاكاة المراجعة — لم يتم الإرسال الخارجي")} className="mt-4 bg-[#0d1b2a]">محاكاة مراجعة المطالبة</Button></div></DemoPanel>;
       case "compliance":
@@ -133,6 +137,7 @@ function DemoOverview({ onNavigate }: { onNavigate: (module: DemoModule) => void
     { id: "customerCare", title: "أنشئ ملف عميل", description: "تفاعل محلي مع حالة الموافقة", icon: UserRound },
     { id: "callCentre", title: "افتح تذكرة", description: "محاكاة دورة مركز الاتصال", icon: PhoneCall },
     { id: "catalog", title: "ابحث في الكتالوج", description: "أدوية وتجميل ومستلزمات اصطناعية", icon: PackageSearch },
+    { id: "hardware", title: "اختبر الأجهزة", description: "إعداد طابعة ومحاكاة ماسح وحرارية", icon: Wrench },
   ];
   return <Card className="border-0 bg-white shadow-sm"><CardHeader><CardTitle>ابدأ من هنا</CardTitle><p className="text-sm text-slate-500">اختر مساراً لتجربة الوظائف الأساسية خطوة بخطوة، ثم استخدم إعادة العرض لمسح حالتك المحلية.</p></CardHeader><CardContent className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{shortcuts.map(item => { const Icon = item.icon; return <button key={item.id} onClick={() => onNavigate(item.id)} className="group rounded-2xl border border-slate-200 p-4 text-right transition hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md"><div className="mb-4 flex items-center justify-between"><div className="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-700"><Icon className="h-5 w-5" /></div><span className="text-xs text-violet-700">استعراض</span></div><p className="font-semibold">{item.title}</p><p className="mt-1 text-xs leading-5 text-slate-500">{item.description}</p></button>; })}</CardContent></Card>;
 }

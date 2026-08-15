@@ -8,10 +8,11 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/lib/trpc";
 import { useLocalization } from "@/contexts/LocalizationContext";
 import { listDurableOfflineDrafts, removeOfflineDraft, type OfflineDraft } from "@/lib/offlineQueue";
-import { Activity, AlertTriangle, ArrowLeftRight, BarChart3, Bell, Boxes, BrainCircuit, Building2, ChevronLeft, ClipboardCheck, Database, FileText, FlaskConical, HeartPulse, LayoutDashboard, LockKeyhole, Menu, PackageSearch, PhoneCall, Plus, Receipt, Search, ShieldCheck, ShoppingCart, Stethoscope, Ticket, UserRound, Users, WalletCards, X } from "lucide-react";
+import { Activity, AlertTriangle, ArrowLeftRight, BarChart3, Bell, Boxes, BrainCircuit, Building2, ChevronLeft, ClipboardCheck, Database, FileText, FlaskConical, HeartPulse, LayoutDashboard, LockKeyhole, Menu, PackageSearch, PhoneCall, Plus, Receipt, Search, Settings2, ShieldCheck, ShoppingCart, Stethoscope, Ticket, UserRound, Users, WalletCards, X } from "lucide-react";
 import { skipToken } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { DemoWorkspace } from "@/components/DemoWorkspace";
+import { HardwareWorkspace } from "@/components/HardwareWorkspace";
 
 const modules = [
   { id: "overview", label: "نظرة عامة", icon: LayoutDashboard },
@@ -26,6 +27,7 @@ const modules = [
   { id: "customerCare", label: "خدمة العملاء", icon: UserRound },
   { id: "callCentre", label: "مركز الاتصال", icon: PhoneCall },
   { id: "catalog", label: "كتالوج الأصناف", icon: Database },
+  { id: "hardware", label: "إعداد الأجهزة والمحاكاة", icon: Settings2 },
 ];
 
 const organizationModules: Record<string, string[]> = { government: ["overview", "compliance", "finance", "people", "insurance"], pharmacy: ["overview", "pos", "inventory", "prescriptions", "insurance", "compliance", "customerCare", "callCentre", "catalog"], pharmacy_chain: ["overview", "pos", "inventory", "prescriptions", "insurance", "compliance", "finance", "people", "customerCare", "callCentre", "catalog"], distributor: ["overview", "inventory", "compliance", "finance", "people", "catalog"], insurer: ["overview", "insurance", "compliance", "finance", "people", "customerCare"], rehabilitation: ["overview", "prescriptions", "customerCare", "finance", "compliance", "people"], hospital: ["overview", "inventory", "prescriptions", "insurance", "compliance", "finance", "people", "customerCare"], laboratory: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare"], radiology: ["overview", "prescriptions", "compliance", "finance", "people", "customerCare"] };
@@ -59,9 +61,9 @@ export default function Home() {
   const allowedModules = useMemo(() => {
     if (isDemo) return modules;
     if (!role) return modules.filter(item => item.id === "overview");
-    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], people: ["admin", "manager"], customerCare: ["admin", "manager", "pharmacist", "cashier"], callCentre: ["admin", "manager", "pharmacist", "cashier"], catalog: ["admin", "manager", "pharmacist"] };
+    const access: Record<string, string[]> = { overview: ["admin", "manager", "pharmacist", "cashier"], pos: ["admin", "manager", "pharmacist", "cashier"], inventory: ["admin", "manager", "pharmacist"], prescriptions: ["admin", "manager", "pharmacist"], insurance: ["admin", "manager", "pharmacist"], compliance: ["admin", "manager", "pharmacist"], compounding: ["admin", "manager", "pharmacist"], finance: ["admin", "manager"], people: ["admin", "manager"], customerCare: ["admin", "manager", "pharmacist", "cashier"], callCentre: ["admin", "manager", "pharmacist", "cashier"], catalog: ["admin", "manager", "pharmacist"], hardware: ["admin", "manager"] };
     const scopedModuleIds = activeOrganizationType ? organizationModules[activeOrganizationType] : undefined;
-    return modules.filter(item => access[item.id]?.includes(role) && (!scopedModuleIds || scopedModuleIds.includes(item.id)));
+    return modules.filter(item => access[item.id]?.includes(role) && (!scopedModuleIds || item.id === "hardware" || scopedModuleIds.includes(item.id)));
   }, [role, activeOrganizationType, isDemo]);
   const activeModule = allowedModules.find(item => item.id === active) ?? allowedModules[0] ?? modules[0];
   const filteredModules = useMemo(() => allowedModules.filter(item => item.label.includes(query.trim())), [allowedModules, query]);
@@ -128,6 +130,7 @@ function ModulePanel({ active }: { active: string }) {
     customerCare: { title: "خدمة العملاء", description: "ملفات العملاء، الموافقات، المتابعة، والشكاوى مع سجل قابل للتدقيق.", items: ["ملف عميل", "متابعة علاجية", "موافقة وخصوصية"] },
     callCentre: { title: "مركز الاتصال", description: "استقبال المكالمات وتوزيع التذاكر ومواعيد إعادة الاتصال دون حفظ تسجيلات حساسة تلقائياً.", items: ["تذكرة جديدة", "أولوية وتصعيد", "موعد متابعة"] },
     catalog: { title: "كتالوج الأصناف", description: "بحث معزول حسب الدولة في الأدوية والتجميل والمستلزمات، مع مصدر ودرجة تحقق لكل صنف.", items: ["أدوية الدولة", "تجميل", "مستلزمات طبية"] },
+    hardware: { title: "إعداد الأجهزة والمحاكاة", description: "اختيار موديلات الطابعات واتصالاتها واختبار الماسح والطابعة الحرارية دون جهاز فعلي.", items: ["موديلات ووسائط", "نوع الاتصال", "سجل محاكاة محلي"] },
   };
   const panel = panels[active] ?? panels.overview;
   if (active === "compliance") return <RegionalComplianceWorkspace />;
@@ -135,6 +138,7 @@ function ModulePanel({ active }: { active: string }) {
   if (active === "customerCare") return <CustomerCareWorkspace />;
   if (active === "callCentre") return <CallCentreWorkspace />;
   if (active === "catalog") return <CatalogWorkspace />;
+  if (active === "hardware") return <HardwareWorkspace />;
   return <Card className="overflow-hidden border-0 bg-white shadow-sm shadow-slate-200/60"><CardContent className="p-0"><div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div><div className="mb-2 flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-cyan-500" /><span className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700">مساحة عمل</span></div><h2 className="text-xl font-bold tracking-tight">{panel.title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{panel.description}</p></div><div className="grid grid-cols-1 gap-2 sm:min-w-[300px] sm:grid-cols-3">{panel.items.map(item => <div key={item} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center text-xs font-medium text-slate-600">{item}</div>)}</div></div></CardContent></Card>;
 }
 

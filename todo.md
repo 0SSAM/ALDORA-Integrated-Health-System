@@ -663,3 +663,12 @@
 - [x] Audit monitoring support, including cold-chain sensors, CCTV/access-control boundaries, device health, and alert delivery.
 - [x] Define fail-closed hardware adapter contracts and a local bridge requirement where browser APIs are insufficient.
 - [x] Add tests and documentation for hardware integration readiness without claiming unsupported device connectivity.
+
+# Printer and Scanner Simulation Enhancement
+
+- [x] Add a role-scoped hardware settings workspace for selecting printer models, media type, and connection transport.
+- [x] Add an interactive barcode scanner simulator with sample payloads, validation, and event log.
+- [x] Add an interactive thermal-printer simulator with receipt preview, print settings, and simulated print result.
+- [x] Keep simulator state local and visibly separate from production device adapters and regulated workflows.
+- [x] Add unit coverage for supported model/transport combinations, barcode validation, and simulator isolation.
+- [x] Verify responsive UI, TypeScript, Vitest, and production build before checkpoint.
