@@ -13,7 +13,7 @@ import { reportsRouter } from "./routers/reports";
 import { insuranceRouter } from "./routers/insurance";
 import { promotionsRouter } from "./routers/promotions";
 import { egyptHealthcareRouter } from "./routers/egypt-healthcare";
-import { createPasswordResetToken, getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, resetInternalPasswordWithToken, revokeInternalSession } from "./db";
+import { createPasswordResetToken, getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, reconcileShowcaseScope, resetInternalPasswordWithToken, revokeInternalSession } from "./db";
 import { assertPasswordPolicy, createInternalSessionToken, INTERNAL_LOCKOUT_MS, INTERNAL_MAX_FAILED_ATTEMPTS, INTERNAL_SESSION_COOKIE, INTERNAL_SESSION_TTL_MS, isLocked, normalizeInternalUsername, verifyInternalPassword } from "./domain/internal-auth";
 import { hashInternalPassword, hashAuditRecord } from "./domain/internal-auth";
 
@@ -169,6 +169,9 @@ export const appRouter = router({
           await recordAuthenticationEvent({ username, eventType: "login_failure", source: "internal" });
         }
         return invalid();
+      }
+      if (credential.accountType === "showcase") {
+        await reconcileShowcaseScope(credential.userId);
       }
       const scope = await getInternalScopeForUser(credential.userId);
       if (!scope) {

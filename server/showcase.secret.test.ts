@@ -16,5 +16,7 @@ describe("showcase credential configuration", () => {
     });
     expect(response.status).toBeGreaterThanOrEqual(200);
     expect(response.status).toBeLessThan(500);
+    const payload = await response.json() as { result?: { data?: { json?: { success?: boolean } } } };
+    expect(payload.result?.data?.json?.success).toBe(true);
   });
 });

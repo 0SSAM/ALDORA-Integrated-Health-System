@@ -1186,3 +1186,19 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add or refresh local setup instructions and a placeholder environment template without real secrets. (Added LOCAL_SETUP.md; real environment files remain excluded by design.)
 - [x] Build one complete updated ZIP archive and verify integrity, manifest, and absence of secrets or generated dependencies.
 - [x] Validate the documented local startup sequence, save the project checkpoint, and deliver the ZIP directly.
+
+# Direct ZIP Delivery Correction — 2026-08-15
+- [ ] Locate and verify the actual updated ALDORA ZIP archive path and integrity.
+- [ ] Rebuild the archive if the direct file is missing or stale.
+- [ ] Attach the ZIP file itself directly to the user, not a project-version link.
+
+# Comprehensive System Review and Showcase Login Fix — 2026-08-15
+- [x] Diagnose the test account failure in the deployed application, including secret configuration, authentication flow, and environment parity. Root cause: the isolated showcase branch was missing its jurisdiction binding, so scope creation failed closed.
+- [x] Correct the confirmed root cause and add regression coverage without exposing test credentials. Added idempotent isolated-scope reconciliation plus managed-secret hash reconciliation at startup; focused local login passes.
+- [x] Audit application health, security controls, CI, dependency state, multi-tenant safeguards, offline boundaries, and integration fail-closed behavior. Full suite passes: 100 files/329 tests, 5 safely skipped; TypeScript, production build, and blocking production audit pass.
+- [x] Apply bounded improvements that pass regression checks, document residual external prerequisites, and deliver a review report. The updated audit records the isolated showcase reconciliation, current validation evidence, package-size warning, and external approval boundaries.
+
+- [x] Restore the missing jurisdiction binding for the isolated showcase branch and make its deployment bootstrap/reconciliation idempotent while keeping the internal `XS` profile inactive.
+- [x] Add regression coverage proving that an incomplete showcase scope is repaired safely and cannot fall back to production scope.
+- [x] Review the remaining Partial/Deferred matrix items. CRM omnichannel/call-centre delivery, official government and insurer integrations, production backup operations, source-specific migration, clinical/tax approvals, independent penetration testing, and device field acceptance remain external or deployment-specific prerequisites and are explicitly fail-closed rather than falsely marked complete.
+- [x] Rebuild and integrity-check the local-ready project archive after the showcase repair, excluding secrets, local environments, Git metadata, dependencies, logs, and build artifacts.
