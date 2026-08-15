@@ -1,7 +1,7 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, authenticationEvents, internalCredentials, internalSessions, passwordResetTokens, users, organizationMemberships, branchUsers, branches, branchJurisdictions, organizations, jurisdictionProfiles } from "../drizzle/schema";
-import { hashAuditRecord, hashInternalPassword, hashSessionToken, isSessionEnvironmentConsistent, verifyInternalPassword } from "./domain/internal-auth";
+import { hashAuditRecord, hashInternalPassword, hashSessionToken, isManagedShowcaseCredential, isSessionEnvironmentConsistent, verifyInternalPassword } from "./domain/internal-auth";
 import { ENV } from './_core/env';
 import { safeErrorLabel } from './domain/safe-error';
 
@@ -221,17 +221,19 @@ export async function reconcileManagedShowcaseAccount() {
 
   try {
     const credential = await getInternalCredentialByUsername("test");
-    if (!credential || !credential.active || credential.accountType !== "showcase") return false;
+    if (!credential || !isManagedShowcaseCredential(credential)) return false;
     const db = await getDb();
     if (!db) return false;
-    if (!verifyInternalPassword(password, credential.passwordHash)) {
-      await db.update(internalCredentials).set({
-        passwordHash: hashInternalPassword(password),
-        failedAttempts: 0,
-        lockedUntil: null,
-        passwordChangedAt: new Date(),
-      }).where(and(eq(internalCredentials.id, credential.id), eq(internalCredentials.accountType, "showcase")));
-    }
+    const passwordMatches = verifyInternalPassword(password, credential.passwordHash);
+    await db.update(internalCredentials).set({
+      ...(passwordMatches ? {} : { passwordHash: hashInternalPassword(password), passwordChangedAt: new Date() }),
+      failedAttempts: 0,
+      lockedUntil: null,
+    }).where(and(
+      eq(internalCredentials.id, credential.id),
+      eq(internalCredentials.username, "test"),
+      eq(internalCredentials.accountType, "showcase"),
+    ));
     return reconcileShowcaseScope(credential.userId);
   } catch (error) {
     console.warn("[Showcase] Managed credential reconciliation failed:", safeErrorLabel(error));

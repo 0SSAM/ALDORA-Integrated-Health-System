@@ -22,6 +22,10 @@ export function isSessionEnvironmentConsistent(sessionMode: "production" | "show
   return sessionMode === environment;
 }
 
+export function isManagedShowcaseCredential(input: { username: string; accountType: string; active: boolean | number }) {
+  return input.username === "test" && input.accountType === "showcase" && (input.active === true || input.active === 1);
+}
+
 export function assertPasswordPolicy(password: string) {
   if (typeof password !== "string" || password.length < PASSWORD_MIN_LENGTH) {
     throw new Error("Password does not meet the minimum security policy");
