@@ -1,8 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
+import { createHash } from "node:crypto";
 import { and, desc, eq, gte, inArray, isNull, like, lt, or, sql } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, ePrescriptions, ePrescriptionLines, healthcarePatients, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships } from "../../drizzle/schema";
+import { prescriptionIntakes, ePrescriptions, ePrescriptionLines, healthcarePatients, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships, auditLogs } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -22,6 +23,7 @@ import { assertAssigneeScope, assertCustomerTicketScope, buildCallTicketUpdate }
 import { evaluatePromotion } from "../domain/promotion-policy";
 import { assertCatalogIntakeReady } from "../domain/catalog-intake-policy";
 import { assertDeviceTrustReady } from "../domain/device-trust-policy";
+import { hashAuditRecord } from "../domain/internal-auth";
 
 async function getUserBranchIds(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string) {
   if (role === "admin") return null;
@@ -72,6 +74,59 @@ const catalogEditorProcedure = protectedProcedure.use(({ ctx, next }) => {
   }
   return next();
 });
+
+const catalogImportRowSchema = z.object({
+  category: z.string().max(40).optional(), sku: z.string().max(80).optional(), barcode: z.string().max(80).optional(), gtin: z.string().max(80).optional(), priceEgp: z.string().max(40).optional(), nameAr: z.string().max(240).optional(), nameEn: z.string().max(240).optional(), genericName: z.string().max(240).optional(), manufacturer: z.string().max(220).optional(), registrationNumber: z.string().max(120).optional(), sourceAuthority: z.string().max(40).optional(), sourceRecordId: z.string().max(160).optional(), sourceUrl: z.string().max(500).optional(), sourceLicense: z.string().max(500).optional(), sourceNotes: z.string().max(4000).optional(), sourceRetrievedAt: z.string().max(80).optional(),
+});
+
+type ValidCatalogImportRow = Omit<z.infer<typeof catalogImportRowSchema>, "category" | "sku" | "nameAr" | "sourceAuthority" | "priceEgp" | "sourceRetrievedAt"> & { category: "medicine" | "cosmetic" | "medical_supply"; sku: string; nameAr: string; sourceAuthority: string; priceEgp?: number; sourceRetrievedAt?: Date };
+
+function normalizeCatalogImportRow(raw: unknown): { row?: ValidCatalogImportRow; errors: string[] } {
+  const parsed = catalogImportRowSchema.safeParse(raw);
+  if (!parsed.success) return { errors: ["صيغة الصف أو طول أحد الحقول غير صالح"] };
+  const value = parsed.data;
+  const errors: string[] = [];
+  const category = value.category?.trim() as ValidCatalogImportRow["category"] | undefined;
+  if (!category || !["medicine", "cosmetic", "medical_supply"].includes(category)) errors.push("category غير صالح");
+  const sku = value.sku?.trim(); if (!sku) errors.push("SKU مطلوب");
+  const nameAr = value.nameAr?.trim(); if (!nameAr) errors.push("الاسم العربي مطلوب");
+  const sourceAuthority = value.sourceAuthority?.trim() || "LOCAL_PENDING_REVIEW";
+  const priceText = value.priceEgp?.trim(); const priceEgp: number | undefined = priceText ? Number(priceText) : undefined;
+  if (priceText && (priceEgp === undefined || !Number.isFinite(priceEgp) || priceEgp < 0)) errors.push("السعر غير صالح");
+  const sourceRetrievedAt = value.sourceRetrievedAt?.trim(); const retrieved = sourceRetrievedAt ? new Date(sourceRetrievedAt) : undefined;
+  if (sourceRetrievedAt && (!retrieved || Number.isNaN(retrieved.getTime()))) errors.push("تاريخ المصدر غير صالح");
+  if (errors.length) return { errors };
+  const { priceEgp: _rawPrice, sourceRetrievedAt: _rawRetrieved, category: _rawCategory, sku: _rawSku, nameAr: _rawNameAr, sourceAuthority: _rawAuthority, ...rest } = value;
+  return { row: { ...rest, category: category!, sku: sku!, nameAr: nameAr!, sourceAuthority, priceEgp, sourceRetrievedAt: retrieved }, errors: [] };
+}
+
+function catalogDryRunDigest(input: { organizationId: number; branchId: number; jurisdictionId: number; rows: unknown[] }) {
+  return createHash("sha256").update(JSON.stringify(input)).digest("hex");
+}
+
+function signCatalogDryRun(input: { organizationId: number; branchId: number; jurisdictionId: number; digest: string; expiresAt: number }) {
+  const payload = { eventType: "catalog_bulk_import_dry_run", organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId, requestId: `${input.digest}:${input.expiresAt}`, createdAt: new Date(input.expiresAt).toISOString() };
+  return `${input.expiresAt}.${input.digest}.${hashAuditRecord(payload)}`;
+}
+
+function verifyCatalogDryRunToken(token: string, scope: { organizationId: number; branchId: number; jurisdictionId: number; digest: string }) {
+  const [expiresText, digest, signature] = token.split("."); const expiresAt = Number(expiresText);
+  if (!expiresAt || expiresAt < Date.now() || digest !== scope.digest || !signature) return false;
+  return signCatalogDryRun({ ...scope, expiresAt }) === token;
+}
+
+async function assertCatalogImportScope(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, userId: number, role: string, input: { organizationId: number; branchId: number; jurisdictionId: number }) {
+  await assertUserBranchAccess(db, userId, role, input.branchId);
+  await assertUserJurisdictionAccess(db, userId, role, input.jurisdictionId);
+  const organizationId = await getBranchOrganizationId(db, input.branchId);
+  if (organizationId !== input.organizationId) throw new TRPCError({ code: "FORBIDDEN", message: "Import scope does not match the selected branch" });
+  if (role !== "admin" && !(await getUserOrganizationIds(db, userId)).includes(input.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Import organization is outside the active scope" });
+  const assignment = (await db.select().from(branchJurisdictions).where(and(eq(branchJurisdictions.branchId, input.branchId), eq(branchJurisdictions.jurisdictionId, input.jurisdictionId))).limit(1))[0];
+  try { assertBranchAssignmentReady(assignment); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Branch jurisdiction assignment is not ready" }); }
+  const profile = (await db.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.id, input.jurisdictionId)).limit(1))[0];
+  if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "Jurisdiction not found" });
+  try { assertJurisdictionProfileReady({ countryCode: profile.countryCode, active: profile.active === 1, legalAuthorityProfile: profile.legalAuthorityProfile, language: profile.language, defaultLocale: profile.defaultLocale, currencyCode: profile.currencyCode, timezone: profile.timezone, taxProfile: profile.taxProfile, dateFormat: profile.dateFormat, numberSystem: profile.numberSystem }); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Active jurisdiction profile is required for import" }); }
+}
 
 const clinicianProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!["admin", "manager", "clinical_lead"].includes(ctx.user.role)) {
@@ -525,6 +580,46 @@ export const erpRouter = router({
         const organizationIds = ctx.user.role === "admin" ? null : await getUserOrganizationIds(db, ctx.user.id);
         const filters = [eq(catalogItems.jurisdictionId, input.jurisdictionId), eq(catalogItems.verificationStatus, input.status), ...(input.category ? [eq(catalogItems.category, input.category)] : []), ...(input.query ? [or(like(catalogItems.nameAr, `%${input.query}%`), like(catalogItems.nameEn, `%${input.query}%`), like(catalogItems.sku, `%${input.query}%`))] : []), ...(organizationIds ? [organizationIds.length ? inArray(catalogItems.organizationId, organizationIds) : eq(catalogItems.id, -1)] : [])];
         return db.select({ id: catalogItems.id, category: catalogItems.category, sku: catalogItems.sku, barcode: catalogItems.barcode, nameAr: catalogItems.nameAr, nameEn: catalogItems.nameEn, genericName: catalogItems.genericName, manufacturer: catalogItems.manufacturer, sourceAuthority: catalogItems.sourceAuthority, sourceRecordId: catalogItems.sourceRecordId, sourceUrl: catalogItems.sourceUrl, sourceRetrievedAt: catalogItems.sourceRetrievedAt, verificationStatus: catalogItems.verificationStatus, organizationId: catalogItems.organizationId, jurisdictionId: catalogItems.jurisdictionId, createdAt: catalogItems.createdAt, updatedAt: catalogItems.updatedAt }).from(catalogItems).where(and(...filters)).orderBy(desc(catalogItems.updatedAt)).limit(200);
+      }),
+    bulkDryRun: catalogEditorProcedure
+      .input(z.object({ organizationId: z.number().int().positive(), branchId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), rows: z.array(z.record(z.string(), z.unknown())).min(1).max(2000) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb(); if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await assertCatalogImportScope(db, ctx.user.id, ctx.user.role, input);
+        const normalized = input.rows.map((raw, index) => ({ index: index + 1, ...normalizeCatalogImportRow(raw) }));
+        const valid = normalized.filter(item => item.row).map(item => ({ index: item.index, row: item.row! }));
+        const issues: Array<{ rowNumber: number; severity: "error" | "conflict"; code: string; message: string; existingId?: number }> = normalized.filter(item => item.errors.length).map(item => ({ rowNumber: item.index, severity: "error", code: "INVALID_ROW", message: item.errors.join("، ") }));
+        const skuCounts = new Map<string, number>(); valid.forEach(item => skuCounts.set(item.row.sku, (skuCounts.get(item.row.sku) ?? 0) + 1));
+        valid.filter(item => (skuCounts.get(item.row.sku) ?? 0) > 1).forEach(item => issues.push({ rowNumber: item.index, severity: "conflict", code: "DUPLICATE_INPUT_SKU", message: `SKU مكرر داخل الملف: ${item.row.sku}` }));
+        const skus = Array.from(new Set(valid.map(item => item.row.sku)));
+        const existing = skus.length ? await db.select({ id: catalogItems.id, sku: catalogItems.sku, organizationId: catalogItems.organizationId, verificationStatus: catalogItems.verificationStatus }).from(catalogItems).where(and(inArray(catalogItems.sku, skus), eq(catalogItems.organizationId, input.organizationId), eq(catalogItems.jurisdictionId, input.jurisdictionId))) : [];
+        const existingBySku = new Map(existing.map(item => [item.sku, item]));
+        valid.forEach(item => { const found = existingBySku.get(item.row.sku); if (found) issues.push({ rowNumber: item.index, severity: "conflict", code: "EXISTING_SKU", message: `SKU موجود مسبقاً (سجل ${found.id})`, existingId: found.id }); });
+        const digest = catalogDryRunDigest({ organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId, rows: input.rows });
+        const expiresAt = Date.now() + 10 * 60 * 1000;
+        return { dryRunToken: signCatalogDryRun({ organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId, digest, expiresAt }), expiresAt, totals: { received: input.rows.length, valid: valid.length, errors: issues.filter(issue => issue.severity === "error").length, conflicts: issues.filter(issue => issue.severity === "conflict").length, importable: Math.max(0, valid.length - issues.filter(issue => issue.severity === "conflict").length) }, issues: issues.slice(0, 500), provenancePolicy: "PENDING_REVIEW", scope: { organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId } };
+      }),
+    bulkConfirm: catalogEditorProcedure
+      .input(z.object({ organizationId: z.number().int().positive(), branchId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), rows: z.array(z.record(z.string(), z.unknown())).min(1).max(2000), dryRunToken: z.string().min(80).max(400), acknowledgePendingReview: z.literal(true) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb(); if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await assertCatalogImportScope(db, ctx.user.id, ctx.user.role, input);
+        const digest = catalogDryRunDigest({ organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId, rows: input.rows });
+        if (!verifyCatalogDryRunToken(input.dryRunToken, { organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId, digest })) throw new TRPCError({ code: "CONFLICT", message: "Dry-run expired or does not match the submitted file and scope" });
+        const normalized = input.rows.map((raw, index) => ({ index: index + 1, ...normalizeCatalogImportRow(raw) }));
+        if (normalized.some(item => !item.row || item.errors.length)) throw new TRPCError({ code: "CONFLICT", message: "Dry-run contains invalid rows; run it again after correction" });
+        const valid = normalized.map(item => ({ index: item.index, row: item.row! }));
+        const skus = valid.map(item => item.row.sku); const existing = skus.length ? await db.select({ id: catalogItems.id, sku: catalogItems.sku }).from(catalogItems).where(and(inArray(catalogItems.sku, skus), eq(catalogItems.organizationId, input.organizationId), eq(catalogItems.jurisdictionId, input.jurisdictionId))) : [];
+        if (existing.length) throw new TRPCError({ code: "CONFLICT", message: `لا يمكن التأكيد: توجد ${existing.length} تعارضات SKU. أعد المحاكاة.` });
+        const insertedIds: number[] = [];
+        for (const item of valid) {
+          const row = item.row; const inserted = await db.insert(catalogItems).values({ jurisdictionId: input.jurisdictionId, organizationId: input.organizationId, category: row.category, sku: row.sku, barcode: row.barcode || null, gtin: row.gtin || null, priceEgp: row.priceEgp === undefined ? null : String(row.priceEgp), nameAr: row.nameAr, nameEn: row.nameEn || null, genericName: row.genericName || null, manufacturer: row.manufacturer || null, registrationNumber: row.registrationNumber || null, sourceAuthority: row.sourceAuthority, sourceRecordId: row.sourceRecordId || null, sourceUrl: row.sourceUrl || null, sourceRetrievedAt: row.sourceRetrievedAt || new Date(), sourceLicense: row.sourceLicense || null, sourceNotes: row.sourceNotes || null, verificationStatus: "PENDING_REVIEW", createdByUserId: ctx.user.id });
+          const itemId = Number(inserted[0].insertId); insertedIds.push(itemId);
+          await db.insert(catalogSyncQueue).values({ jurisdictionId: input.jurisdictionId, organizationId: input.organizationId, entityType: row.category, operation: "create", entityId: itemId, idempotencyKey: `catalog-bulk-${input.organizationId}-${input.jurisdictionId}-${createHash("sha256").update(`${row.sku}:${row.sourceRecordId ?? ""}`).digest("hex").slice(0, 56)}`, payloadJson: JSON.stringify({ ...row, priceEgp: row.priceEgp ?? null, sourceRetrievedAt: row.sourceRetrievedAt?.toISOString() ?? null }), createdByUserId: ctx.user.id });
+        }
+        const createdAt = new Date().toISOString(); const recordHash = hashAuditRecord({ eventType: "catalog_bulk_import_confirmed", userId: ctx.user.id, organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId, requestId: digest, createdAt });
+        await db.insert(auditLogs).values({ userId: ctx.user.id, organizationId: input.organizationId, branchId: input.branchId, action: "catalog_bulk_import_confirmed", entityType: "catalog_bulk_import", entityId: digest, previousHash: null, recordHash });
+        return { imported: insertedIds.length, itemIds: insertedIds, status: "PENDING_REVIEW" as const, scope: { organizationId: input.organizationId, branchId: input.branchId, jurisdictionId: input.jurisdictionId } };
       }),
     search: protectedProcedure
       .input(z.object({ jurisdictionId: z.number().int().positive(), query: z.string().max(120).default(""), category: z.enum(["medicine", "cosmetic", "medical_supply"]).optional() }))

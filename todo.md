@@ -1047,3 +1047,21 @@
 - [x] Add clinician-authored e-prescription workflow with verification, patient-ID scoped pharmacy access, and dispensing gate.
 - [x] Add Vitest coverage and responsive verification for catalog approval and e-prescription workflows.
 - [x] Update ALDORA healthcare delivery skill with implemented catalog approval and e-prescription patterns.
+
+# Bulk Catalog Import Workspace 2026-08-15
+
+- [x] Add admin-only bulk catalog import workspace with file selection and explicit organization/branch/jurisdiction scope.
+- [x] Add server dry-run contract that parses and validates starter rows without mutation, reports duplicates, existing records, invalid fields, and provenance gaps.
+- [x] Add explicit confirmation contract that accepts only a matching dry-run token and preserves PENDING_REVIEW/idempotency/audit behavior.
+- [x] Add bilingual responsive UI for dry-run results, conflict review, confirmation, loading, error, and fail-closed states.
+- [x] Add focused tests, full validation, screenshots, and publish a checkpoint.
+
+# Shortcuts, Egyptian Returns, Tax and Invoice Controls 2026-08-15
+
+- [x] Fix the current bulk-import UI TypeScript error and complete focused/full validation before extending scope.
+- [x] Add role-aware shortcuts registry and keyboard navigation for core operations: new sale, returns, prescription, inventory, search, reports, and help.
+- [x] Add an accessible shortcuts help dialog with conflict detection, focus-safe behavior, and no sensitive-data exposure.
+- [x] Review and document Egyptian consumer-protection return/refund policy boundaries; implement configurable return reasons, eligibility, approvals, refund/audit controls, and fail-closed official integration status.
+- [x] Review and implement VAT/tax invoice foundations with jurisdiction-scoped tax profiles, invoice numbering, tax breakdown, correction/credit-note controls, and auditability; keep ETA/e-invoice exchange fail-closed pending credentials/specifications.
+- [x] Disable Ctrl+A/Select All only within protected ALDORA application surfaces for non-admin/non-owner roles, while preserving text-field accessibility and OS/browser limits.
+- [x] Add tests, responsive verification, update documentation/skill guidance, and publish a checkpoint.
