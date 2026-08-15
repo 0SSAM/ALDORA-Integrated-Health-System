@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { parse as parseCookie } from "cookie";
 import { and, desc, eq, gte, inArray, isNull, like, lt, or, sql } from "drizzle-orm";
 import { COOKIE_NAME } from "@shared/const";
-import { prescriptionIntakes, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships } from "../../drizzle/schema";
+import { prescriptionIntakes, ePrescriptions, ePrescriptionLines, healthcarePatients, scheduledJobs, customerProfiles, careInteractions, callTickets, catalogItems, catalogSyncQueue, offlineDrafts, complianceEvidence, compliancePacks, jurisdictionProfiles, branchJurisdictions, branchUsers, inventoryBatches, products, promotions, sales, saleItems, branches, organizationMemberships } from "../../drizzle/schema";
 import { getDb } from "../db";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { z } from "zod";
@@ -69,6 +69,13 @@ const pharmacistProcedure = protectedProcedure.use(({ ctx, next }) => {
 const catalogEditorProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!["admin", "manager", "pharmacist"].includes(ctx.user.role)) {
     throw new TRPCError({ code: "FORBIDDEN", message: "Catalog editor permission required" });
+  }
+  return next();
+});
+
+const clinicianProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!["admin", "manager", "clinical_lead"].includes(ctx.user.role)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Clinician prescription permission required" });
   }
   return next();
 });
@@ -509,6 +516,16 @@ export const erpRouter = router({
       }),
   }),
   catalog: router({
+    reviewQueue: catalogEditorProcedure
+      .input(z.object({ jurisdictionId: z.number().int().positive(), category: z.enum(["medicine", "cosmetic", "medical_supply"]).optional(), status: z.enum(["UNVERIFIED", "PENDING_REVIEW", "VERIFIED", "REJECTED"]).default("PENDING_REVIEW"), query: z.string().max(120).default("") }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId);
+        const organizationIds = ctx.user.role === "admin" ? null : await getUserOrganizationIds(db, ctx.user.id);
+        const filters = [eq(catalogItems.jurisdictionId, input.jurisdictionId), eq(catalogItems.verificationStatus, input.status), ...(input.category ? [eq(catalogItems.category, input.category)] : []), ...(input.query ? [or(like(catalogItems.nameAr, `%${input.query}%`), like(catalogItems.nameEn, `%${input.query}%`), like(catalogItems.sku, `%${input.query}%`))] : []), ...(organizationIds ? [organizationIds.length ? inArray(catalogItems.organizationId, organizationIds) : eq(catalogItems.id, -1)] : [])];
+        return db.select({ id: catalogItems.id, category: catalogItems.category, sku: catalogItems.sku, barcode: catalogItems.barcode, nameAr: catalogItems.nameAr, nameEn: catalogItems.nameEn, genericName: catalogItems.genericName, manufacturer: catalogItems.manufacturer, sourceAuthority: catalogItems.sourceAuthority, sourceRecordId: catalogItems.sourceRecordId, sourceUrl: catalogItems.sourceUrl, sourceRetrievedAt: catalogItems.sourceRetrievedAt, verificationStatus: catalogItems.verificationStatus, organizationId: catalogItems.organizationId, jurisdictionId: catalogItems.jurisdictionId, createdAt: catalogItems.createdAt, updatedAt: catalogItems.updatedAt }).from(catalogItems).where(and(...filters)).orderBy(desc(catalogItems.updatedAt)).limit(200);
+      }),
     search: protectedProcedure
       .input(z.object({ jurisdictionId: z.number().int().positive(), query: z.string().max(120).default(""), category: z.enum(["medicine", "cosmetic", "medical_supply"]).optional() }))
       .query(async ({ ctx, input }) => {
@@ -590,6 +607,84 @@ export const erpRouter = router({
         }
         await db.update(catalogItems).set({ verificationStatus: input.approved ? "VERIFIED" : "REJECTED", approvedByUserId: ctx.user.id }).where(eq(catalogItems.id, input.itemId));
         return { itemId: input.itemId, status: input.approved ? "VERIFIED" as const : "REJECTED" as const };
+      }),
+  }),
+  ePrescription: router({
+    create: clinicianProcedure
+      .input(z.object({ branchId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), patientId: z.number().int().positive(), encounterId: z.number().int().positive().optional(), prescriptionCode: z.string().min(6).max(80), expiresAt: z.coerce.date().optional(), lines: z.array(z.object({ catalogItemId: z.number().int().positive().optional(), medicationText: z.string().min(2).max(240), dosage: z.string().min(1).max(160), route: z.string().max(80).optional(), frequency: z.string().min(1).max(120), duration: z.string().min(1).max(120), quantity: z.coerce.number().positive().max(100000), instructions: z.string().max(1000).optional() })).min(1).max(50) }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
+        await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId);
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
+        if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Prescription is outside the active organization scope" });
+        const patient = (await db.select({ id: healthcarePatients.id }).from(healthcarePatients).where(and(eq(healthcarePatients.id, input.patientId), eq(healthcarePatients.organizationId, organizationId), eq(healthcarePatients.jurisdictionId, input.jurisdictionId), eq(healthcarePatients.branchId, input.branchId), eq(healthcarePatients.active, 1))).limit(1))[0];
+        if (!patient) throw new TRPCError({ code: "NOT_FOUND", message: "Patient is outside the active branch scope" });
+        const assignment = (await db.select().from(branchJurisdictions).where(and(eq(branchJurisdictions.branchId, input.branchId), eq(branchJurisdictions.jurisdictionId, input.jurisdictionId))).limit(1))[0];
+        try { assertBranchAssignmentReady(assignment); } catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Branch jurisdiction assignment is not ready" }); }
+        const existing = (await db.select({ id: ePrescriptions.id }).from(ePrescriptions).where(and(eq(ePrescriptions.organizationId, organizationId), eq(ePrescriptions.prescriptionCode, input.prescriptionCode))).limit(1))[0];
+        if (existing) throw new TRPCError({ code: "CONFLICT", message: "Prescription code already exists in this organization" });
+        const head = await db.insert(ePrescriptions).values({ organizationId, jurisdictionId: input.jurisdictionId, branchId: input.branchId, patientId: input.patientId, encounterId: input.encounterId, prescriptionCode: input.prescriptionCode, status: "PENDING_VERIFICATION", prescriberUserId: ctx.user.id, expiresAt: input.expiresAt });
+        const prescriptionId = Number(head[0].insertId);
+        await db.insert(ePrescriptionLines).values(input.lines.map(line => ({ prescriptionId, catalogItemId: line.catalogItemId, medicationText: line.medicationText, dosage: line.dosage, route: line.route, frequency: line.frequency, duration: line.duration, quantity: String(line.quantity), instructionsEncrypted: line.instructions ?? null })));
+        return { prescriptionId, prescriptionCode: input.prescriptionCode, status: "PENDING_VERIFICATION" as const, lineCount: input.lines.length };
+      }),
+    verify: pharmacistProcedure
+      .input(z.object({ prescriptionId: z.number().int().positive() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const prescription = (await db.select().from(ePrescriptions).where(eq(ePrescriptions.id, input.prescriptionId)).limit(1))[0];
+        if (!prescription) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription not found" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, prescription.branchId);
+        await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, prescription.jurisdictionId);
+        if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(prescription.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Prescription is outside the active organization scope" });
+        if (prescription.status !== "PENDING_VERIFICATION") throw new TRPCError({ code: "CONFLICT", message: "Prescription is not awaiting verification" });
+        if (prescription.expiresAt && prescription.expiresAt < new Date()) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription has expired" });
+        await db.update(ePrescriptions).set({ status: "VERIFIED", verifierUserId: ctx.user.id, verifiedAt: new Date() }).where(and(eq(ePrescriptions.id, prescription.id), eq(ePrescriptions.organizationId, prescription.organizationId), eq(ePrescriptions.jurisdictionId, prescription.jurisdictionId)));
+        return { prescriptionId: prescription.id, status: "VERIFIED" as const };
+      }),
+    accessByPatientId: pharmacistProcedure
+      .input(z.object({ branchId: z.number().int().positive(), jurisdictionId: z.number().int().positive(), patientId: z.number().int().positive(), prescriptionCode: z.string().max(80).optional(), includePending: z.boolean().optional() }))
+      .query(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, input.branchId);
+        await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, input.jurisdictionId);
+        const organizationId = await getBranchOrganizationId(db, input.branchId);
+        if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Patient lookup is outside the active organization scope" });
+        const patient = (await db.select({ id: healthcarePatients.id }).from(healthcarePatients).where(and(eq(healthcarePatients.id, input.patientId), eq(healthcarePatients.organizationId, organizationId), eq(healthcarePatients.jurisdictionId, input.jurisdictionId), eq(healthcarePatients.branchId, input.branchId), eq(healthcarePatients.active, 1))).limit(1))[0];
+        if (!patient) throw new TRPCError({ code: "NOT_FOUND", message: "Patient not found in this branch" });
+        const allowedStatuses = input.includePending ? ["PENDING_VERIFICATION", "VERIFIED", "PARTIALLY_DISPENSED"] as const : ["VERIFIED", "PARTIALLY_DISPENSED"] as const;
+        const filters = [eq(ePrescriptions.organizationId, organizationId), eq(ePrescriptions.jurisdictionId, input.jurisdictionId), eq(ePrescriptions.branchId, input.branchId), eq(ePrescriptions.patientId, input.patientId), inArray(ePrescriptions.status, allowedStatuses), ...(input.prescriptionCode ? [eq(ePrescriptions.prescriptionCode, input.prescriptionCode)] : [])];
+        const prescriptions = await db.select().from(ePrescriptions).where(and(...filters)).orderBy(desc(ePrescriptions.createdAt)).limit(20);
+        const result = [];
+        for (const prescription of prescriptions) result.push({ prescription, lines: await db.select().from(ePrescriptionLines).where(eq(ePrescriptionLines.prescriptionId, prescription.id)).orderBy(ePrescriptionLines.id) });
+        return result;
+      }),
+    dispenseLine: pharmacistProcedure
+      .input(z.object({ prescriptionId: z.number().int().positive(), lineId: z.number().int().positive(), quantity: z.coerce.number().positive() }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const prescription = (await db.select().from(ePrescriptions).where(eq(ePrescriptions.id, input.prescriptionId)).limit(1))[0];
+        const line = (await db.select().from(ePrescriptionLines).where(and(eq(ePrescriptionLines.id, input.lineId), eq(ePrescriptionLines.prescriptionId, input.prescriptionId))).limit(1))[0];
+        if (!prescription || !line) throw new TRPCError({ code: "NOT_FOUND", message: "Prescription line not found" });
+        await assertUserBranchAccess(db, ctx.user.id, ctx.user.role, prescription.branchId);
+        await assertUserJurisdictionAccess(db, ctx.user.id, ctx.user.role, prescription.jurisdictionId);
+        if (ctx.user.role !== "admin" && !(await getUserOrganizationIds(db, ctx.user.id)).includes(prescription.organizationId)) throw new TRPCError({ code: "FORBIDDEN", message: "Dispensing is outside the active organization scope" });
+        if (!["VERIFIED", "PARTIALLY_DISPENSED"].includes(prescription.status) || ["CANCELLED", "DISPENSED"].includes(line.status)) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Prescription is not eligible for dispensing" });
+        const remaining = Number(line.quantity) - Number(line.dispensedQuantity);
+        if (input.quantity > remaining) throw new TRPCError({ code: "BAD_REQUEST", message: "Dispensed quantity exceeds the prescribed remainder" });
+        const nextDispensed = Number(line.dispensedQuantity) + input.quantity;
+        const lineComplete = nextDispensed >= Number(line.quantity);
+        await db.update(ePrescriptionLines).set({ dispensedQuantity: String(nextDispensed), status: lineComplete ? "DISPENSED" : "PARTIALLY_DISPENSED" }).where(and(eq(ePrescriptionLines.id, line.id), eq(ePrescriptionLines.prescriptionId, prescription.id)));
+        const allLines = await db.select().from(ePrescriptionLines).where(eq(ePrescriptionLines.prescriptionId, prescription.id));
+        const allDispensed = allLines.every(item => item.id === line.id ? lineComplete : ["DISPENSED", "CANCELLED"].includes(item.status));
+        const anyDispensed = allLines.some(item => item.id === line.id ? nextDispensed > 0 : Number(item.dispensedQuantity) > 0);
+        await db.update(ePrescriptions).set({ status: allDispensed ? "DISPENSED" : anyDispensed ? "PARTIALLY_DISPENSED" : prescription.status }).where(eq(ePrescriptions.id, prescription.id));
+        return { prescriptionId: prescription.id, lineId: line.id, dispensedQuantity: nextDispensed, lineStatus: lineComplete ? "DISPENSED" as const : "PARTIALLY_DISPENSED" as const, prescriptionStatus: allDispensed ? "DISPENSED" as const : "PARTIALLY_DISPENSED" as const };
       }),
   }),
 });

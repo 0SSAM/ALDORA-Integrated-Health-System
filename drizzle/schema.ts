@@ -202,6 +202,41 @@ export const prescriptionIntakes = mysqlTable("prescription_intakes", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+/** Clinician-authored e-prescription. Official eRx/insurer submission remains fail-closed until credentials and jurisdiction evidence exist. */
+export const ePrescriptions = mysqlTable("e_prescriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  organizationId: int("organizationId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  branchId: int("branchId").notNull(),
+  patientId: int("patientId").notNull(),
+  encounterId: int("encounterId"),
+  prescriptionCode: varchar("prescriptionCode", { length: 80 }).notNull(),
+  status: mysqlEnum("status", ["DRAFT", "PENDING_VERIFICATION", "VERIFIED", "PARTIALLY_DISPENSED", "DISPENSED", "CANCELLED", "EXPIRED"]).default("DRAFT").notNull(),
+  notesEncrypted: text("notesEncrypted"),
+  prescriberUserId: int("prescriberUserId").notNull(),
+  verifierUserId: int("verifierUserId"),
+  verifiedAt: timestamp("verifiedAt"),
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ codeIdx: uniqueIndex("e_prescriptions_scope_code_idx").on(table.organizationId, table.prescriptionCode), patientIdx: index("e_prescriptions_patient_scope_idx").on(table.organizationId, table.branchId, table.patientId, table.status), statusIdx: index("e_prescriptions_status_idx").on(table.organizationId, table.jurisdictionId, table.status) }));
+
+export const ePrescriptionLines = mysqlTable("e_prescription_lines", {
+  id: int("id").autoincrement().primaryKey(),
+  prescriptionId: int("prescriptionId").notNull(),
+  catalogItemId: int("catalogItemId"),
+  medicationText: varchar("medicationText", { length: 240 }).notNull(),
+  dosage: varchar("dosage", { length: 160 }).notNull(),
+  route: varchar("route", { length: 80 }),
+  frequency: varchar("frequency", { length: 120 }).notNull(),
+  duration: varchar("duration", { length: 120 }).notNull(),
+  quantity: decimal("quantity", { precision: 12, scale: 3 }).notNull(),
+  instructionsEncrypted: text("instructionsEncrypted"),
+  status: mysqlEnum("status", ["ACTIVE", "PARTIALLY_DISPENSED", "DISPENSED", "CANCELLED"]).default("ACTIVE").notNull(),
+  dispensedQuantity: decimal("dispensedQuantity", { precision: 12, scale: 3 }).default("0").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ prescriptionIdx: index("e_prescription_lines_prescription_idx").on(table.prescriptionId, table.status), catalogIdx: index("e_prescription_lines_catalog_idx").on(table.catalogItemId) }));
 
 export const customerProfiles = mysqlTable("customer_profiles", {
   id: int("id").autoincrement().primaryKey(),

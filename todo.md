@@ -1016,3 +1016,34 @@
 - [x] Produce source-safe CSV/XLSX datasets and an Arabic/English research report with coverage, limitations, provenance, and import instructions; do not insert unverified records into production catalogs.
 - [x] Add or update a controlled catalog-intake path for reviewed records, preserving jurisdiction, organization scope, source evidence, and approval status.
 - [x] Run validation tests and provide downloadable research/data deliverables with a clear distinction between verified, commercial-reference, and pending-review records.
+
+
+# Catalog Approval and E-Prescription 2026-08-15
+
+- [ ] Create a reusable skill for Egyptian healthcare catalog research, provenance, licensing, normalization, validation, review, and controlled import.
+- [ ] Validate and package the reusable skill using the skill-creator workflow.
+- [ ] Add an admin-authorized bilingual catalog review workspace for imported medicine and cosmetics records before main-catalog approval.
+- [ ] Support review decisions, rejection reasons, evidence/source links, duplicate detection, field corrections, approval status, and tamper-evident audit events.
+- [ ] Preserve organization/branch/jurisdiction isolation and prevent unreviewed records from appearing in operational catalogs.
+- [ ] Review existing prescription-related models and add a safe e-prescription workflow for doctors, pharmacies, hospital pharmacies, and contracted dispensaries.
+- [ ] Add prescription identity, verification, patient retrieval ID, dispensing status, partial dispensing, cancellation/expiry, and duplicate-dispense protections without exposing unnecessary PHI.
+- [ ] Keep governmental, insurer, e-prescription exchange, SMS/email, and regulated integrations fail-closed until official specifications, credentials, sandbox, and acceptance evidence are provided.
+- [ ] Add regression tests, run TypeScript, Vitest, production build, responsive visual verification, validate the skill, and save/publish a checkpoint.
+
+
+# Local Starter Catalog Import Clarification 2026-08-15
+
+- [ ] Treat the collected medicine, cosmetics, medical cosmetics, equipment, instruments, and supplies datasets as local starter data rather than online-only references.
+- [ ] Preserve source URL, extraction date, source type, category, and review status for every imported starter record, even when official verification is unavailable.
+- [ ] Deduplicate starter records using normalized Arabic/English names, manufacturer, barcode/GTIN when present, and category-specific identifiers without inventing missing values.
+- [ ] Import starter records into a quarantined/pending-review catalog scope that is available for search and review but cannot silently become authoritative or regulated data.
+- [ ] Add controlled promotion from starter/pending-review records to the main catalog after an authorized review decision, with audit evidence and rollback-safe behavior.
+- [ ] Add tests and validation reports for local persistence, duplicate handling, source provenance, review states, and protection from unreviewed regulated use.
+
+# Catalog Approval and E-Prescription Expansion
+
+- [x] Add catalog review queue UI with category/status filters, provenance visibility, and authorized approve/reject actions.
+- [ ] Add safe local-starter catalog import path preserving UNVERIFIED/PENDING_REVIEW provenance and idempotency.
+- [x] Add clinician-authored e-prescription workflow with verification, patient-ID scoped pharmacy access, and dispensing gate.
+- [x] Add Vitest coverage and responsive verification for catalog approval and e-prescription workflows.
+- [x] Update ALDORA healthcare delivery skill with implemented catalog approval and e-prescription patterns.
