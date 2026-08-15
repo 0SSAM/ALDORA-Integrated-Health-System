@@ -1164,3 +1164,9 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Review package scripts and existing GitHub workflow configuration.
 - [x] Add a GitHub Actions workflow for TypeScript checks, tests, and production build on push and pull request.
 - [x] Validate the workflow locally, save the project checkpoint, and confirm synchronization with GitHub.
+
+# ALDORA CI Security and Maintenance Guardrails — 2026-08-15
+- [ ] Add lint/format validation, dependency security audit, CodeQL analysis, and dependency review to CI.
+- [ ] Add a post-build smoke check that validates the application responds without modifying data.
+- [ ] Configure main-branch protection requiring the CI check when GitHub permissions allow it.
+- [ ] Document safe auto-maintenance boundaries: report and propose fixes automatically, but require review for security, data, permissions, or regulated changes; camera/microphone monitoring remains consent-gated and disabled by default.
