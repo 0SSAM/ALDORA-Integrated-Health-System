@@ -696,3 +696,12 @@
 - [x] Expose search suggestions and explain when a keyboard-layout correction was applied.
 - [x] Add focused tests for Arabic normalization, English/Arabic lookup, keyboard mapping, mixed text, and no-result safety.
 - [x] Verify performance, RTL/LTR behavior, TypeScript, Vitest, production build, and save a published checkpoint.
+
+# Egyptian and Arab Pharmacopeia References 2026-08-15
+- [ ] Identify authoritative, current, and legally usable Egyptian and Arab pharmacopeia reference sources and record edition, authority, effective date, access/licensing status, and URL.
+- [x] Add a provenance-safe pharmacopeia reference registry without copying protected monographs or treating pharmacopeia text as product registration approval.
+- [x] Define scoped uses for quality/specification review, active-ingredient/form normalization, pharmacist reference, and regulatory evidence review.
+- [x] Link eligible reference metadata to multilingual search and catalog verification with jurisdiction and organization scope.
+- [x] Add fail-closed tests for missing source, stale edition, missing license, wrong jurisdiction, and unverified product claims.
+- [x] Update Arabic/English operational documentation with pharmacopeia usage boundaries and run TypeScript, Vitest, build, and visual checks.
+- [x] Save and publish the verified implementation; keep unavailable official sources and credentials explicitly open.
