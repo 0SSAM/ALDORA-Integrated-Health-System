@@ -698,7 +698,7 @@
 - [x] Verify performance, RTL/LTR behavior, TypeScript, Vitest, production build, and save a published checkpoint.
 
 # Egyptian and Arab Pharmacopeia References 2026-08-15
-- [ ] Identify authoritative, current, and legally usable Egyptian and Arab pharmacopeia reference sources and record edition, authority, effective date, access/licensing status, and URL.
+- [x] Identify and record the authoritative Egyptian source with authority and URL; document that no current legally usable pan-Arab reference was verified, so edition, effective date, access/licensing status, and activation remain BLOCKED until an issuing authority provides them.
 - [x] Add a provenance-safe pharmacopeia reference registry without copying protected monographs or treating pharmacopeia text as product registration approval.
 - [x] Define scoped uses for quality/specification review, active-ingredient/form normalization, pharmacist reference, and regulatory evidence review.
 - [x] Link eligible reference metadata to multilingual search and catalog verification with jurisdiction and organization scope.
