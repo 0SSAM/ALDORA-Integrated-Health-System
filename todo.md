@@ -1159,3 +1159,8 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Confirm which account identifiers and roles are documented, without exposing password hashes or unverified secrets.
 - [x] Create a secure account sheet that identifies the test username and explains how its password is provisioned or reset.
 - [x] Verify and deliver the account sheet directly to the user.
+
+# ALDORA Continuous Integration — 2026-08-15
+- [x] Review package scripts and existing GitHub workflow configuration.
+- [x] Add a GitHub Actions workflow for TypeScript checks, tests, and production build on push and pull request.
+- [x] Validate the workflow locally, save the project checkpoint, and confirm synchronization with GitHub.
