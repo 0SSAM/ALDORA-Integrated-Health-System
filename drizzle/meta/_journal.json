@@ -155,6 +155,13 @@
       "when": 1786734824133,
       "tag": "0021_odd_veda",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1786773428529,
+      "tag": "0022_boring_wrecking_crew",
+      "breakpoints": true
     }
   ]
 }

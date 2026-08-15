@@ -468,3 +468,51 @@ export const insuranceRequests = mysqlTable("insurance_requests", {
 }));
 
 export type InsuranceRequestRecord = typeof insuranceRequests.$inferSelect;
+
+
+/** Internal employee authentication is deliberately separate from OAuth and demo sessions. */
+export const internalCredentials = mysqlTable("internal_credentials", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  username: varchar("username", { length: 80 }).notNull(),
+  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+  failedAttempts: int("failedAttempts").default(0).notNull(),
+  lockedUntil: timestamp("lockedUntil"),
+  active: int("active").default(1).notNull(),
+  passwordChangedAt: timestamp("passwordChangedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, table => ({ usernameIdx: uniqueIndex("internal_credentials_username_idx").on(table.username), userIdx: uniqueIndex("internal_credentials_user_idx").on(table.userId) }));
+
+export const internalSessions = mysqlTable("internal_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  sessionHash: varchar("sessionHash", { length: 128 }).notNull(),
+  userId: int("userId").notNull(),
+  organizationId: int("organizationId").notNull(),
+  branchId: int("branchId").notNull(),
+  jurisdictionId: int("jurisdictionId").notNull(),
+  role: varchar("role", { length: 80 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  revokedAt: timestamp("revokedAt"),
+  lastSeenAt: timestamp("lastSeenAt").defaultNow().notNull(),
+}, table => ({ sessionHashIdx: uniqueIndex("internal_sessions_hash_idx").on(table.sessionHash), userScopeIdx: index("internal_sessions_user_scope_idx").on(table.userId, table.organizationId, table.branchId, table.revokedAt) }));
+
+export const authenticationEvents = mysqlTable("authentication_events", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  username: varchar("username", { length: 80 }),
+  organizationId: int("organizationId"),
+  branchId: int("branchId"),
+  jurisdictionId: int("jurisdictionId"),
+  eventType: mysqlEnum("eventType", ["login_success", "login_failure", "logout", "lockout", "session_revoked"]).notNull(),
+  source: mysqlEnum("source", ["internal", "oauth", "demo"]).notNull(),
+  requestId: varchar("requestId", { length: 120 }),
+  recordHash: varchar("recordHash", { length: 128 }).notNull(),
+  previousHash: varchar("previousHash", { length: 128 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, table => ({ authEventTimeIdx: index("authentication_events_time_idx").on(table.createdAt), authEventScopeIdx: index("authentication_events_scope_idx").on(table.organizationId, table.branchId, table.jurisdictionId, table.createdAt) }));
+
+export type InternalCredential = typeof internalCredentials.$inferSelect;
+export type InternalSession = typeof internalSessions.$inferSelect;
+export type AuthenticationEvent = typeof authenticationEvents.$inferSelect;

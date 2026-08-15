@@ -622,3 +622,10 @@
 - [x] Verify and expose the login entry screen and sales/POS route clearly in the current application, preserving demo-mode and protected-auth behavior; /login and /sales added, 233 tests passed, TypeScript and production build passed.
 - [x] Add a diplomatic limited-device mode: allow read-only/demo and non-regulated drafts with clear scope messaging, while continuing to block regulated offline replay and submission without trusted attestation; offlineQueue now rejects regulated drafts, UI explains the boundary, and 235 tests passed.
 - [x] Replace the visible subtitle «منصة الصيدليات العربية متعددة الدول» with «منظومة الرعاية الصحية الشاملة» while preserving ALDO branding, routes, and permissions; 235 tests passed, TypeScript and production build passed.
+
+- [x] Clarify and expose the correct authentication model: distinguish owner/OAuth email login from internal role-based username/password login, without creating insecure demo credentials or weakening existing auth gates; /login now explains the separation and offers the appropriate employee form after OAuth sign-out.
+
+- [x] Add a secure internal employee username/password authentication path separate from OAuth and demo mode, with hashed credentials, session rotation, throttling/lockout boundaries, and logout/revocation; implemented with opaque revocable sessions and generic failure handling.
+- [x] Bind internal sessions to organization, branch, jurisdiction, role, and permission snapshot; enforce these scopes server-side for regulated workflows.
+- [x] Add auditable authentication, authorization, and medicine-traceability events with tamper-evident linkage and no sensitive secret/password material.
+- [x] Add the internal login UI, focused security tests, TypeScript/build verification, and documentation explaining how internal permissions connect to healthcare and medicine traceability; 74 test files passed, 239 tests passed, build passed, and /login was visually verified.
