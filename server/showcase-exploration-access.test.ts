@@ -27,4 +27,17 @@ describe("showcase exploration access", () => {
     expect(trpcBoundary).toContain("showcase_mutation_simulated");
     expect(trpcBoundary).toContain("هذه العملية محاكاة فقط ولا تُحفظ من حساب العرض.");
   });
+
+  it("provides a reversible, non-persistent guided sale and a permanent sidebar restart action", () => {
+    expect(source).toContain("سيناريو بيع تدريبي: افتح نقطة البيع");
+    expect(source).toContain("سيناريو بيع تدريبي: اختر الصنف");
+    expect(source).toContain("سيناريو بيع تدريبي: راجع الكمية والعميل");
+    expect(source).toContain("سيناريو بيع تدريبي: اعرض الضريبة والدفع");
+    expect(source).toContain("سيناريو بيع تدريبي: عاين الفاتورة");
+    expect(source).toContain("لا تُنشأ حركة مخزون");
+    expect(source).toContain("لا تُسجل دفعة");
+    expect(source).toContain("إعادة بدء الجولة");
+    expect(source).toContain("const retreatShowcaseTour");
+    expect(trpcBoundary).toContain("showcase_mutation_simulated");
+  });
 });

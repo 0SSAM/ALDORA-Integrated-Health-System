@@ -1330,3 +1330,10 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add rich, clearly labelled sample invoice data to the showcase POS workspace without persisting any transaction or inventory movement.
 - [x] Add rich, clearly labelled sample stock, batches, expiry, FEFO, and reorder data to the showcase inventory workspace without querying production records.
 - [x] Add regression tests for tour isolation, restart behaviour, rich showcase content, and mutation blocking; run TypeScript, Vitest, production build, and mobile verification.
+
+# Guided Showcase Sale and Persistent Tour Restart — 2026-08-16
+
+- [x] Define a five-step, non-persistent showcase sale scenario from product selection through invoice preview and audit/safety explanation.
+- [x] Add the sale scenario to the Arabic showcase tour with progress, back/next, dismiss, and no mutation or stock deduction.
+- [x] Add a permanently visible, accessible «إعادة بدء الجولة» action in the showcase sidebar only.
+- [x] Add focused coverage for the restart control and no-save/no-deduction sale walkthrough boundary; validate with TypeScript, Vitest, build, and a mobile screenshot. Validation: TypeScript, production build, 348 passing tests with 9 safely skipped, and mobile capture.
