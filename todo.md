@@ -972,3 +972,13 @@
 - [x] Add Arabic/English loading, success, error, deferred, and unavailable states for the new settings and integration notices.
 - [x] Add regression tests for notice visibility, tooltip accessibility, fail-closed 2FA/recovery states, role/scope protection, and no external activation.
 - [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.
+
+
+# Connector and Accreditation Control Center 2026-08-15
+
+- [x] Define a central connector registry model with government and insurance providers, jurisdiction, organization scope, readiness state, required prerequisites, and last reviewed metadata.
+- [x] Add an admin-only server procedure for reading connector and accreditation readiness without exposing credentials or enabling external calls.
+- [x] Add a protected bilingual admin dashboard with summary counts, provider cards, prerequisite checklists, fail-closed state, and audit/review timestamps.
+- [x] Add accessible tooltips and clear actions for reviewing prerequisites without presenting deferred connectors as active.
+- [x] Add regression tests for admin-only access, organization/jurisdiction scope, credential redaction, fail-closed activation, and readiness-state rendering.
+- [x] Run TypeScript, Vitest, production build, responsive visual verification, and save/publish a checkpoint.

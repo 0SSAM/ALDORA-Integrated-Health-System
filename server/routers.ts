@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getSessionCookieOptions, isSecureRequest } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import { allowNlmManualRefresh, clearNlmIcd10Cache, getNlmIcd10CacheStats, searchNlmIcd10Cm } from "./domain/nlm-icd10";
 import { erpRouter } from "./routers/erp";
 import { regionalRouter } from "./routers/regional";
@@ -17,6 +17,33 @@ import { createPasswordResetToken, getInternalCredentialByUsername, getInternalS
 import { assertPasswordPolicy, createInternalSessionToken, INTERNAL_LOCKOUT_MS, INTERNAL_MAX_FAILED_ATTEMPTS, INTERNAL_SESSION_COOKIE, INTERNAL_SESSION_TTL_MS, isLocked, normalizeInternalUsername, verifyInternalPassword } from "./domain/internal-auth";
 import { hashInternalPassword } from "./domain/internal-auth";
 
+const connectorReadinessRegistry = [
+  {
+    id: "egypt-government",
+    category: "government" as const,
+    name: "الجهات الحكومية المصرية",
+    providers: ["UPA", "EDA", "ETA", "UHIA"],
+    jurisdiction: "EG",
+    state: "blocked" as const,
+    readinessPercent: 0,
+    prerequisites: ["مواصفة endpoint رسمية", "اعتماد وبيانات تسجيل المؤسسة", "اعتمادات سرية عبر مدير الأسرار", "بيئة sandbox واختبار قبول موثق"],
+    lastReviewedAt: "2026-08-15T00:00:00.000Z",
+    note: "لا توجد أي مكالمات خارجية أو إرسال بيانات قبل استيفاء بوابة الجاهزية والقبول البشري.",
+  },
+  {
+    id: "insurance-payers",
+    category: "insurance" as const,
+    name: "شركات التأمين والجهات الدافعة",
+    providers: ["TPA / Payer APIs"],
+    jurisdiction: "EG",
+    state: "blocked" as const,
+    readinessPercent: 0,
+    prerequisites: ["عقد API وخرائط الأهلية والمطالبات", "اعتمادات الجهة الدافعة", "بيئة اختبار sandbox", "اختبارات قبول ومطابقة التسويات"],
+    lastReviewedAt: "2026-08-15T00:00:00.000Z",
+    note: "تظل الأهلية والموافقات والمطالبات في نطاق داخلي غير مرسل حتى الاعتماد الرسمي.",
+  },
+] as const;
+
 export const appRouter = router({
   system: systemRouter,
   auth: router({
@@ -28,6 +55,11 @@ export const appRouter = router({
       role: ctx.user.role,
       expiresAt: ctx.internalSession?.session.expiresAt ?? null,
     } : { authenticated: false as const }),
+    connectorReadiness: adminProcedure.query(() => ({
+      reviewedAt: "2026-08-15T00:00:00.000Z",
+      activationPolicy: "fail-closed" as const,
+      connectors: connectorReadinessRegistry,
+    })),
     securityReadiness: protectedProcedure.query(() => ({
       twoFactorState: "deferred" as const,
       recoveryChannelState: "deferred" as const,
