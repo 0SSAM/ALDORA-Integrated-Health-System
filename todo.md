@@ -604,3 +604,5 @@
 - [x] Make the database smoke test assert its safe-skip state explicitly when no isolated test database is configured, while preserving the guarded connection check when one is available; 4 focused tests and TypeScript passed.
 
 - [x] Refresh the open-prerequisites index with the exact remaining unchecked items after the database-test skip, preserving each blocker and its required prerequisite.
+
+- [x] Create and validate the dated source-safe Egyptian medicine workbook with 28-column medicine schema, coverage/limitations, field dictionary, source register, and import instructions; validation passed with zero medicine product rows and one explicit non-record status row.
