@@ -953,7 +953,7 @@
 - [x] Prevent audit-chain concurrency races and validate request identifiers before recording showcase simulation events.
 - [x] Add regression tests for stale/revoked membership, inactive users, expired sessions, and concurrent audit writes.
 
-- [ ] Review and remediate actionable production dependency advisories, prioritizing Drizzle ORM, Axios, Lodash, and redirect/SSRF-related packages; verify compatibility after updates.
+- [x] Review and remediate actionable production dependency advisories, prioritizing Drizzle ORM, Axios, Lodash, and redirect/SSRF-related packages; verify compatibility after updates. Remaining Express 4 body-parser advisory is documented as a non-breaking migration constraint.
 - [x] Review client offline persistence to ensure no PHI or credentials can be stored in localStorage or IndexedDB.
 
 - [x] Add payload-level defense-in-depth to offline drafts so common PHI, credential, and clinical identifiers cannot be queued even when a caller incorrectly marks a draft as non-regulated.
