@@ -1261,3 +1261,4 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [ ] Fix CI disposable MySQL schema drift by adding the missing nullable branches.jurisdictionId migration, regression coverage, and external GitHub verification.
 - [ ] Package and integrity-check the final local-ready ALDORA archive after CI verification.
 - [ ] Resolve CI compatibility blockers revealed by the migrated repository: TypeScript 6 rejecting deprecated baseUrl and dependency-review unsupported on the current private repository plan, while retaining visible security evidence.
+- [ ] Add an explicit post-migration schema assertion/repair in the isolated test runner so CI fails with the missing table/column name and never proceeds with a partially compatible disposable schema.

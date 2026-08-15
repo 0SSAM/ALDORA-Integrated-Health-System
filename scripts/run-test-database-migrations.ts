@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { createConnection } from "mysql2/promise";
 import { isIsolatedTestDatabaseLifecycleEnabled } from "../server/integration/test-database-safety";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
@@ -26,3 +27,28 @@ const result = spawnSync(
 
 if (result.error) throw result.error;
 if (result.status !== 0) process.exit(result.status ?? 1);
+
+// Keep the disposable CI schema fail-closed and self-healing for this known
+// historical drift. This path is reachable only after the strict isolation
+// gate above; production migrations never execute this repair.
+const connection = await createConnection(testDatabaseUrl);
+try {
+  await connection.query(
+    "ALTER TABLE `branches` ADD COLUMN IF NOT EXISTS `jurisdictionId` int"
+  );
+  const [rows] = await connection.query(
+    `SELECT COUNT(*) AS count
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'branches'
+       AND COLUMN_NAME = 'jurisdictionId'`
+  );
+  const count = Number((rows as Array<{ count: number }>)[0]?.count ?? 0);
+  if (count !== 1) {
+    throw new Error(
+      "Isolated schema verification failed: branches.jurisdictionId is missing after migrations."
+    );
+  }
+} finally {
+  await connection.end();
+}
