@@ -133,11 +133,23 @@ export async function getInternalScopeForUser(userId: number, environment: "prod
     jurisdictionId: branchJurisdictions.jurisdictionId,
     role: organizationMemberships.organizationRole,
   }).from(organizationMemberships)
+    .innerJoin(organizations, and(
+      eq(organizations.id, organizationMemberships.organizationId),
+      eq(organizations.status, "active"),
+      eq(organizations.environment, environment),
+    ))
     .innerJoin(branchUsers, eq(branchUsers.userId, organizationMemberships.userId))
-    .innerJoin(branches, eq(branches.id, branchUsers.branchId))
-    .innerJoin(organizations, eq(organizations.id, organizationMemberships.organizationId))
+    .innerJoin(branches, and(
+      eq(branches.id, branchUsers.branchId),
+      eq(branches.organizationId, organizationMemberships.organizationId),
+    ))
     .innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, branches.id))
-    .where(and(eq(organizationMemberships.userId, userId), eq(organizationMemberships.active, 1), eq(branchUsers.active, 1), eq(branches.active, 1), eq(organizations.environment, environment)))
+    .where(and(
+      eq(organizationMemberships.userId, userId),
+      eq(organizationMemberships.active, 1),
+      eq(branchUsers.active, 1),
+      eq(branches.active, 1),
+    ))
     .limit(1);
   return result[0];
 }

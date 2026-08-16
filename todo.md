@@ -1369,3 +1369,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Verify the GitHub commit 4e907a9 and apply its showcase-session environment fix to the active project; release validation passed locally, with live verification tracked separately.
 
 - [x] Fix internal-session cookie parsing before tRPC context creation; add regression coverage for published-style auth.me session retrieval and rerun validation.
+
+- [ ] Inspect and enable safe GitHub synchronization for project updates, with validation and documented commit/publish boundaries.
+
+- [ ] Reconcile the GitHub main branch at 4e907a9 with the local published history at c5e8f2fc without force-pushing or overwriting remote commits.
