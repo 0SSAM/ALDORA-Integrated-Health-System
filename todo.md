@@ -1383,3 +1383,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Retry creating the private organization repository and push the verified local history, without force-pushing or replacing any existing repository; GitHub reported the organization owner is being deleted, so no organization push was attempted.
 
 - [x] Inspect 0SSAM repositories, identify a suitable ALDORA target, and verify access before connecting the project remote; no public repositories were listed, so a new private repository was created.
+
+- [ ] Add GitHub Actions CI for TypeScript, Vitest, and production build on push and pull_request.
+- [ ] Add scheduled Dependabot configuration for npm dependencies and GitHub Actions.
+- [ ] Verify repository ownership-transfer prerequisites and document the organization limitation if transfer is unavailable.
