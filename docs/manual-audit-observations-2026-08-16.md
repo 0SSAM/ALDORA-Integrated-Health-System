@@ -33,3 +33,11 @@ After dependency and Vite chunking updates, the public landing page initially sh
 - Development dependency audit still reports moderate/high findings through tooling paths involving Rollup, esbuild, picomatch, and pnpm; these are not present in the production dependency audit and should be addressed through future toolchain upgrades after compatibility testing.
 - Manual browser checks covered the public landing page, login route, safe invalid-login behavior, direct protected workspace access without a session, and the post-restart landing page. No protected business data or sensitive action was exposed.
 - Git histories are unrelated: the managed project history and the selected GitHub repository have different roots. A destructive force-push or implicit merge into GitHub `main` was not performed. The validated project will be synchronized to a separate GitHub branch to preserve the existing GitHub history.
+
+## Pull Request and staging follow-up — 2026-08-16
+
+A pull request was created at https://github.com/0SSAM/ALDORA-Integrated-Health-System/pull/8 from `manus/full-system-audit-pr-2026-08-16`. GitHub reports the PR as mergeable but blocked with `REVIEW_REQUIRED`; it must not be merged by bypassing the review gate.
+
+The database-dependent integration run was executed safely without substituting the configured application `DATABASE_URL`: 9 tests passed and 5 remained skipped because `TEST_DATABASE_URL` and `TEST_DATABASE_ISOLATED` were not supplied. The five tests require an authorized isolated staging database and use temporary or transactional probes only.
+
+The production dependency audit reported zero vulnerabilities. The full development-inclusive audit reported 14 moderate and 13 high findings, primarily in the local package-manager/toolchain path (`pnpm`) plus transitive development tooling such as `rollup`, `picomatch`, and an `esbuild` path requiring review. No production runtime vulnerability was identified by that audit.

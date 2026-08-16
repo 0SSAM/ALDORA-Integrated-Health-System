@@ -1272,3 +1272,6 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [ ] Complete anti-manipulation, anti-fraud, and anti-theft controls across prevention, detection, reconciliation, investigation, evidence, escalation, privacy, and audit boundaries.
 - [ ] Perform final regression, security, responsive, and manual workflow verification for the new changes.
 - [ ] Merge the reviewed PR into main only after all required gates pass, save a final checkpoint, and document residual limitations.
+
+- [ ] Keep the five database-dependent tests safely skipped until an explicitly isolated TEST_DATABASE_URL and TEST_DATABASE_ISOLATED=true are available; never substitute the application DATABASE_URL.
+- [ ] Continue autonomous PR review, toolchain compatibility checks, anti-fraud hardening, regression validation, and merge-gate documentation without bypassing required GitHub review.
