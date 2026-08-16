@@ -1275,3 +1275,4 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 
 - [ ] Keep the five database-dependent tests safely skipped until an explicitly isolated TEST_DATABASE_URL and TEST_DATABASE_ISOLATED=true are available; never substitute the application DATABASE_URL.
 - [ ] Continue autonomous PR review, toolchain compatibility checks, anti-fraud hardening, regression validation, and merge-gate documentation without bypassing required GitHub review.
+- [ ] إصلاح اختبار مسار تسجيل دخول الموظفين بعد تغيّر نصوص واجهة الدخول، ثم إعادة تشغيل prettier وTypeScript وVitest والبناء قبل تحديث PR.

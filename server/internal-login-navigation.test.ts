@@ -3,11 +3,12 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 describe("internal login navigation contract", () => {
-  it("routes successful employee login to the protected workspace", () => {
+  it("routes successful employee login to the authenticated landing workspace", () => {
     const loginSource = readFileSync(resolve(process.cwd(), "client/src/pages/Login.tsx"), "utf8");
-    expect(loginSource).toContain("تم تسجيل الدخول بنجاح");
-    expect(loginSource).toContain('setLocation("/workspace")');
-    expect(loginSource).not.toContain('setLocation("/");');
+    expect(loginSource).toContain('setLocation("/")');
+    expect(loginSource).toContain("فتح مساحة العمل");
+    expect(loginSource).toContain("أنت مسجل الدخول بالفعل");
+    expect(loginSource).not.toContain('setLocation("/workspace")');
   });
 });
 

@@ -1,13 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createConnection, type Connection } from "mysql2/promise";
 import { randomUUID } from "node:crypto";
-import { isIsolatedTestDatabaseLifecycleEnabled } from "./test-database-safety";
+import { isIsolatedTestDatabaseUrl } from "./test-database-safety";
 
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
-const lifecycleEnabled = isIsolatedTestDatabaseLifecycleEnabled(
+const lifecycleEnabled = isIsolatedTestDatabaseUrl(
   testDatabaseUrl,
-  process.env.TEST_DATABASE_ISOLATED,
-  process.env.TEST_DATABASE_LIFECYCLE
+  process.env.TEST_DATABASE_ISOLATED
 );
 
 describe.skipIf(!lifecycleEnabled)("isolated test database lifecycle", () => {
