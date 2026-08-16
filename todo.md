@@ -1361,11 +1361,11 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 # Showcase Test Login Regression — 2026-08-16
 
 - [x] Reproduce the published `test` login failure and capture the exact failure stage without logging or exposing credentials: login returned success, then auth.me returned null because the session scope environment was mismatched.
-- [x] Verify showcase credential reconciliation, lockout state, session creation, redirect, and mobile login UX in the isolated showcase path through source review and regression coverage; published smoke verification remains pending.
+- [x] Verify showcase credential reconciliation, lockout state, session creation, redirect, mobile login UX, and published smoke behaviour in the isolated showcase path through source review, regression coverage, and live verification.
 - [x] Fix the root cause without changing production-account authentication behavior by constraining scope lookup to the account environment.
-- [ ] Add regression coverage for the corrected showcase login and run TypeScript, Vitest, build, and a published smoke check; local regression, TypeScript, and build passed, published smoke check remains pending.
+- [x] Add regression coverage for the corrected showcase login and run TypeScript, Vitest, build, and a published smoke check; local regression, TypeScript, build, and published smoke check passed.
 
 - [x] Retry the interrupted showcase-account reconciliation inspection and verify the published login failure stage before any further change.
 - [x] Verify the GitHub commit 4e907a9 and apply its showcase-session environment fix to the active project; release validation passed locally, with live verification tracked separately.
 
-- [ ] Fix internal-session cookie parsing before tRPC context creation; add regression coverage for published-style auth.me session retrieval and rerun validation.
+- [x] Fix internal-session cookie parsing before tRPC context creation; add regression coverage for published-style auth.me session retrieval and rerun validation.
