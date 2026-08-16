@@ -1377,3 +1377,9 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [ ] Inspect the ALDO-Health-Care-Eco-System organization dashboard, confirm the target repository, and verify safe project-to-GitHub auto-sync boundaries.
 
 - [ ] Create a private ALDO-Health-Care-Eco-System repository, connect the project remote, and push the current verified project history without overwriting another repository.
+
+- [ ] Inspect the organization repository list, identify the correct ALDORA repository, and confirm its access path before pushing the local verified history.
+
+- [ ] Retry creating the private organization repository and push the verified local history, without force-pushing or replacing any existing repository.
+
+- [ ] Inspect 0SSAM repositories, identify a suitable ALDORA target, and verify access before connecting the project remote.
