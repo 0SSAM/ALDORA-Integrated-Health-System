@@ -2,46 +2,71 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const read = (relativePath: string) => readFileSync(resolve(process.cwd(), relativePath), "utf8");
+const read = (relativePath: string) =>
+  readFileSync(resolve(process.cwd(), relativePath), "utf8");
 
-describe("showcase login enhancement contracts", () => {
-  it("renders explicit success feedback and routes to the protected workspace", () => {
+describe("internal authentication security contracts", () => {
+  it("uses the server-backed employee login and recovery mutations", () => {
     const source = read("client/src/pages/Login.tsx");
-    expect(source).toContain("تم تسجيل الدخول بنجاح");
-    expect(source).toContain("setLocation(\"/workspace\")");
-    expect(source).toContain("تجربة الحساب المعزول");
+    expect(source).toContain("trpc.auth.internalLogin.useMutation");
+    expect(source).toContain("internalLogin.mutate({ username, password })");
+    expect(source).toContain("trpc.auth.requestPasswordReset.useMutation");
+    expect(source).toContain("trpc.auth.resetPassword.useMutation");
+    expect(source).toContain("لا تُرسل كلمات المرور إلى سجل التدقيق");
   });
 
-  it("keeps the showcase trial password-free at the browser boundary", () => {
-    const source = read("client/src/pages/Login.tsx");
-    expect(source).toContain("trpc.auth.showcaseTrial.useMutation");
-    expect(source).toContain("showcaseTrial.mutate()");
-    expect(source).not.toContain('showcaseTrial.mutate({ password');
-  });
-
-  it("keeps the server trial bound to the managed showcase account", () => {
+  it("verifies passwords before creating a scoped internal session and applies lockout policy", () => {
     const source = read("server/routers.ts");
-    expect(source).toContain("showcaseTrial: publicProcedure.mutation");
-    expect(source).toContain('const username = "test"');
-    expect(source).toContain('credential.accountType !== "showcase"');
-    expect(source).toContain('sessionMode: "showcase"');
+    expect(source).toContain("internalLogin: publicProcedure.input");
+    expect(source).toContain("try {");
+    expect(source).toContain(
+      "verifyInternalPassword(input.password, credential.passwordHash)"
+    );
+    expect(source).toContain("INTERNAL_MAX_FAILED_ATTEMPTS");
+    expect(source).toContain("INTERNAL_LOCKOUT_MS");
+    expect(source).toContain(
+      "createInternalSession({ token, userId: credential.userId"
+    );
+    expect(source).toContain(
+      'sessionMode: credential.accountType === "showcase" ? "showcase" : "production"'
+    );
   });
 
-  it("reconciles direct showcase login only after a server-side managed-secret match", () => {
-    const routerSource = read("server/routers.ts");
-    const dbSource = read("server/db.ts");
-    expect(routerSource).toContain("reconcileManagedShowcaseLogin(username, input.password)");
-    expect(dbSource).toContain('if (username !== "test" || !process.env.SHOWCASE_TEST_PASSWORD || password !== process.env.SHOWCASE_TEST_PASSWORD) return false;');
-    expect(dbSource).toContain("return reconcileManagedShowcaseAccount()");
-    expect(routerSource).toContain("Wrong guesses still follow the normal lockout path");
+  it("fails closed without exposing database or audit infrastructure errors", () => {
+    const source = read("server/routers.ts");
+    expect(source).toContain('"[Auth] internal login unavailable:"');
+    expect(source).toContain("safeErrorLabel(error)");
+    expect(source).toContain(
+      "تعذر التحقق من البيانات حالياً. تأكد من الاتصال وحاول مرة أخرى."
+    );
   });
 
-  it("registers a cron-authenticated, read-only login health callback", () => {
+  it("does not turn failed-login audit outages into a connection error", () => {
+    const source = read("server/routers.ts");
+    expect(source).toContain("const recordLoginFailure = async");
+    expect(source).toContain("login failure audit unavailable:");
+    expect(source).toContain(
+      'await recordLoginFailure({ username, eventType: "login_failure", source: "internal" });'
+    );
+    expect(source).toContain(
+      'message: "اسم المستخدم أو كلمة المرور غير صحيحة"'
+    );
+  });
+
+  it("uses memory-hard password hashing and timing-safe verification", () => {
+    const source = read("server/domain/internal-auth.ts");
+    expect(source).toContain("scryptSync");
+    expect(source).toContain("timingSafeEqual");
+    expect(source).toContain("assertPasswordPolicy(password)");
+    expect(source).toContain("PASSWORD_MIN_LENGTH = 12");
+  });
+
+  it("keeps scheduled login health read-only and cron-authenticated", () => {
     const handler = read("server/scheduled/login-health.ts");
-    const server = read("server/_core/index.ts");
     expect(handler).toContain("sdk.authenticateRequest(req)");
     expect(handler).toContain("user.isCron");
     expect(handler).toContain('loginMutation: "not_attempted"');
-    expect(server).toContain('app.post("/api/scheduled/login-health", loginHealthHandler)');
+    expect(handler).toContain('passwordExposure: "none"');
+    expect(handler).not.toContain("createInternalSession");
   });
 });

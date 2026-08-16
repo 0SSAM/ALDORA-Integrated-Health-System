@@ -25,7 +25,7 @@ export const ORGANIZATION_CAPABILITIES = [
 
 export type OrganizationCapability = (typeof ORGANIZATION_CAPABILITIES)[number];
 
-const ROLE_CAPABILITIES: Record<OrganizationRole, readonly OrganizationCapability[]> = {
+export const ROLE_CAPABILITIES: Record<OrganizationRole, readonly OrganizationCapability[]> = {
   owner: ["view_workspace", "manage_members", "view_sensitive_clinical", "view_audit"],
   org_admin: ["view_workspace", "manage_members", "view_sensitive_clinical", "view_audit"],
   compliance_officer: ["view_workspace", "view_sensitive_clinical", "view_audit"],

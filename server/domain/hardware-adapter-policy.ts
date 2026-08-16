@@ -25,6 +25,8 @@ export type HardwareAdapterContext = {
   healthCheckPassed: boolean;
   operatorAuthorized: boolean;
   externalCredentialsVerified: boolean;
+  monitoringGovernanceApproved?: boolean;
+  monitoringPurpose?: "safety" | "asset-protection" | "environmental";
 };
 
 export type HardwareReadiness = "READY" | "BLOCKED";
@@ -60,7 +62,7 @@ function transportAllowed(context: HardwareAdapterContext) {
 export function hardwareReadiness(context: HardwareAdapterContext | null): HardwareReadiness {
   if (!context || !transportAllowed(context) || !hasValidScope(context)) return "BLOCKED";
   if (!context.protocolVerified || !context.scopeVerified || !context.healthCheckPassed || !context.operatorAuthorized) return "BLOCKED";
-  if (context.kind === "monitor" && (!context.secureChannelVerified || !context.externalCredentialsVerified)) return "BLOCKED";
+  if (context.kind === "monitor" && (!context.secureChannelVerified || !context.externalCredentialsVerified || !context.monitoringGovernanceApproved || !context.monitoringPurpose)) return "BLOCKED";
   if (context.kind === "printer" && context.transport !== "browser-download" && !context.secureChannelVerified) return "BLOCKED";
   if (context.kind === "scanner" && context.transport === "local-bridge" && !context.secureChannelVerified) return "BLOCKED";
   return "READY";

@@ -1,7 +1,7 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, authenticationEvents, internalCredentials, internalSessions, passwordResetTokens, users, organizationMemberships, branchUsers, branches, branchJurisdictions, organizations, jurisdictionProfiles } from "../drizzle/schema";
-import { hashAuditRecord, hashInternalPassword, hashSessionToken, isManagedShowcaseCredential, isSessionEnvironmentConsistent, verifyInternalPassword } from "./domain/internal-auth";
+import { hashAuditRecord, hashInternalPassword, hashSessionToken, isSessionEnvironmentConsistent, verifyInternalPassword } from "./domain/internal-auth";
 import { ENV } from './_core/env';
 import { safeErrorLabel } from './domain/safe-error';
 
@@ -98,6 +98,147 @@ export async function getInternalCredentialByUsername(username: string) {
   return result[0];
 }
 
+const SHOWCASE_USERNAME = "test";
+const SHOWCASE_OPEN_ID = "aldora-showcase-internal-user-v1";
+const SHOWCASE_ORGANIZATION_NAME = "ALDORA Investor Showcase";
+const SHOWCASE_BRANCH_CODE = "ALDORA-SHOWCASE-001";
+
+/**
+ * Ensures the deliberately isolated, non-production showcase identity exists.
+ * This path is idempotent, is available only for the fixed showcase username,
+ * and derives the password hash from server-side secret management only.
+ */
+export async function ensureShowcaseAccount(username: string) {
+  if (username !== SHOWCASE_USERNAME) return false;
+  const configuredPassword = process.env.SHOWCASE_TEST_PASSWORD?.replace(/\r?\n/g, "");
+  if (!configuredPassword) return false;
+
+  const db = await getDb();
+  if (!db) throw new Error("Showcase authentication requires a database");
+
+  return db.transaction(async tx => {
+    const credentialRows = await tx.select().from(internalCredentials).where(eq(internalCredentials.username, SHOWCASE_USERNAME)).limit(1);
+    const existingCredential = credentialRows[0];
+    if (existingCredential && existingCredential.accountType !== "showcase") {
+      throw new Error("Reserved showcase username is not a showcase account");
+    }
+
+    let showcaseUserId = existingCredential?.userId;
+    if (!showcaseUserId) {
+      const existingUser = (await tx.select().from(users).where(eq(users.openId, SHOWCASE_OPEN_ID)).limit(1))[0];
+      if (existingUser) {
+        showcaseUserId = existingUser.id;
+      } else {
+        await tx.insert(users).values({
+          openId: SHOWCASE_OPEN_ID,
+          name: "ALDORA Showcase User",
+          loginMethod: "internal_showcase",
+          role: "manager",
+          lastSignedIn: new Date(),
+        });
+        showcaseUserId = (await tx.select().from(users).where(eq(users.openId, SHOWCASE_OPEN_ID)).limit(1))[0]?.id;
+      }
+    }
+    if (!showcaseUserId) throw new Error("Showcase user bootstrap failed");
+
+    let showcaseOrganization = (await tx.select().from(organizations).where(and(
+      eq(organizations.displayName, SHOWCASE_ORGANIZATION_NAME),
+      eq(organizations.environment, "showcase"),
+    )).limit(1))[0];
+    if (!showcaseOrganization) {
+      await tx.insert(organizations).values({
+        organizationType: "pharmacy",
+        legalName: "ALDORA Investor Showcase — Non-production",
+        displayName: SHOWCASE_ORGANIZATION_NAME,
+        countryCode: "EG",
+        status: "active",
+        environment: "showcase",
+      });
+      showcaseOrganization = (await tx.select().from(organizations).where(and(
+        eq(organizations.displayName, SHOWCASE_ORGANIZATION_NAME),
+        eq(organizations.environment, "showcase"),
+      )).limit(1))[0];
+    }
+    if (!showcaseOrganization) throw new Error("Showcase organization bootstrap failed");
+
+    let showcaseBranch = (await tx.select().from(branches).where(eq(branches.code, SHOWCASE_BRANCH_CODE)).limit(1))[0];
+    if (showcaseBranch && showcaseBranch.organizationId !== showcaseOrganization.id) {
+      throw new Error("Reserved showcase branch code has an unexpected organization");
+    }
+    if (!showcaseBranch) {
+      await tx.insert(branches).values({
+        organizationId: showcaseOrganization.id,
+        code: SHOWCASE_BRANCH_CODE,
+        nameAr: "فرع العرض التجريبي المعزول",
+        address: "Showcase only — no physical or regulated operations",
+        active: 1,
+      });
+      showcaseBranch = (await tx.select().from(branches).where(eq(branches.code, SHOWCASE_BRANCH_CODE)).limit(1))[0];
+    }
+    if (!showcaseBranch) throw new Error("Showcase branch bootstrap failed");
+
+    let showcaseJurisdiction = (await tx.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.countryCode, "EG")).limit(1))[0];
+    if (!showcaseJurisdiction) {
+      await tx.insert(jurisdictionProfiles).values({
+        countryCode: "EG",
+        countryNameAr: "نطاق عرض غير تنظيمي",
+        legalAuthorityProfile: "UNVERIFIED_AUTHORITY",
+        language: "ar",
+        defaultLocale: "ar-EG",
+        currencyCode: "EGP",
+        timezone: "Africa/Cairo",
+        taxProfile: "SHOWCASE_NOT_REGULATORY",
+        dateFormat: "dd/MM/yyyy",
+        numberSystem: "latn",
+        active: 0,
+      });
+      showcaseJurisdiction = (await tx.select().from(jurisdictionProfiles).where(eq(jurisdictionProfiles.countryCode, "EG")).limit(1))[0];
+    }
+    if (!showcaseJurisdiction) throw new Error("Showcase jurisdiction bootstrap failed");
+
+    await tx.insert(organizationMemberships).values({
+      organizationId: showcaseOrganization.id,
+      userId: showcaseUserId,
+      organizationRole: "operations_manager",
+      active: 1,
+    }).onDuplicateKeyUpdate({ set: { organizationRole: "operations_manager", active: 1 } });
+    await tx.insert(branchUsers).values({ branchId: showcaseBranch.id, userId: showcaseUserId, active: 1 })
+      .onDuplicateKeyUpdate({ set: { active: 1 } });
+    await tx.insert(branchJurisdictions).values({
+      branchId: showcaseBranch.id,
+      jurisdictionId: showcaseJurisdiction.id,
+      locationSource: "manual_override",
+      confirmedByUserId: showcaseUserId,
+    }).onDuplicateKeyUpdate({ set: { jurisdictionId: showcaseJurisdiction.id, locationSource: "manual_override", confirmedByUserId: showcaseUserId, confirmedAt: new Date() } });
+
+    if (!existingCredential) {
+      await tx.insert(internalCredentials).values({
+        userId: showcaseUserId,
+        username: SHOWCASE_USERNAME,
+        passwordHash: hashInternalPassword(configuredPassword),
+        failedAttempts: 0,
+        lockedUntil: null,
+        active: 1,
+        accountType: "showcase",
+        passwordChangedAt: new Date(),
+      });
+    } else if (!verifyInternalPassword(configuredPassword, existingCredential.passwordHash)) {
+      const now = new Date();
+      await tx.update(internalCredentials).set({
+        passwordHash: hashInternalPassword(configuredPassword),
+        failedAttempts: 0,
+        lockedUntil: null,
+        passwordChangedAt: now,
+      }).where(eq(internalCredentials.id, existingCredential.id));
+      await tx.update(internalSessions).set({ revokedAt: now }).where(and(
+        eq(internalSessions.userId, showcaseUserId),
+        isNull(internalSessions.revokedAt),
+      ));
+    }
+    return true;
+  });
+}
+
 export async function createPasswordResetToken(input: { userId: number; credentialId: number; token: string; expiresAt: Date }) {
   const db = await getDb();
   if (!db) throw new Error("Password recovery requires a database");
@@ -124,7 +265,7 @@ export async function resetInternalPasswordWithToken(input: { token: string; pas
   });
 }
 
-export async function getInternalScopeForUser(userId: number, environment: "production" | "showcase" = "production") {
+export async function getInternalScopeForUser(userId: number) {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select({
@@ -133,130 +274,12 @@ export async function getInternalScopeForUser(userId: number, environment: "prod
     jurisdictionId: branchJurisdictions.jurisdictionId,
     role: organizationMemberships.organizationRole,
   }).from(organizationMemberships)
-    .innerJoin(organizations, and(
-      eq(organizations.id, organizationMemberships.organizationId),
-      eq(organizations.status, "active"),
-      eq(organizations.environment, environment),
-    ))
     .innerJoin(branchUsers, eq(branchUsers.userId, organizationMemberships.userId))
-    .innerJoin(branches, and(
-      eq(branches.id, branchUsers.branchId),
-      eq(branches.organizationId, organizationMemberships.organizationId),
-    ))
+    .innerJoin(branches, eq(branches.id, branchUsers.branchId))
     .innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, branches.id))
-    .where(and(
-      eq(organizationMemberships.userId, userId),
-      eq(organizationMemberships.active, 1),
-      eq(branchUsers.active, 1),
-      eq(branches.active, 1),
-    ))
+    .where(and(eq(organizationMemberships.userId, userId), eq(organizationMemberships.active, 1), eq(branchUsers.active, 1), eq(branches.active, 1)))
     .limit(1);
   return result[0];
-}
-
-/**
- * Repairs only the missing jurisdiction link for an existing, isolated showcase user.
- * This never provisions a production user, never grants a production scope, and keeps
- * the showcase jurisdiction inactive so regulated workflows remain fail-closed.
- */
-export async function reconcileShowcaseScope(userId: number) {
-  const db = await getDb();
-  if (!db) return false;
-
-  const showcaseBranch = await db.select({ branchId: branches.id }).from(internalCredentials)
-    .innerJoin(organizationMemberships, and(eq(organizationMemberships.userId, internalCredentials.userId), eq(organizationMemberships.active, 1)))
-    .innerJoin(organizations, and(eq(organizations.id, organizationMemberships.organizationId), eq(organizations.environment, "showcase"), eq(organizations.status, "active")))
-    .innerJoin(branchUsers, and(eq(branchUsers.userId, internalCredentials.userId), eq(branchUsers.active, 1)))
-    .innerJoin(branches, and(eq(branches.id, branchUsers.branchId), eq(branches.organizationId, organizations.id), eq(branches.active, 1)))
-    .where(and(eq(internalCredentials.userId, userId), eq(internalCredentials.accountType, "showcase"), eq(internalCredentials.active, 1)))
-    .limit(1);
-
-  const branch = showcaseBranch[0];
-  if (!branch) return false;
-
-  // XS is an internal non-country code reserved for the isolated showcase scope.
-  // It is intentionally inactive and therefore cannot represent regulatory readiness.
-  await db.insert(jurisdictionProfiles).values({
-    countryCode: "XS",
-    countryNameAr: "بيئة عرض معزولة",
-    legalAuthorityProfile: "SHOWCASE_ONLY_UNVERIFIED",
-    language: "ar",
-    defaultLocale: "ar-EG",
-    currencyCode: "EGP",
-    timezone: "Africa/Cairo",
-    taxProfile: "SHOWCASE_UNVERIFIED",
-    dateFormat: "DD/MM/YYYY",
-    numberSystem: "latn",
-    active: 0,
-  }).onDuplicateKeyUpdate({
-    set: {
-      countryNameAr: "بيئة عرض معزولة",
-      legalAuthorityProfile: "SHOWCASE_ONLY_UNVERIFIED",
-      active: 0,
-    },
-  });
-
-  const jurisdiction = await db.select({ id: jurisdictionProfiles.id })
-    .from(jurisdictionProfiles)
-    .where(eq(jurisdictionProfiles.countryCode, "XS"))
-    .limit(1);
-  const profile = jurisdiction[0];
-  if (!profile) return false;
-
-  await db.insert(branchJurisdictions).values({
-    branchId: branch.branchId,
-    jurisdictionId: profile.id,
-    locationSource: "admin_confirmed",
-    confirmedByUserId: userId,
-    confirmedAt: new Date(),
-  }).onDuplicateKeyUpdate({
-    set: {
-      jurisdictionId: profile.id,
-      locationSource: "admin_confirmed",
-      confirmedByUserId: userId,
-      confirmedAt: new Date(),
-    },
-  });
-
-  return true;
-}
-
-/**
- * Keeps the explicitly configured showcase credential aligned with its managed secret.
- * The reconciliation is intentionally limited to the active `test` showcase account.
- */
-export async function reconcileManagedShowcaseLogin(username: string, password: string) {
-  if (username !== "test" || !process.env.SHOWCASE_TEST_PASSWORD || password !== process.env.SHOWCASE_TEST_PASSWORD) return false;
-  return reconcileManagedShowcaseAccount();
-}
-
-export async function reconcileManagedShowcaseAccount() {
-  const password = process.env.SHOWCASE_TEST_PASSWORD;
-  if (!password) {
-    console.warn("[Showcase] Managed credential reconciliation skipped: secret is unavailable");
-    return false;
-  }
-
-  try {
-    const credential = await getInternalCredentialByUsername("test");
-    if (!credential || !isManagedShowcaseCredential(credential)) return false;
-    const db = await getDb();
-    if (!db) return false;
-    const passwordMatches = verifyInternalPassword(password, credential.passwordHash);
-    await db.update(internalCredentials).set({
-      ...(passwordMatches ? {} : { passwordHash: hashInternalPassword(password), passwordChangedAt: new Date() }),
-      failedAttempts: 0,
-      lockedUntil: null,
-    }).where(and(
-      eq(internalCredentials.id, credential.id),
-      eq(internalCredentials.username, "test"),
-      eq(internalCredentials.accountType, "showcase"),
-    ));
-    return reconcileShowcaseScope(credential.userId);
-  } catch (error) {
-    console.warn("[Showcase] Managed credential reconciliation failed:", safeErrorLabel(error));
-    return false;
-  }
 }
 
 export async function createInternalSession(input: { token: string; userId: number; organizationId: number; branchId: number; jurisdictionId: number; role: string; expiresAt: Date; sessionMode?: "production" | "showcase" }) {

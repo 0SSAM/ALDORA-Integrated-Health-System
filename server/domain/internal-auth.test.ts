@@ -6,7 +6,6 @@ import {
   hashSessionToken,
   hashAuditRecord,
   isLocked,
-  isManagedShowcaseCredential,
   isSessionEnvironmentConsistent,
   normalizeInternalUsername,
   verifyInternalPassword,
@@ -36,13 +35,6 @@ describe("internal employee authentication contract", () => {
     expect(() => hashAuditRecord({ eventType: "test", createdAt: new Date().toISOString() })).toThrow(/Audit signing key/);
     if (previous === undefined) delete process.env.AUDIT_SIGNING_KEY;
     else process.env.AUDIT_SIGNING_KEY = previous;
-  });
-
-  it("limits managed credential reconciliation to the active isolated showcase account", () => {
-    expect(isManagedShowcaseCredential({ username: "test", accountType: "showcase", active: true })).toBe(true);
-    expect(isManagedShowcaseCredential({ username: "test", accountType: "production", active: true })).toBe(false);
-    expect(isManagedShowcaseCredential({ username: "admin", accountType: "showcase", active: true })).toBe(false);
-    expect(isManagedShowcaseCredential({ username: "test", accountType: "showcase", active: false })).toBe(false);
   });
 
   it("rejects cross-environment session elevation", () => {

@@ -55,4 +55,18 @@ describe("connector readiness dashboard contract", () => {
     await expect(caller.auth.connectorReadiness({ provider: "" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
     await expect(appRouter.createCaller(contextFor("user")).auth.connectorReadiness({ countryCode: "EG" })).rejects.toMatchObject({ code: "FORBIDDEN" });
   });
+
+  it("returns a redacted government acceptance packet that cannot activate external submission", async () => {
+    const packet = await appRouter.createCaller(contextFor("admin")).auth.governmentIntegrationPacket();
+
+    expect(packet.activationPolicy).toBe("fail-closed");
+    expect(packet.activationState).toBe("blocked");
+    expect(packet.externalSubmissionAllowed).toBe(false);
+    expect(packet.gates.length).toBeGreaterThan(8);
+    expect(packet.gates.every(gate => gate.state === "missing")).toBe(true);
+    expect(packet.audit.integrity).toBe("tamper-evident");
+    expect(packet.audit.recordHash).toMatch(/^[a-f0-9]{64}$/);
+    expect(JSON.stringify(packet)).not.toMatch(/"(?:password|token|apiKey|authorization)"\s*:/i);
+    await expect(appRouter.createCaller(contextFor("user")).auth.governmentIntegrationPacket()).rejects.toMatchObject({ code: "FORBIDDEN" });
+  });
 });
