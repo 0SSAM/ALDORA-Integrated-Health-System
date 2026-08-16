@@ -44,6 +44,10 @@ jobs:
           AUDIT_SIGNING_KEY="ci-only-audit-signing-key-not-for-production-2026" \
           SHOWCASE_TEST_PASSWORD="CI-only-showcase-password-2026" \
           VITE_APP_ID="ci-smoke" \
+          VITE_APP_TITLE="ألدورا | منظومة الرعاية الصحية المتكاملة" \
+          VITE_APP_LOGO="https://example.invalid/aldora-ci-logo.png" \
+          VITE_ANALYTICS_ENDPOINT="https://analytics.invalid" \
+          VITE_ANALYTICS_WEBSITE_ID="ci-smoke" \
           OAUTH_SERVER_URL="http://127.0.0.1:3999" \
           OWNER_OPEN_ID="ci-smoke" \
           OWNER_NAME="ALDORA CI" \
