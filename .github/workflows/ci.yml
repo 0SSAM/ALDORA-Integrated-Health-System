@@ -131,7 +131,10 @@ jobs:
 
   dependency-review:
     name: Dependency review (advisory)
-    if: github.event_name == 'pull_request'
+    # GitHub reports dependency-review-action as unsupported because this repository
+    # does not expose the Dependency Graph API. Keep this advisory job disabled rather
+    # than presenting a permanent false failure; CodeQL remains enabled below.
+    if: ${{ false }}
     continue-on-error: true
     runs-on: ubuntu-latest
     permissions:
