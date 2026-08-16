@@ -1384,6 +1384,6 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 
 - [x] Inspect 0SSAM repositories, identify a suitable ALDORA target, and verify access before connecting the project remote; no public repositories were listed, so a new private repository was created.
 
-- [ ] Add GitHub Actions CI for TypeScript, Vitest, and production build on push and pull_request.
-- [ ] Add scheduled Dependabot configuration for npm dependencies and GitHub Actions.
-- [ ] Verify repository ownership-transfer prerequisites and document the organization limitation if transfer is unavailable.
+- [x] Add GitHub Actions CI for TypeScript, Vitest, and production build on every push and pull_request.
+- [x] Add scheduled Dependabot configuration for npm dependencies and GitHub Actions; both ecosystems run weekly.
+- [x] Verify repository ownership-transfer prerequisites and document the organization limitation: transfer remains unavailable while the organization owner is being deleted.
