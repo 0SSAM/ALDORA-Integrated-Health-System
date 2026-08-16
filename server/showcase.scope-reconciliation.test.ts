@@ -2,56 +2,37 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-describe("showcase scope reconciliation", () => {
-  it("repairs scope only for an active user in an isolated showcase organization", async () => {
-    const source = await readFile(
-      resolve(process.cwd(), "server/db.ts"),
-      "utf8"
-    );
-    expect(source).toContain("export async function reconcileShowcaseScope");
-    expect(source).toContain('eq(internalCredentials.accountType, "showcase")');
-    expect(source).toContain('eq(organizations.environment, "showcase")');
-    expect(source).toContain('eq(organizations.status, "active")');
-    expect(source).toContain('countryCode: "XS"');
-    expect(source).toContain("active: 0");
-    expect(source).toContain("onDuplicateKeyUpdate");
-    expect(source).toContain(
-      "export async function reconcileManagedShowcaseAccount"
-    );
-    expect(source).toContain("process.env.SHOWCASE_TEST_PASSWORD");
-    expect(source).toContain('eq(internalCredentials.username, "test")');
-    expect(source).toContain('eq(internalCredentials.accountType, "showcase")');
+const read = (relativePath: string) => readFile(resolve(process.cwd(), relativePath), "utf8");
+
+describe("internal scope isolation", () => {
+  it("resolves scope only through active membership, branch, and jurisdiction joins", async () => {
+    const source = await read("server/db.ts");
+    expect(source).toContain("export async function getInternalScopeForUser");
+    expect(source).toContain("innerJoin(branchUsers");
+    expect(source).toContain("innerJoin(branches");
+    expect(source).toContain("innerJoin(branchJurisdictions");
+    expect(source).toContain("eq(organizationMemberships.active, 1)");
+    expect(source).toContain("eq(branchUsers.active, 1)");
+    expect(source).toContain("eq(branches.active, 1)");
+    expect(source).toContain("organizationId: organizationMemberships.organizationId");
   });
 
-  it("reconciles only after password verification and before the scope-backed session is created", async () => {
-    const source = await readFile(
-      resolve(process.cwd(), "server/routers.ts"),
-      "utf8"
-    );
-    const verifiedPassword = source.indexOf(
-      "verifyInternalPassword(input.password, credential.passwordHash)"
-    );
-    const reconciliation = source.indexOf(
-      "await reconcileShowcaseScope(credential.userId)"
-    );
-    const scopeLookup = source.indexOf(
-      "const scope = await getInternalScopeForUser(credential.userId, credential.accountType === \"showcase\" ? \"showcase\" : \"production\")"
-    );
-    expect(verifiedPassword).toBeGreaterThanOrEqual(0);
-    expect(reconciliation).toBeGreaterThan(verifiedPassword);
-    expect(scopeLookup).toBeGreaterThan(reconciliation);
-    expect(source).toContain('getInternalScopeForUser(credential.userId, credential.accountType === "showcase" ? "showcase" : "production")');
-    expect(source).toContain('getInternalScopeForUser(credential.userId, "showcase")');
+  it("creates sessions with explicit organization, branch, jurisdiction, role, and mode", async () => {
+    const source = await read("server/db.ts");
+    expect(source).toContain("export async function createInternalSession");
+    expect(source).toContain("organizationId: number");
+    expect(source).toContain("branchId: number");
+    expect(source).toContain("jurisdictionId: number");
+    expect(source).toContain('sessionMode?: "production" | "showcase"');
   });
 
-  it("runs managed reconciliation once during server startup without blocking the service", async () => {
-    const source = await readFile(
-      resolve(process.cwd(), "server/_core/index.ts"),
-      "utf8"
-    );
-    expect(source).toContain("await reconcileManagedShowcaseAccount()");
-    expect(source).toContain(
-      "the isolated showcase account remains unavailable"
-    );
+  it("revalidates active scope and organization state when reading a session", async () => {
+    const source = await read("server/db.ts");
+    expect(source).toContain("export async function getInternalSession");
+    expect(source).toContain("eq(organizations.status, \"active\")");
+    expect(source).toContain("eq(organizationMemberships.active, 1)");
+    expect(source).toContain("eq(branches.active, 1)");
+    expect(source).toContain("eq(branchUsers.active, 1)");
+    expect(source).toContain("isNull(internalSessions.revokedAt)");
   });
 });

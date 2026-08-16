@@ -28,5 +28,5 @@ export function modulesForOrganization(organizationType: string | undefined) {
 
 export function canUseOrganizationModule(organizationType: string | undefined, moduleId: string) {
   const modules = modulesForOrganization(organizationType);
-  return modules === null || modules.includes(moduleId);
+  return modules !== null && modules.includes(moduleId);
 }

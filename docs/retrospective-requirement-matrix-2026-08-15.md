@@ -67,16 +67,6 @@ The bilingual product description, role-based manuals, IT/admin/owner guide, pro
 
 The documentation package must be versioned together with the release and tailored before external presentation. It must not include real credentials, patient data, private keys, or unsupported claims of government approval. The proposal should describe the system as implementation-ready for formal onboarding and integration, not already approved by EDA, ETA, UHIA, insurers, or any other authority.
 
-## Expansion delivered in this review
-
-| Capability | Current status | Evidence | Boundary |
-|---|---|---|---|
-| Operations Hub | Implemented bounded vertical slice | `client/src/components/IntegratedOperationsWorkspaces.tsx`, `client/src/pages/Home.tsx`, F10 shortcut | It surfaces existing scoped operational state; it does not invent clinical, financial, or regulatory events |
-| Report delivery visibility | Implemented | Reports workspace and delivery-attempt contract | External delivery channels remain readiness-gated |
-| Sector capability bundles | Implemented evidence-bound descriptors | `shared/operations-hub.ts`, `server/operations-hub.test.ts` | Bundles describe supported workflow areas; they are not certifications, billing plans, or live integrations |
-| Isolated lifecycle testing | Implemented locally and configured for CI | test-database safety gate, lifecycle test, migration runner, CI MySQL service | Observable GitHub run remains blocked until repository access is restored; no production database is used |
-| Quality evidence | Passed | 100 test files, 331 passing tests, 9 skipped; TypeScript, build, production audit, desktop/mobile screenshots | Skipped tests are explicitly environment-gated and must not be presented as passed |
-
 ## Items that can be implemented next inside the project
 
 | Priority | Item | Safe in-project action |

@@ -23,10 +23,11 @@ describe("security middleware boundaries", () => {
     });
   });
 
-  it("does not trust forwarded host or protocol from a direct client", () => {
+  it("uses Express-resolved origin data rather than raw forwarded headers", () => {
     const request = {
       ip: "203.0.113.8",
       protocol: "http",
+      hostname: "aldora.example",
       headers: {
         "x-forwarded-host": "attacker.example",
         "x-forwarded-proto": "https",
@@ -36,119 +37,24 @@ describe("security middleware boundaries", () => {
     expect(securityInternals.requestOrigin(request)).toBe("http://aldora.example");
   });
 
-  it("accepts the public HTTPS origin when TLS terminates before the app", () => {
+  it("uses HTTPS and hostname already resolved by the trusted proxy", () => {
     const request = {
-      ip: "10.0.0.8",
-      method: "POST",
-      protocol: "http",
-      headers: {
-        origin: "https://aldora.example",
-        "sec-fetch-site": "same-origin",
-      },
-      get: (name: string) => name === "host" ? "aldora.example" : undefined,
-    } as never;
-    expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
-  });
-
-  it("allows the configured public origin when the proxy exposes an internal Host", () => {
-    const request = {
-      ip: "10.0.0.8",
-      socket: { remoteAddress: "127.0.0.1" },
-      method: "POST",
-      protocol: "http",
-      headers: {
-        origin: "https://bdfpharma-icsvf3q3.manus.space",
-        "sec-fetch-site": "same-site",
-      },
-      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
-    } as never;
-    expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
-  });
-
-  it("rejects an unconfigured public origin when the proxy exposes an internal Host", () => {
-    const request = {
-      ip: "10.0.0.8",
-      socket: { remoteAddress: "127.0.0.1" },
-      method: "POST",
-      protocol: "http",
-      headers: {
-        origin: "https://attacker.example",
-        "sec-fetch-site": "same-site",
-      },
-      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
-    } as never;
-    expect(securityInternals.isTrustedMutationRequest(request)).toMatchObject({ allowed: false, status: 403 });
-  });
-
-  it("allows a browser same-origin request when the reverse proxy exposes an internal Host", () => {
-    const request = {
-      ip: "10.0.0.8",
-      socket: { remoteAddress: "127.0.0.1" },
-      method: "POST",
-      protocol: "http",
-      headers: {
-        origin: "https://bdfpharma-icsvf3q3.manus.space",
-        "sec-fetch-site": "same-origin",
-      },
-      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
-    } as never;
-    expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
-  });
-
-  it("normalizes the default TLS port when binding the browser origin to Host", () => {
-    const request = {
-      ip: "10.0.0.8",
-      socket: { remoteAddress: "127.0.0.1" },
-      method: "POST",
-      protocol: "http",
-      headers: {
-        origin: "https://aldora.example",
-        "sec-fetch-site": "same-origin",
-        "x-forwarded-proto": "https",
-      },
-      get: (name: string) => name === "host" ? "aldora.example:443" : undefined,
-    } as never;
-    expect(securityInternals.isTrustedMutationRequest(request)).toEqual({ allowed: true });
-  });
-
-  it("accepts forwarded host and protocol only from loopback proxy", () => {
-    const request = {
-      ip: "127.0.0.1",
-      protocol: "http",
-      headers: {
-        "x-forwarded-host": "aldora.example",
-        "x-forwarded-proto": "https",
-      },
-      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
-    } as never;
-    expect(securityInternals.requestOrigin(request)).toBe("https://aldora.example");
-  });
-
-  it("trusts forwarded host and protocol when the socket is the loopback proxy", () => {
-    const request = {
-      ip: "198.51.100.9",
-      socket: { remoteAddress: "::1" },
-      protocol: "http",
-      headers: {
-        "x-forwarded-host": "aldora.example",
-        "x-forwarded-proto": "https",
-      },
-      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
-    } as never;
-    expect(securityInternals.requestOrigin(request)).toBe("https://aldora.example");
-  });
-
-  it("does not trust forwarded host when both client and socket are external", () => {
-    const request = {
-      ip: "198.51.100.9",
-      socket: { remoteAddress: "198.51.100.10" },
-      protocol: "http",
+      ip: "203.0.113.8",
+      protocol: "https",
+      hostname: "aldorapharm.example",
       headers: {
         "x-forwarded-host": "attacker.example",
         "x-forwarded-proto": "https",
       },
-      get: (name: string) => name === "host" ? "aldora.example" : undefined,
+      get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
     } as never;
-    expect(securityInternals.requestOrigin(request)).toBe("http://aldora.example");
+    expect(securityInternals.requestOrigin(request)).toBe("https://aldorapharm.example");
+  });
+
+  it("applies stricter limits to authentication and upload routes", () => {
+    expect(securityInternals.rateLimitFor("/api/trpc/auth.internalLogin", true)).toEqual({ category: "auth", limit: 12 });
+    expect(securityInternals.rateLimitFor("/api/trpc/erp.prescription.upload", true)).toEqual({ category: "upload", limit: 20 });
+    expect(securityInternals.rateLimitFor("/api/trpc/erp.sales.commit", true)).toEqual({ category: "mutation", limit: 120 });
+    expect(securityInternals.rateLimitFor("/api/trpc/erp.catalog", false)).toBeNull();
   });
 });

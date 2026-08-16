@@ -1,7 +1,10 @@
 import { startLogin } from "@/const";
 import { trpc } from "@/lib/trpc";
+import { clearSessionAuthHeaderCache } from "@/lib/sessionAuth";
 import { TRPCClientError } from "@trpc/client";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+export const AUTH_CHECK_TIMEOUT_MS = 1_500;
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -20,7 +23,28 @@ export function useAuth(options?: UseAuthOptions) {
     retry: false,
     refetchOnWindowFocus: false,
   });
+  const [authCheckTimedOut, setAuthCheckTimedOut] = useState(false);
 
+  useEffect(() => {
+    if (!meQuery.isLoading) {
+      setAuthCheckTimedOut(false);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      // A missing session must never leave the public login route blocked forever.
+      // The server remains fail-closed; this only releases the UI from its spinner.
+      setAuthCheckTimedOut(true);
+    }, AUTH_CHECK_TIMEOUT_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [meQuery.isLoading]);
+
+  const internalLogoutMutation = trpc.auth.internalLogout.useMutation({
+    onSuccess: () => {
+      utils.auth.me.setData(undefined, null);
+    },
+  });
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       utils.auth.me.setData(undefined, null);
@@ -28,6 +52,13 @@ export function useAuth(options?: UseAuthOptions) {
   });
 
   const logout = useCallback(async () => {
+    try {
+      await internalLogoutMutation.mutateAsync();
+    } catch (error: unknown) {
+      if (!(error instanceof TRPCClientError && error.data?.code === "UNAUTHORIZED")) {
+        throw error;
+      }
+    }
     try {
       await logoutMutation.mutateAsync();
     } catch (error: unknown) {
@@ -45,10 +76,11 @@ export function useAuth(options?: UseAuthOptions) {
       try {
         sessionStorage.removeItem("manus-cookie");
       } catch {}
+      clearSessionAuthHeaderCache();
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
     }
-  }, [logoutMutation, utils]);
+  }, [internalLogoutMutation, logoutMutation, utils]);
 
   const state = useMemo(() => {
     localStorage.setItem(
@@ -57,7 +89,7 @@ export function useAuth(options?: UseAuthOptions) {
     );
     return {
       user: meQuery.data ?? null,
-      loading: meQuery.isLoading || logoutMutation.isPending,
+      loading: (meQuery.isLoading && !authCheckTimedOut) || internalLogoutMutation.isPending || logoutMutation.isPending,
       error: meQuery.error ?? logoutMutation.error ?? null,
       isAuthenticated: Boolean(meQuery.data),
     };
@@ -65,13 +97,15 @@ export function useAuth(options?: UseAuthOptions) {
     meQuery.data,
     meQuery.error,
     meQuery.isLoading,
+    authCheckTimedOut,
     logoutMutation.error,
+    internalLogoutMutation.isPending,
     logoutMutation.isPending,
   ]);
 
   useEffect(() => {
     if (!redirectOnUnauthenticated) return;
-    if (meQuery.isLoading || logoutMutation.isPending) return;
+    if ((meQuery.isLoading && !authCheckTimedOut) || logoutMutation.isPending) return;
     if (state.user) return;
     if (typeof window === "undefined") return;
     if (redirectPath && window.location.pathname === redirectPath) return;
@@ -87,6 +121,7 @@ export function useAuth(options?: UseAuthOptions) {
     redirectPath,
     logoutMutation.isPending,
     meQuery.isLoading,
+    authCheckTimedOut,
     state.user,
   ]);
 

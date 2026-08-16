@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 const baseUrl = process.env.SHOWCASE_TEST_BASE_URL ?? "http://127.0.0.1:3000";
-const liveServerIt = process.env.RUN_LIVE_HTTP_TESTS === "true" ? it : it.skip;
+const runLiveShowcaseTest = process.env.RUN_LIVE_SHOWCASE_TEST === "1";
 
 describe("showcase credential configuration", () => {
-  liveServerIt(
+  it.skipIf(!runLiveShowcaseTest)(
     "uses the configured secret when calling the internal login endpoint",
     async () => {
       const password = process.env.SHOWCASE_TEST_PASSWORD;
@@ -17,12 +17,12 @@ describe("showcase credential configuration", () => {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ json: { username: "test", password } }),
       });
-      expect(response.status).toBeGreaterThanOrEqual(200);
-      expect(response.status).toBeLessThan(500);
+      expect(response.status).toBe(200);
       const payload = (await response.json()) as {
         result?: { data?: { json?: { success?: boolean } } };
       };
       expect(payload.result?.data?.json?.success).toBe(true);
-    }
+    },
+    30_000
   );
 });

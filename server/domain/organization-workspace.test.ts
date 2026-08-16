@@ -14,6 +14,7 @@ describe("organization workspace module policy", () => {
 
   it("keeps unknown organization types fail-safe", () => {
     expect(modulesForOrganization("unknown")).toBeNull();
-    expect(canUseOrganizationModule("unknown", "pos")).toBe(true);
+    expect(canUseOrganizationModule("unknown", "pos")).toBe(false);
+    expect(canUseOrganizationModule(undefined, "overview")).toBe(false);
   });
 });
