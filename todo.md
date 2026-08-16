@@ -1278,3 +1278,5 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] إصلاح اختبار مسار تسجيل دخول الموظفين بعد تغيّر نصوص واجهة الدخول، ثم إعادة تشغيل prettier وTypeScript وVitest والبناء قبل تحديث PR.
 
 - [x] إصلاح تحميل server/test.setup.ts في Vitest/CI وتشغيل smoke server بعزل واضح بقيم CI-only غير إنتاجية؛ quality وCodeQL نجحا على f9b4f74.
+
+- [x] إصلاح فشل تسجيل دخول الموظفين عند تعذر بنية قاعدة البيانات أو سجل التدقيق عبر استجابة fail-closed عامة ووسم خطأ غير حساس؛ اجتازت 368 اختبارًا وTypeScript والبناء، ودُفع الإصلاح إلى PR #8 في commit cefb375.
