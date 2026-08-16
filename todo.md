@@ -1370,6 +1370,6 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 
 - [x] Fix internal-session cookie parsing before tRPC context creation; add regression coverage for published-style auth.me session retrieval and rerun validation.
 
-- [ ] Inspect and enable safe GitHub synchronization for project updates, with validation and documented commit/publish boundaries.
+- [x] Inspect GitHub synchronization, repair the local credential helper, reconcile divergent history without force-push, validate auth tests, and push the current published history to GitHub; future synchronization is documented at the saved-release boundary.
 
-- [ ] Reconcile the GitHub main branch at 4e907a9 with the local published history at c5e8f2fc without force-pushing or overwriting remote commits.
+- [x] Reconcile the GitHub main branch at 4e907a9 with the local published history at c5e8f2fc without force-pushing or overwriting remote commits; final synchronized commit is 19e698b.
