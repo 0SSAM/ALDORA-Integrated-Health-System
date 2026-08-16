@@ -35,11 +35,13 @@ describe("showcase scope reconciliation", () => {
       "await reconcileShowcaseScope(credential.userId)"
     );
     const scopeLookup = source.indexOf(
-      "const scope = await getInternalScopeForUser(credential.userId)"
+      "const scope = await getInternalScopeForUser(credential.userId, credential.accountType === \"showcase\" ? \"showcase\" : \"production\")"
     );
     expect(verifiedPassword).toBeGreaterThanOrEqual(0);
     expect(reconciliation).toBeGreaterThan(verifiedPassword);
     expect(scopeLookup).toBeGreaterThan(reconciliation);
+    expect(source).toContain('getInternalScopeForUser(credential.userId, credential.accountType === "showcase" ? "showcase" : "production")');
+    expect(source).toContain('getInternalScopeForUser(credential.userId, "showcase")');
   });
 
   it("runs managed reconciliation once during server startup without blocking the service", async () => {

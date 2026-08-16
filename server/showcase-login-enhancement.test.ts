@@ -27,6 +27,15 @@ describe("showcase login enhancement contracts", () => {
     expect(source).toContain('sessionMode: "showcase"');
   });
 
+  it("reconciles direct showcase login only after a server-side managed-secret match", () => {
+    const routerSource = read("server/routers.ts");
+    const dbSource = read("server/db.ts");
+    expect(routerSource).toContain("reconcileManagedShowcaseLogin(username, input.password)");
+    expect(dbSource).toContain('if (username !== "test" || !process.env.SHOWCASE_TEST_PASSWORD || password !== process.env.SHOWCASE_TEST_PASSWORD) return false;');
+    expect(dbSource).toContain("return reconcileManagedShowcaseAccount()");
+    expect(routerSource).toContain("Wrong guesses still follow the normal lockout path");
+  });
+
   it("registers a cron-authenticated, read-only login health callback", () => {
     const handler = read("server/scheduled/login-health.ts");
     const server = read("server/_core/index.ts");

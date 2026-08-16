@@ -124,7 +124,7 @@ export async function resetInternalPasswordWithToken(input: { token: string; pas
   });
 }
 
-export async function getInternalScopeForUser(userId: number) {
+export async function getInternalScopeForUser(userId: number, environment: "production" | "showcase" = "production") {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select({
@@ -135,8 +135,9 @@ export async function getInternalScopeForUser(userId: number) {
   }).from(organizationMemberships)
     .innerJoin(branchUsers, eq(branchUsers.userId, organizationMemberships.userId))
     .innerJoin(branches, eq(branches.id, branchUsers.branchId))
+    .innerJoin(organizations, eq(organizations.id, organizationMemberships.organizationId))
     .innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, branches.id))
-    .where(and(eq(organizationMemberships.userId, userId), eq(organizationMemberships.active, 1), eq(branchUsers.active, 1), eq(branches.active, 1)))
+    .where(and(eq(organizationMemberships.userId, userId), eq(organizationMemberships.active, 1), eq(branchUsers.active, 1), eq(branches.active, 1), eq(organizations.environment, environment)))
     .limit(1);
   return result[0];
 }
@@ -212,6 +213,11 @@ export async function reconcileShowcaseScope(userId: number) {
  * Keeps the explicitly configured showcase credential aligned with its managed secret.
  * The reconciliation is intentionally limited to the active `test` showcase account.
  */
+export async function reconcileManagedShowcaseLogin(username: string, password: string) {
+  if (username !== "test" || !process.env.SHOWCASE_TEST_PASSWORD || password !== process.env.SHOWCASE_TEST_PASSWORD) return false;
+  return reconcileManagedShowcaseAccount();
+}
+
 export async function reconcileManagedShowcaseAccount() {
   const password = process.env.SHOWCASE_TEST_PASSWORD;
   if (!password) {

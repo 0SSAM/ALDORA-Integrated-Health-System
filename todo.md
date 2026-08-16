@@ -1357,3 +1357,13 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add accessible receipt preview and print controls to the showcase tour without creating, exporting, storing, or transmitting a real financial document.
 - [x] Create and validate a reusable skill documenting how to build secure, isolated, interactive product walkthroughs with sample data and non-persistent business simulations. Skill: `secure-showcase-walkthroughs`; official validation passed.
 - [x] Add focused regression coverage for the receipt no-save boundary; run TypeScript, Vitest, production build, mobile verification, and skill validation. Validation: 351 passing tests, 9 safely skipped, TypeScript/build passed, mobile capture completed.
+
+# Showcase Test Login Regression — 2026-08-16
+
+- [x] Reproduce the published `test` login failure and capture the exact failure stage without logging or exposing credentials: login returned success, then auth.me returned null because the session scope environment was mismatched.
+- [x] Verify showcase credential reconciliation, lockout state, session creation, redirect, and mobile login UX in the isolated showcase path through source review and regression coverage; published smoke verification remains pending.
+- [x] Fix the root cause without changing production-account authentication behavior by constraining scope lookup to the account environment.
+- [ ] Add regression coverage for the corrected showcase login and run TypeScript, Vitest, build, and a published smoke check; local regression, TypeScript, and build passed, published smoke check remains pending.
+
+- [x] Retry the interrupted showcase-account reconciliation inspection and verify the published login failure stage before any further change.
+- [x] Verify the GitHub commit 4e907a9 and apply its showcase-session environment fix to the active project; release validation passed locally, with live verification tracked separately.
