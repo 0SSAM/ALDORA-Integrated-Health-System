@@ -2,7 +2,8 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const read = (relativePath: string) => readFileSync(resolve(process.cwd(), relativePath), "utf8");
+const read = (relativePath: string) =>
+  readFileSync(resolve(process.cwd(), relativePath), "utf8");
 
 describe("internal authentication security contracts", () => {
   it("uses the server-backed employee login and recovery mutations", () => {
@@ -17,11 +18,27 @@ describe("internal authentication security contracts", () => {
   it("verifies passwords before creating a scoped internal session and applies lockout policy", () => {
     const source = read("server/routers.ts");
     expect(source).toContain("internalLogin: publicProcedure.input");
-    expect(source).toContain("verifyInternalPassword(input.password, credential.passwordHash)");
+    expect(source).toContain("try {");
+    expect(source).toContain(
+      "verifyInternalPassword(input.password, credential.passwordHash)"
+    );
     expect(source).toContain("INTERNAL_MAX_FAILED_ATTEMPTS");
     expect(source).toContain("INTERNAL_LOCKOUT_MS");
-    expect(source).toContain("createInternalSession({ token, userId: credential.userId");
-    expect(source).toContain("sessionMode: credential.accountType === \"showcase\" ? \"showcase\" : \"production\"");
+    expect(source).toContain(
+      "createInternalSession({ token, userId: credential.userId"
+    );
+    expect(source).toContain(
+      'sessionMode: credential.accountType === "showcase" ? "showcase" : "production"'
+    );
+  });
+
+  it("fails closed without exposing database or audit infrastructure errors", () => {
+    const source = read("server/routers.ts");
+    expect(source).toContain('"[Auth] internal login unavailable:"');
+    expect(source).toContain("safeErrorLabel(error)");
+    expect(source).toContain(
+      "تعذر التحقق من البيانات حالياً. تأكد من الاتصال وحاول مرة أخرى."
+    );
   });
 
   it("uses memory-hard password hashing and timing-safe verification", () => {
@@ -37,7 +54,7 @@ describe("internal authentication security contracts", () => {
     expect(handler).toContain("sdk.authenticateRequest(req)");
     expect(handler).toContain("user.isCron");
     expect(handler).toContain('loginMutation: "not_attempted"');
-    expect(handler).toContain("passwordExposure: \"none\"");
+    expect(handler).toContain('passwordExposure: "none"');
     expect(handler).not.toContain("createInternalSession");
   });
 });

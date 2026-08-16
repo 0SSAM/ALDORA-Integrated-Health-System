@@ -20,6 +20,7 @@ import { antiFraudRouter } from "./routers/anti-fraud";
 import { createPasswordResetToken, getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, resetInternalPasswordWithToken, revokeInternalSession } from "./db";
 import { assertPasswordPolicy, createInternalSessionToken, INTERNAL_LOCKOUT_MS, INTERNAL_MAX_FAILED_ATTEMPTS, INTERNAL_SESSION_COOKIE, INTERNAL_SESSION_TTL_MS, isLocked, normalizeInternalUsername, verifyInternalPassword } from "./domain/internal-auth";
 import { hashInternalPassword, hashAuditRecord } from "./domain/internal-auth";
+import { safeErrorLabel } from "./domain/safe-error";
 import { buildGovernmentIntegrationReadinessPacket } from "./domain/government-integration-readiness";
 
 const connectorReadinessRegistry = [
@@ -173,6 +174,7 @@ export const appRouter = router({
       reason: "لا توجد قناة بريد أو OTP مؤسسية موثقة حالياً؛ تبقى الأسرار والرموز والتسليم الخارجي مغلقة بأمان.",
     })),
     internalLogin: publicProcedure.input(z.object({ username: z.string().min(3).max(80), password: z.string().min(1).max(200) })).mutation(async ({ ctx, input }) => {
+      try {
       const username = normalizeInternalUsername(input.username);
       const credential = await getInternalCredentialByUsername(username);
       const now = new Date();
@@ -203,6 +205,10 @@ export const appRouter = router({
       await recordAuthenticationEvent({ username, userId: credential.userId, ...scope, eventType: "login_success", source: "internal" });
       ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), maxAge: INTERNAL_SESSION_TTL_MS, path: "/" });
       return { success: true as const, mode: "internal" as const, scope, accountType: credential.accountType, sessionMode: credential.accountType === "showcase" ? "showcase" as const : "production" as const };
+      } catch (error) {
+        console.error("[Auth] internal login unavailable:", safeErrorLabel(error));
+        return { success: false as const, message: "تعذر التحقق من البيانات حالياً. تأكد من الاتصال وحاول مرة أخرى." };
+      }
     }),
     requestPasswordReset: publicProcedure.input(z.object({ username: z.string().min(3).max(80) })).mutation(async ({ input }) => {
       const generic = { success: true as const, message: "إذا كانت بيانات الحساب صحيحة، فسيتم إرسال تعليمات الاستعادة عبر قناة المؤسسة المعتمدة." };
