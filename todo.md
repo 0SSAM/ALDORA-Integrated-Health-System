@@ -1387,3 +1387,11 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add GitHub Actions CI for TypeScript, Vitest, and production build on every push and pull_request.
 - [x] Add scheduled Dependabot configuration for npm dependencies and GitHub Actions; both ecosystems run weekly.
 - [x] Verify repository ownership-transfer prerequisites and document the organization limitation: transfer remains unavailable while the organization owner is being deleted.
+
+- [x] Create one complete downloadable archive containing project source, documentation, tests, CI/Dependabot configuration, and safe local-run files, excluding secrets and generated temporary artifacts; ZIP integrity passed with 574 files.
+
+- [ ] Review the current CI run and repository permissions before changing main branch protection.
+- [ ] Enable required CODEOWNERS review and block merges when required CI checks fail, if repository permissions support it.
+- [ ] Retry transfer to ALDO-Health-Care-Eco-System only if the organization is restored and GitHub permits the transfer.
+
+- [ ] Make unsupported CodeQL and dependency-review jobs non-blocking or conditionally skipped on the private GitHub Free repository, while keeping TypeScript, tests, build, audit, smoke, and database lifecycle checks required.

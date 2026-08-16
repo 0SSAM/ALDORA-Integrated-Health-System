@@ -84,6 +84,7 @@ jobs:
 
   codeql:
     name: CodeQL security analysis
+    continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
