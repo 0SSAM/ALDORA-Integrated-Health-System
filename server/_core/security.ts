@@ -3,16 +3,8 @@ import type { NextFunction, Request, Response } from "express";
 const MAX_RATE_ENTRIES = 10_000;
 const WINDOW_MS = 60_000;
 const AUTH_LIMIT = 12;
-const MUTATION_LIMIT = 240;
-const DEFAULT_PUBLIC_ORIGINS = ["https://bdfpharma-icsvf3q3.manus.space"];
-
-function configuredPublicOrigins(): Set<string> {
-  const configured = (process.env.ALDORA_PUBLIC_ORIGINS ?? "")
-    .split(",")
-    .map((value) => normalizedOrigin(value.trim()))
-    .filter((origin): origin is string => Boolean(origin));
-  return new Set([...DEFAULT_PUBLIC_ORIGINS.map(normalizedOrigin), ...configured].filter((origin): origin is string => Boolean(origin)));
-}
+const MUTATION_LIMIT = 120;
+const UPLOAD_LIMIT = 20;
 
 type Bucket = { count: number; resetAt: number };
 
@@ -42,10 +34,7 @@ function isLoopbackAddress(value: string | undefined): boolean {
 }
 
 function requestOrigin(req: Request): string | undefined {
-  // Express's trusted proxy setting may resolve req.ip to the original client;
-  // the socket address is the reliable boundary for a local reverse proxy.
-  const socketAddress = req.socket?.remoteAddress;
-  const trustedForwarder = isLoopbackAddress(socketAddress) || isLoopbackAddress(req.ip);
+  const trustedForwarder = isLoopbackAddress(req.ip);
   const forwardedHost = trustedForwarder ? firstHeader(req.headers["x-forwarded-host"]) : undefined;
   const host = forwardedHost?.split(",")[0]?.trim() || req.get("host");
   if (!host) return undefined;
@@ -65,26 +54,10 @@ export function isTrustedMutationRequest(req: Request): SecurityDecision {
   const refererHeader = firstHeader(req.headers.referer);
   const expected = requestOrigin(req);
   const supplied = normalizedOrigin(originHeader ?? refererHeader);
-  const requestHost = req.get("host")?.toLowerCase();
-  const hostBoundOrigins = requestHost
-    ? new Set(
-        [`http://${requestHost}`, `https://${requestHost}`]
-          .map(normalizedOrigin)
-          .filter((origin): origin is string => Boolean(origin)),
-      )
-    : new Set<string>();
 
   // Non-browser clients may omit both headers. Browser requests with an origin
   // or referer must match the current host before cookie-authenticated mutation.
-  // The public WebDev reverse proxy may terminate TLS before the app receives
-  // the request, so accept either scheme for the *current Host* without trusting
-  // forwarded host/protocol headers supplied by a direct client.
-  const browserSameOrigin = secFetchSite === "same-origin" && Boolean(originHeader || refererHeader);
-  const publicOriginMatch = supplied !== undefined && configuredPublicOrigins().has(supplied);
-  if (
-    (originHeader || refererHeader) &&
-    (!supplied || (!hostBoundOrigins.has(supplied) && supplied !== expected && !browserSameOrigin && !publicOriginMatch))
-  ) {
+  if ((originHeader || refererHeader) && (!expected || supplied !== expected)) {
     return { allowed: false, status: 403, reason: "request origin rejected" };
   }
   return { allowed: true };
@@ -92,6 +65,15 @@ export function isTrustedMutationRequest(req: Request): SecurityDecision {
 
 function clientKey(req: Request): string {
   return req.ip || "unknown";
+}
+
+function rateLimitFor(path: string, isMutation: boolean): { category: "auth" | "upload" | "mutation"; limit: number } | null {
+  if (!isMutation) return null;
+  if (path === "/api/trpc/auth.internalLogin" || path === "/api/trpc/auth.requestPasswordReset" || path === "/api/trpc/auth.resetPassword" || path === "/api/oauth/callback") {
+    return { category: "auth", limit: AUTH_LIMIT };
+  }
+  if (/\.(upload|extract|import)\b/i.test(path)) return { category: "upload", limit: UPLOAD_LIMIT };
+  return { category: "mutation", limit: MUTATION_LIMIT };
 }
 
 function take(bucketMap: Map<string, Bucket>, key: string, limit: number, now: number): boolean {
@@ -114,18 +96,16 @@ export function createSecurityMiddleware() {
   return (req: Request, res: Response, next: NextFunction) => {
     const isMutation = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method.toUpperCase());
     const path = req.path;
-    const isAuth = path === "/api/trpc/auth.internalLogin" || path === "/api/trpc/auth.showcaseTrial" || path === "/api/trpc/auth.requestPasswordReset" || path === "/api/trpc/auth.resetPassword" || path === "/api/oauth/callback";
-
     const decision = isTrustedMutationRequest(req);
     if (!decision.allowed) {
       res.status(decision.status).json({ error: "Request rejected by security policy" });
       return;
     }
 
-    if (isMutation) {
-      const limit = isAuth ? AUTH_LIMIT : MUTATION_LIMIT;
-      const key = `${isAuth ? "auth" : "mutation"}:${clientKey(req)}`;
-      if (!take(buckets, key, limit, Date.now())) {
+    const rateLimit = rateLimitFor(path, isMutation);
+    if (rateLimit) {
+      const key = `${rateLimit.category}:${clientKey(req)}`;
+      if (!take(buckets, key, rateLimit.limit, Date.now())) {
         res.set("Retry-After", "60");
         res.status(429).json({ error: "Too many requests" });
         return;
@@ -139,8 +119,13 @@ export function createSecurityMiddleware() {
       "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Resource-Policy": "same-origin",
+      "X-DNS-Prefetch-Control": "off",
+      "X-Permitted-Cross-Domain-Policies": "none",
     });
-    const trustedForwarder = isLoopbackAddress(req.socket?.remoteAddress) || isLoopbackAddress(req.ip);
+    if (process.env.NODE_ENV === "production") {
+      res.set("Content-Security-Policy", "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; object-src 'none'; script-src 'self' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https:; worker-src 'self' blob:; upgrade-insecure-requests");
+    }
+    const trustedForwarder = isLoopbackAddress(req.ip);
     if (req.protocol === "https" || (trustedForwarder && firstHeader(req.headers["x-forwarded-proto"])?.split(",")[0]?.trim() === "https")) {
       res.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     }
@@ -149,4 +134,4 @@ export function createSecurityMiddleware() {
   };
 }
 
-export const securityInternals = { normalizedOrigin, requestOrigin, clientKey, take, isTrustedMutationRequest, isLoopbackAddress, configuredPublicOrigins };
+export const securityInternals = { normalizedOrigin, requestOrigin, clientKey, rateLimitFor, take, isTrustedMutationRequest, isLoopbackAddress };

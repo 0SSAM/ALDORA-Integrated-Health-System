@@ -10,10 +10,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { inventoryAlertHandler } from "../scheduled/inventory";
 import { reportExecutionHandler } from "../scheduled/reports";
-import { loginHealthHandler } from "../scheduled/login-health";
 import { createSecurityMiddleware } from "./security";
-import { reconcileManagedShowcaseAccount } from "../db";
-import { attachRequestCookies } from "./request-cookies";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -35,22 +32,15 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
-  const showcaseReconciled = await reconcileManagedShowcaseAccount();
-  if (!showcaseReconciled) {
-    console.warn("[Showcase] Reconciliation did not run; the isolated showcase account remains unavailable until its managed prerequisites are restored.");
-  }
   const app = express();
   const server = createServer(app);
   app.disable("x-powered-by");
   app.set("trust proxy", "loopback");
   app.use(createSecurityMiddleware());
-  // Configure body parser with larger size limit for file uploads
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  app.use((req, _res, next) => {
-    attachRequestCookies(req);
-    next();
-  });
+  // Bounded request parsing: upload handlers additionally validate MIME, scope,
+  // and content before persistence. Large payloads must use approved object storage.
+  app.use(express.json({ limit: "10mb" }));
+  app.use(express.urlencoded({ limit: "10mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   // tRPC API
@@ -64,7 +54,6 @@ async function startServer() {
   // Heartbeat callback: production cron only; handler authenticates task UID.
   app.post("/api/scheduled/inventory-alerts", inventoryAlertHandler);
   app.post("/api/scheduled/report-execution", reportExecutionHandler);
-  app.post("/api/scheduled/login-health", loginHealthHandler);
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);

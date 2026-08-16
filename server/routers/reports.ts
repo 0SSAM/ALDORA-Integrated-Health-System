@@ -9,6 +9,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { createHeartbeatJob } from "../_core/heartbeat";
 import { assertCompliancePackUsable } from "../domain/regional-engine";
 import { assertReportJurisdictionAccess } from "../domain/reporting-policy";
+import { assertReportSchedulingEnabled, getReportSchedulingReadiness } from "../domain/report-scheduling-policy";
 
 const REPORT_CATALOG = {
   "inventory.alerts": { name: "Inventory alerts", queryKey: "inventory.alerts.v1" },
@@ -51,6 +52,7 @@ async function assertReportRegulatoryScope(db: NonNullable<Awaited<ReturnType<ty
 
 export const reportsRouter = router({
   catalog: protectedProcedure.query(() => Object.entries(REPORT_CATALOG).map(([key, value]) => ({ key, ...value, deliveryEnabledByDefault: false }))),
+  automationStatus: protectedProcedure.query(() => getReportSchedulingReadiness(process.env.REPORT_SCHEDULING_ENABLED)),
 
   definitions: protectedProcedure
     .input(z.object({ organizationId: z.number().int().positive(), jurisdictionId: z.number().int().positive().optional() }).optional())
@@ -99,6 +101,8 @@ export const reportsRouter = router({
   schedule: protectedProcedure
     .input(z.object({ definitionId: z.number().int().positive(), cronExpression: z.string().regex(/^\\d+ \\S+ \\S+ \\S+ \\S+ \\S+$/) }))
     .mutation(async ({ ctx, input }) => {
+      try { assertReportSchedulingEnabled(process.env.REPORT_SCHEDULING_ENABLED); }
+      catch { throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Report automation is disabled pending explicit production release approval" }); }
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       const definition = (await db.select().from(reportDefinitions).where(eq(reportDefinitions.id, input.definitionId)).limit(1))[0];

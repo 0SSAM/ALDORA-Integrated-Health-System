@@ -52,9 +52,12 @@ describe("hardware adapter readiness", () => {
       deviceId: "sensor-1",
       secureChannelVerified: true,
       externalCredentialsVerified: true,
+      monitoringGovernanceApproved: true,
+      monitoringPurpose: "safety" as const,
     };
     expect(hardwareReadiness(monitor)).toBe("READY");
     expect(hardwareReadiness({ ...monitor, externalCredentialsVerified: false })).toBe("BLOCKED");
+    expect(hardwareReadiness({ ...monitor, monitoringGovernanceApproved: false })).toBe("BLOCKED");
     expect(() => assertHardwareReady({ ...monitor, scopeVerified: false })).toThrow();
   });
 });
