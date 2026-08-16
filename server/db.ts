@@ -1,7 +1,7 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, authenticationEvents, internalCredentials, internalSessions, passwordResetTokens, users, organizationMemberships, branchUsers, branches, branchJurisdictions, organizations, jurisdictionProfiles } from "../drizzle/schema";
-import { hashAuditRecord, hashInternalPassword, hashSessionToken, isSessionEnvironmentConsistent, verifyInternalPassword } from "./domain/internal-auth";
+import { hashAuditRecord, hashInternalPassword, hashSessionToken, isManagedShowcaseCredential, isSessionEnvironmentConsistent, verifyInternalPassword } from "./domain/internal-auth";
 import { ENV } from './_core/env';
 import { safeErrorLabel } from './domain/safe-error';
 
@@ -124,7 +124,7 @@ export async function resetInternalPasswordWithToken(input: { token: string; pas
   });
 }
 
-export async function getInternalScopeForUser(userId: number) {
+export async function getInternalScopeForUser(userId: number, environment?: "production" | "showcase") {
   const db = await getDb();
   if (!db) return undefined;
   const result = await db.select({
@@ -133,8 +133,13 @@ export async function getInternalScopeForUser(userId: number) {
     jurisdictionId: branchJurisdictions.jurisdictionId,
     role: organizationMemberships.organizationRole,
   }).from(organizationMemberships)
+    .innerJoin(organizations, and(
+      eq(organizations.id, organizationMemberships.organizationId),
+      eq(organizations.status, "active"),
+      ...(environment ? [eq(organizations.environment, environment)] : []),
+    ))
     .innerJoin(branchUsers, eq(branchUsers.userId, organizationMemberships.userId))
-    .innerJoin(branches, eq(branches.id, branchUsers.branchId))
+    .innerJoin(branches, and(eq(branches.id, branchUsers.branchId), eq(branches.organizationId, organizationMemberships.organizationId)))
     .innerJoin(branchJurisdictions, eq(branchJurisdictions.branchId, branches.id))
     .where(and(eq(organizationMemberships.userId, userId), eq(organizationMemberships.active, 1), eq(branchUsers.active, 1), eq(branches.active, 1)))
     .limit(1);
@@ -212,6 +217,11 @@ export async function reconcileShowcaseScope(userId: number) {
  * Keeps the explicitly configured showcase credential aligned with its managed secret.
  * The reconciliation is intentionally limited to the active `test` showcase account.
  */
+export async function reconcileManagedShowcaseLogin(username: string, password: string) {
+  if (username !== "test" || !process.env.SHOWCASE_TEST_PASSWORD || password !== process.env.SHOWCASE_TEST_PASSWORD) return false;
+  return reconcileManagedShowcaseAccount();
+}
+
 export async function reconcileManagedShowcaseAccount() {
   const password = process.env.SHOWCASE_TEST_PASSWORD;
   if (!password) {
@@ -221,17 +231,19 @@ export async function reconcileManagedShowcaseAccount() {
 
   try {
     const credential = await getInternalCredentialByUsername("test");
-    if (!credential || !credential.active || credential.accountType !== "showcase") return false;
+    if (!credential || !isManagedShowcaseCredential(credential)) return false;
     const db = await getDb();
     if (!db) return false;
-    if (!verifyInternalPassword(password, credential.passwordHash)) {
-      await db.update(internalCredentials).set({
-        passwordHash: hashInternalPassword(password),
-        failedAttempts: 0,
-        lockedUntil: null,
-        passwordChangedAt: new Date(),
-      }).where(and(eq(internalCredentials.id, credential.id), eq(internalCredentials.accountType, "showcase")));
-    }
+    const passwordMatches = verifyInternalPassword(password, credential.passwordHash);
+    await db.update(internalCredentials).set({
+      ...(passwordMatches ? {} : { passwordHash: hashInternalPassword(password), passwordChangedAt: new Date() }),
+      failedAttempts: 0,
+      lockedUntil: null,
+    }).where(and(
+      eq(internalCredentials.id, credential.id),
+      eq(internalCredentials.username, "test"),
+      eq(internalCredentials.accountType, "showcase"),
+    ));
     return reconcileShowcaseScope(credential.userId);
   } catch (error) {
     console.warn("[Showcase] Managed credential reconciliation failed:", safeErrorLabel(error));

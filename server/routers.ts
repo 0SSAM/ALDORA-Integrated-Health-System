@@ -13,7 +13,7 @@ import { reportsRouter } from "./routers/reports";
 import { insuranceRouter } from "./routers/insurance";
 import { promotionsRouter } from "./routers/promotions";
 import { egyptHealthcareRouter } from "./routers/egypt-healthcare";
-import { createPasswordResetToken, getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, reconcileShowcaseScope, resetInternalPasswordWithToken, revokeInternalSession } from "./db";
+import { createPasswordResetToken, getInternalCredentialByUsername, getInternalScopeForUser, createInternalSession, recordAuthenticationEvent, reconcileManagedShowcaseAccount, reconcileManagedShowcaseLogin, reconcileShowcaseScope, resetInternalPasswordWithToken, revokeInternalSession } from "./db";
 import { assertPasswordPolicy, createInternalSessionToken, INTERNAL_LOCKOUT_MS, INTERNAL_MAX_FAILED_ATTEMPTS, INTERNAL_SESSION_COOKIE, INTERNAL_SESSION_TTL_MS, isLocked, normalizeInternalUsername, verifyInternalPassword } from "./domain/internal-auth";
 import { hashInternalPassword, hashAuditRecord } from "./domain/internal-auth";
 
@@ -151,7 +151,17 @@ export const appRouter = router({
     })),
     internalLogin: publicProcedure.input(z.object({ username: z.string().min(3).max(80), password: z.string().min(1).max(200) })).mutation(async ({ ctx, input }) => {
       const username = normalizeInternalUsername(input.username);
-      const credential = await getInternalCredentialByUsername(username);
+      let credential = await getInternalCredentialByUsername(username);
+      // The managed showcase password is reconciled only after a server-side match with
+      // the submitted secret. Wrong guesses still follow the normal lockout path and
+      // never reset failed-attempt counters.
+      if (
+        credential?.accountType === "showcase" &&
+        await reconcileManagedShowcaseLogin(username, input.password) &&
+        (!verifyInternalPassword(input.password, credential.passwordHash) || isLocked(credential.lockedUntil, new Date()))
+      ) {
+        credential = await getInternalCredentialByUsername(username);
+      }
       const now = new Date();
       const invalid = () => ({ success: false as const, message: "اسم المستخدم أو كلمة المرور غير صحيحة" });
       if (!credential || !credential.active || isLocked(credential.lockedUntil, now) || !verifyInternalPassword(input.password, credential.passwordHash)) {
@@ -173,7 +183,7 @@ export const appRouter = router({
       if (credential.accountType === "showcase") {
         await reconcileShowcaseScope(credential.userId);
       }
-      const scope = await getInternalScopeForUser(credential.userId);
+      const scope = await getInternalScopeForUser(credential.userId, credential.accountType === "showcase" ? "showcase" : "production");
       if (!scope) {
         await recordAuthenticationEvent({ username, userId: credential.userId, eventType: "login_failure", source: "internal" });
         return invalid();
@@ -183,6 +193,27 @@ export const appRouter = router({
       await recordAuthenticationEvent({ username, userId: credential.userId, ...scope, eventType: "login_success", source: "internal" });
       ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), maxAge: INTERNAL_SESSION_TTL_MS, path: "/" });
       return { success: true as const, mode: "internal" as const, scope, accountType: credential.accountType, sessionMode: credential.accountType === "showcase" ? "showcase" as const : "production" as const };
+    }),
+    showcaseTrial: publicProcedure.mutation(async ({ ctx }) => {
+      const username = "test";
+      const managed = await reconcileManagedShowcaseAccount();
+      if (!managed) return { success: false as const, message: "حساب العرض غير متاح حالياً. حاول مرة أخرى لاحقاً." };
+      const credential = await getInternalCredentialByUsername(username);
+      if (!credential || !credential.active || credential.accountType !== "showcase") {
+        await recordAuthenticationEvent({ username, eventType: "login_failure", source: "internal", requestId: "showcase-trial-unavailable" });
+        return { success: false as const, message: "حساب العرض غير متاح حالياً. حاول مرة أخرى لاحقاً." };
+      }
+      const scope = await getInternalScopeForUser(credential.userId, "showcase");
+      if (!scope) {
+        await recordAuthenticationEvent({ username, userId: credential.userId, eventType: "login_failure", source: "internal", requestId: "showcase-trial-no-scope" });
+        return { success: false as const, message: "بيئة العرض غير مكتملة حالياً. حاول مرة أخرى لاحقاً." };
+      }
+      const now = new Date();
+      const token = createInternalSessionToken();
+      await createInternalSession({ token, userId: credential.userId, ...scope, sessionMode: "showcase", expiresAt: new Date(now.getTime() + INTERNAL_SESSION_TTL_MS) });
+      await recordAuthenticationEvent({ username, userId: credential.userId, ...scope, eventType: "login_success", source: "internal", requestId: "showcase-trial" });
+      ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), maxAge: INTERNAL_SESSION_TTL_MS, path: "/" });
+      return { success: true as const, mode: "internal" as const, accountType: "showcase" as const, sessionMode: "showcase" as const };
     }),
     requestPasswordReset: publicProcedure.input(z.object({ username: z.string().min(3).max(80) })).mutation(async ({ input }) => {
       const generic = { success: true as const, message: "إذا كانت بيانات الحساب صحيحة، فسيتم إرسال تعليمات الاستعادة عبر قناة المؤسسة المعتمدة." };
