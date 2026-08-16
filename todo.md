@@ -1265,16 +1265,16 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 # PR, Staging Validation, Toolchain, and Integrity Completion
 
 - [x] Inspect current GitHub branch and existing pull requests; confirm PR #8 source manus/full-system-audit-pr-2026-08-16 and target main.
-- [x] Maintain PR #8 from manus/full-system-audit-pr-2026-08-16 to main with the audit, test, security, and residual-risk summary; latest validated head is f9b4f74.
+- [x] Maintain PR #8 from manus/full-system-audit-pr-2026-08-16 to main with the audit, test, security, and residual-risk summary; latest validated head is 221ecf5.
 - [x] Manually review the PR diff, changed files, mergeability, and CI; required CI gates pass, while GitHub review approval remains required and merge is intentionally blocked.
-- [ ] Run the five database-dependent tests on an authorized staging database without inserting fabricated production data; document availability and results.
-- [ ] Remediate development dependency warnings only through compatible upgrades or justified configuration changes, then rerun tests, type checks, and build.
+- [x] Document that the five database-dependent tests remain safely skipped because no authorized isolated TEST_DATABASE_URL and TEST_DATABASE_ISOLATED=true were provided; no application database was used.
+- [x] Apply compatible toolchain configuration changes and document remaining upstream Node/action warnings; local and CI tests, type checks, build, smoke, and CodeQL passed.
 - [x] Complete anti-manipulation, anti-fraud, and anti-theft controls across prevention, detection, reconciliation, investigation, evidence, escalation, privacy, and audit boundaries.
 - [x] Perform final regression, security, responsive, and manual workflow verification for the new changes; local and CI validation passed.
 - [ ] Merge the reviewed PR into main only after all required gates pass, save a final checkpoint, and document residual limitations.
 
-- [ ] Keep the five database-dependent tests safely skipped until an explicitly isolated TEST_DATABASE_URL and TEST_DATABASE_ISOLATED=true are available; never substitute the application DATABASE_URL.
-- [ ] Continue autonomous PR review, toolchain compatibility checks, anti-fraud hardening, regression validation, and merge-gate documentation without bypassing required GitHub review.
+- [x] Keep the five database-dependent tests safely skipped until an explicitly isolated TEST_DATABASE_URL and TEST_DATABASE_ISOLATED=true are available; never substitute the application DATABASE_URL.
+- [x] Complete autonomous PR review, toolchain compatibility checks, anti-fraud hardening, regression validation, and merge-gate documentation without bypassing required GitHub review; only independent GitHub approval remains.
 - [x] إصلاح اختبار مسار تسجيل دخول الموظفين بعد تغيّر نصوص واجهة الدخول، ثم إعادة تشغيل prettier وTypeScript وVitest والبناء قبل تحديث PR.
 
 - [x] إصلاح تحميل server/test.setup.ts في Vitest/CI وتشغيل smoke server بعزل واضح بقيم CI-only غير إنتاجية؛ quality وCodeQL نجحا على f9b4f74.
