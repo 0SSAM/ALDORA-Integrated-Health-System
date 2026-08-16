@@ -1373,3 +1373,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Inspect GitHub synchronization, repair the local credential helper, reconcile divergent history without force-push, validate auth tests, and push the current published history to GitHub; future synchronization is documented at the saved-release boundary.
 
 - [x] Reconcile the GitHub main branch at 4e907a9 with the local published history at c5e8f2fc without force-pushing or overwriting remote commits; final synchronized commit is 19e698b.
+
+- [ ] Inspect the ALDO-Health-Care-Eco-System organization dashboard, confirm the target repository, and verify safe project-to-GitHub auto-sync boundaries.
+
+- [ ] Create a private ALDO-Health-Care-Eco-System repository, connect the project remote, and push the current verified project history without overwriting another repository.
