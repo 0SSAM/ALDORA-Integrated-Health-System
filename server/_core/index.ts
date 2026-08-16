@@ -13,6 +13,7 @@ import { reportExecutionHandler } from "../scheduled/reports";
 import { loginHealthHandler } from "../scheduled/login-health";
 import { createSecurityMiddleware } from "./security";
 import { reconcileManagedShowcaseAccount } from "../db";
+import { attachRequestCookies } from "./request-cookies";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -46,6 +47,10 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  app.use((req, _res, next) => {
+    attachRequestCookies(req);
+    next();
+  });
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   // tRPC API

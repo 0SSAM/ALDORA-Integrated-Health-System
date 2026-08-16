@@ -1367,3 +1367,5 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 
 - [x] Retry the interrupted showcase-account reconciliation inspection and verify the published login failure stage before any further change.
 - [x] Verify the GitHub commit 4e907a9 and apply its showcase-session environment fix to the active project; release validation passed locally, with live verification tracked separately.
+
+- [ ] Fix internal-session cookie parsing before tRPC context creation; add regression coverage for published-style auth.me session retrieval and rerun validation.
