@@ -10,11 +10,11 @@ The official API covers the Foundation Component, ICD-11 linearizations such as 
 
 ## Licensing and provenance
 
-WHO states that ICD-11 is licensed under the Creative Commons Attribution-NoDerivs 3.0 IGO license (CC BY-ND 3.0 IGO). ALDORA must preserve attribution and must not modify or create an adapted copy of the WHO classification. Local data should therefore store WHO identifiers, release/version, language, source URI, retrieval time, and local metadata separately. Any cached or synchronized representation must remain traceable to the official source and license terms.
+WHO states that ICD-11 is licensed under the Creative Commons Attribution-NoDerivs 3.0 IGO license (CC BY-ND 3.0 IGO). MEDORA must preserve attribution and must not modify or create an adapted copy of the WHO classification. Local data should therefore store WHO identifiers, release/version, language, source URI, retrieval time, and local metadata separately. Any cached or synchronized representation must remain traceable to the official source and license terms.
 
 ## Languages
 
-The official supported-classifications documentation lists Arabic with ISO 639-1 code `ar` and English with `en`, among other languages. ALDORA can provide Arabic/English search through WHO language negotiation while retaining the source language and release metadata.
+The official supported-classifications documentation lists Arabic with ISO 639-1 code `ar` and English with `en`, among other languages. MEDORA can provide Arabic/English search through WHO language negotiation while retaining the source language and release metadata.
 
 ## Versioning and maintenance
 
@@ -22,11 +22,11 @@ WHO describes ICD-11 as an actively maintained classification with ongoing updat
 
 ## Clinical and reporting boundaries
 
-ICD-11 can support clinical recording, reporting, and extension codes. WHO states that ICD-10-to-ICD-11 mapping tables are for comparison and transition support, not automatic one-to-one conversion. ALDORA should never silently derive a final ICD-11 diagnosis or financial outcome from a crosswalk. Diagnosis selection requires a qualified user, explicit status, and audit history.
+ICD-11 can support clinical recording, reporting, and extension codes. WHO states that ICD-10-to-ICD-11 mapping tables are for comparison and transition support, not automatic one-to-one conversion. MEDORA should never silently derive a final ICD-11 diagnosis or financial outcome from a crosswalk. Diagnosis selection requires a qualified user, explicit status, and audit history.
 
 ## External prerequisites
 
-A production WHO API connector requires a WHO ICD API account and client credentials. No such credentials are currently configured in the project. Until credentials and an approved test/production integration path are supplied, ALDORA must keep external synchronization fail-closed and may implement only the catalog contract, UI, and controlled local test fixtures that are explicitly marked as non-production.
+A production WHO API connector requires a WHO ICD API account and client credentials. No such credentials are currently configured in the project. Until credentials and an approved test/production integration path are supplied, MEDORA must keep external synchronization fail-closed and may implement only the catalog contract, UI, and controlled local test fixtures that are explicitly marked as non-production.
 
 ## Sources
 

@@ -2,7 +2,7 @@
 
 ## Current status
 
-ألدورا | منظومة الرعاية الصحية المتكاملة currently provides **browser-safe interaction contracts**, not universal direct control of every physical device. This distinction is intentional: a browser/PWA can reliably render and download documents, accept keyboard-wedge scanner input, and use a camera/file input when the device and browser grant permission. Direct USB, Bluetooth, ESC/POS, label-printer, network-printer, CCTV, access-control, and sensor operation requires a verified local bridge or an official external adapter.
+ميدورا | منظومة الرعاية الصحية المتكاملة currently provides **browser-safe interaction contracts**, not universal direct control of every physical device. This distinction is intentional: a browser/PWA can reliably render and download documents, accept keyboard-wedge scanner input, and use a camera/file input when the device and browser grant permission. Direct USB, Bluetooth, ESC/POS, label-printer, network-printer, CCTV, access-control, and sensor operation requires a verified local bridge or an official external adapter.
 
 | Hardware area | Safe capability in the current web app | Direct operation status | Required production gate |
 |---|---|---|---|

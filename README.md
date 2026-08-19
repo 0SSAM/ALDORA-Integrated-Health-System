@@ -1,7 +1,7 @@
 <div align="center">
 
-# 🏥 ALDORA — منظومة الرعاية الصحية المتكاملة
-### ALDORA Integrated Health System — منظومة الرعاية الصحية المتكاملة
+# 🏥 MEDORA — منظومة الرعاية الصحية المتكاملة
+### MEDORA Integrated Health System — منظومة الرعاية الصحية المتكاملة
 
 **🌍 Multi-Country Healthcare Ecosystem | منظومة رعاية صحية مؤسسية متعددة الدول**
 
@@ -15,22 +15,22 @@
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 
-[![CI Status](https://img.shields.io/github/actions/workflow/status/0SSAM/ALDORA-Integrated-Health-System/ci.yml?style=for-the-badge&label=CI%2FCD&logo=githubactions&logoColor=white)](https://github.com/0SSAM/ALDORA-Integrated-Health-System/actions/workflows/ci.yml)
-[![CodeQL](https://img.shields.io/badge/CodeQL-Security%20Verified-green?style=for-the-badge&logo=github&logoColor=white)](https://github.com/0SSAM/ALDORA-Integrated-Health-System/security/code-scanning)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/0SSAM/MEDORA-Integrated-Health-System/ci.yml?style=for-the-badge&label=CI%2FCD&logo=githubactions&logoColor=white)](https://github.com/0SSAM/MEDORA-Integrated-Health-System/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/badge/CodeQL-Security%20Verified-green?style=for-the-badge&logo=github&logoColor=white)](https://github.com/0SSAM/MEDORA-Integrated-Health-System/security/code-scanning)
 [![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)]()
-[![Last Commit](https://img.shields.io/github/last-commit/0SSAM/ALDORA-Integrated-Health-System?style=for-the-badge&logo=git&logoColor=white)]()
+[![Last Commit](https://img.shields.io/github/last-commit/0SSAM/MEDORA-Integrated-Health-System?style=for-the-badge&logo=git&logoColor=white)]()
 
-🔗 **[🌐 Live Demo — العرض المباشر](https://aldorapharm-fwilugbd.manus.space)**
+🔗 **[🌐 Live Demo — العرض المباشر](https://medorapharm-fwilugbd.manus.space)**
 
 ---
 
 ### 🇬🇧 English Overview
 
-**ALDORA** is a **comprehensive, enterprise-grade healthcare operations platform** designed for multi-country pharmacy chains, hospitals, and healthcare networks. It seamlessly integrates **Point-of-Sale (POS)**, **inventory management**, **prescription AI**, **regulatory compliance** (Egypt MOH, EDA, ETA, NFSA, UHIA), and **financial operations** into a single, secure, offline-capable Progressive Web Application.
+**MEDORA** is a **comprehensive, enterprise-grade healthcare operations platform** designed for multi-country pharmacy chains, hospitals, and healthcare networks. It seamlessly integrates **Point-of-Sale (POS)**, **inventory management**, **prescription AI**, **regulatory compliance** (Egypt MOH, EDA, ETA, NFSA, UHIA), and **financial operations** into a single, secure, offline-capable Progressive Web Application.
 
 ### 🇪🇬 نظرة عامة بالعربية
 
-**ألدورا** هي **منظومة متكاملة على مستوى المؤسسات** مصممة لسلاسل الصيدليات والمستشفيات وشبكات الرعاية الصحية متعددة الدول. تدمج بسلاسة **نقاط البيع (POS)**، **إدارة المخزون**، **الذكاء الاصطناعي للوصفات الطبية**، **الامتثال التنظيمي** (وزارة الصحة المصرية، الهيئة المصرية للدواء، مصلحة الضرائب)، **والعمليات المالية** في تطبيق ويب تقدمي (PWA) آمن واحد يعمل بدون اتصال بالإنترنت.
+**ميدورا** هي **منظومة متكاملة على مستوى المؤسسات** مصممة لسلاسل الصيدليات والمستشفيات وشبكات الرعاية الصحية متعددة الدول. تدمج بسلاسة **نقاط البيع (POS)**، **إدارة المخزون**، **الذكاء الاصطناعي للوصفات الطبية**، **الامتثال التنظيمي** (وزارة الصحة المصرية، الهيئة المصرية للدواء، مصلحة الضرائب)، **والعمليات المالية** في تطبيق ويب تقدمي (PWA) آمن واحد يعمل بدون اتصال بالإنترنت.
 
 ---
 
@@ -110,8 +110,8 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    ALDORA Health Ecosystem                    │
-│                  منظومة ألدورا الصحية                        │
+│                    MEDORA Health Ecosystem                    │
+│                  منظومة ميدورا الصحية                        │
 ├─────────────────────────────────────────────────────────────┤
 │  🖥️ Frontend (React + Vite + TailwindCSS + shadcn/ui)       │
 │  ┌──────────────────────────────────────────────────────┐   │
@@ -136,8 +136,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/0SSAM/ALDORA-Integrated-Health-System.git
-cd ALDORA-Integrated-Health-System
+git clone https://github.com/0SSAM/MEDORA-Integrated-Health-System.git
+cd MEDORA-Integrated-Health-System
 
 # Install dependencies with pnpm
 pnpm install
@@ -155,7 +155,7 @@ pnpm build
 ## 📁 Project Structure | هيكل المشروع
 
 ```
-ALDORA-Integrated-Health-System/
+MEDORA-Integrated-Health-System/
 ├── client/          # 🖥️ React frontend (85+ components)
 ├── server/          # 🔧 Node.js backend (214+ modules)
 ├── shared/          # 🔗 Shared types & utilities
@@ -184,14 +184,14 @@ ALDORA-Integrated-Health-System/
 
 - **Author:** Hossam Naeim Osman | حسام نعيم عثمان
 - **License:** Private / UNLICENSED
-- **Copyright:** © 2026 ALDORA Health Care Eco System
+- **Copyright:** © 2026 MEDORA Health Care Eco System
 
 ---
 
 <div align="center">
 
-**🏥 ALDORA — Where Healthcare Meets Innovation**
-**ألدورا — حيث تلتقي الرعاية الصحية بالابتكار**
+**🏥 MEDORA — Where Healthcare Meets Innovation**
+**ميدورا — حيث تلتقي الرعاية الصحية بالابتكار**
 
 *Built with ❤️ for the healthcare community*
 *مُصمم بحب ❤️ لمجتمع الرعاية الصحية*

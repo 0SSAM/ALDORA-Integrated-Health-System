@@ -12,7 +12,7 @@ Next verification step: inspect the repository workflow definitions and recent G
 
 ## Observable CI evidence
 
-The migrated repository is reachable and has recent Actions history. The latest main-branch run for `.github/workflows/ci.yml` at commit `6620268ce5e6fc6acece6f27f51ea80399f7c18f` was run `31905743716` and was reported as cancelled. Earlier main-branch CI runs `31905521185`, `31905425102`, and `31905306398` were reported as failed. Dependabot and GitHub Actions update runs were separate from the ALDORA CI workflow. No secret values were read.
+The migrated repository is reachable and has recent Actions history. The latest main-branch run for `.github/workflows/ci.yml` at commit `6620268ce5e6fc6acece6f27f51ea80399f7c18f` was run `31905743716` and was reported as cancelled. Earlier main-branch CI runs `31905521185`, `31905425102`, and `31905306398` were reported as failed. Dependabot and GitHub Actions update runs were separate from the MEDORA CI workflow. No secret values were read.
 
 The next safe action is to rerun the latest main-branch CI workflow; its configured database job uses a disposable MySQL service and explicit test-only markers rather than the application database.
 
@@ -34,4 +34,4 @@ The migrated repository completed GitHub Actions run `31908712195` successfully 
 
 The isolated lifecycle failure was traced to a schema-boundary contract that covered `branches`, `customer_profiles`, and `call_tickets`, while the database history did not reliably materialize all jurisdiction columns in the disposable MySQL service. Migration `0036_awesome_starfox.sql` adds the nullable `branches.jurisdictionId` column, and migration `0037_brief_hellion.sql` adds nullable `jurisdictionId` to `customer_profiles` and `call_tickets`. The isolated migration wrapper now performs a strict identity gate, applies MySQL-compatible idempotent repair only inside the disposable CI database, and verifies all three columns after migration with table-specific failure messages. No production migration path invokes this repair.
 
-The final local-ready archive was created at `/home/ubuntu/ALDORA_integrated_health_system_local_ready.zip`. Integrity validation passed with `unzip -tq`; it contains 593 entries, is 4,528,950 bytes, excludes `.env` files, `node_modules`, `.git`, and local logs, and has SHA-256 `8d691747aa536743e95d6e2b824b08864973c785f23f0fa453b4a5acdfdd67a7`.
+The final local-ready archive was created at `/home/ubuntu/MEDORA_integrated_health_system_local_ready.zip`. Integrity validation passed with `unzip -tq`; it contains 593 entries, is 4,528,950 bytes, excludes `.env` files, `node_modules`, `.git`, and local logs, and has SHA-256 `8d691747aa536743e95d6e2b824b08864973c785f23f0fa453b4a5acdfdd67a7`.

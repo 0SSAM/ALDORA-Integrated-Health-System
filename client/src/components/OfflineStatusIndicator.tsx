@@ -16,7 +16,7 @@ type OfflineStatusIndicatorProps = {
 export function OfflineStatusIndicator({ online, drafts, serverPendingCount = 0, onRefresh, onRetryConflict }: OfflineStatusIndicatorProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [lastSyncAt, setLastSyncAt] = useState<number | null>(() => {
-    const value = Number(localStorage.getItem("aldora-last-sync-at"));
+    const value = Number(localStorage.getItem("medora-last-sync-at"));
     return Number.isFinite(value) && value > 0 ? value : null;
   });
   const queued = useMemo(() => drafts.filter(item => item.status !== "conflict" && item.status !== "failed").length, [drafts]);
@@ -33,7 +33,7 @@ export function OfflineStatusIndicator({ online, drafts, serverPendingCount = 0,
         if (!cancelled) {
           const now = Date.now();
           setLastSyncAt(now);
-          localStorage.setItem("aldora-last-sync-at", String(now));
+          localStorage.setItem("medora-last-sync-at", String(now));
         }
       } catch {
         // The indicator remains fail-safe and does not claim a successful sync.
@@ -51,7 +51,7 @@ export function OfflineStatusIndicator({ online, drafts, serverPendingCount = 0,
       if (online) {
         const now = Date.now();
         setLastSyncAt(now);
-        localStorage.setItem("aldora-last-sync-at", String(now));
+        localStorage.setItem("medora-last-sync-at", String(now));
       }
     } finally {
       setRefreshing(false);

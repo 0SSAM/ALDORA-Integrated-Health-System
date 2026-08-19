@@ -1,8 +1,8 @@
-# ALDORA Security Automation and Monitoring Policy
+# MEDORA Security Automation and Monitoring Policy
 
 ## Purpose
 
-ALDORA performs automated quality and security checks after every push and pull request. The checks are designed to detect failures early while preserving human approval for changes that can affect patient data, organization isolation, permissions, regulated workflows, or production availability.
+MEDORA performs automated quality and security checks after every push and pull request. The checks are designed to detect failures early while preserving human approval for changes that can affect patient data, organization isolation, permissions, regulated workflows, or production availability.
 
 ## Checks that run automatically
 
@@ -16,7 +16,7 @@ The platform must fail closed when an update could weaken authorization, organiz
 
 ## Firewalls and infrastructure controls
 
-Repository CI can validate application and dependency security, but it cannot prove the firewall state of a production host or cloud perimeter. Firewall and network controls must be verified through the hosting provider, infrastructure-as-code, vulnerability scanning, access logs, and an approved change process. ALDORA should report missing infrastructure evidence rather than claim that a firewall is configured.
+Repository CI can validate application and dependency security, but it cannot prove the firewall state of a production host or cloud perimeter. Firewall and network controls must be verified through the hosting provider, infrastructure-as-code, vulnerability scanning, access logs, and an approved change process. MEDORA should report missing infrastructure evidence rather than claim that a firewall is configured.
 
 ## Cameras and microphones
 

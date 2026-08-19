@@ -7,7 +7,7 @@ export function canExportLocalInvoice(invoice: LocalInvoiceExportState) {
 
 export function sanitizeTaxInvoiceFileName(invoiceNumber: string) {
   const normalized = invoiceNumber.trim().replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
-  return (normalized || "aldora-tax-invoice").slice(0, 120);
+  return (normalized || "medora-tax-invoice").slice(0, 120);
 }
 
 export function formatTaxInvoiceAmount(value: number, currencyCode: string) {

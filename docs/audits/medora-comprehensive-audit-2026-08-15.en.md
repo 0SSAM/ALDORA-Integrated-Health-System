@@ -1,4 +1,4 @@
-# ALDORA Integrated Health System — Comprehensive Audit and Readiness Note
+# MEDORA Integrated Health System — Comprehensive Audit and Readiness Note
 
 **Date:** 15 August 2026  
 **Scope:** Internal technical, security, operational, healthcare-workflow, and regulatory-readiness review. Government and regulated external connectors are intentionally deferred until formal approval, specifications, credentials, sandbox access, and acceptance evidence are supplied.
@@ -7,7 +7,7 @@
 
 ## Executive outcome
 
-ALDORA is in a stronger position for a controlled institutional and investor showcase. The review covered tenant isolation, session revalidation, audit signing, Investor Showcase simulation, offline-storage boundaries, CSRF and proxy-header handling, AI Markdown rendering, NLM ICD-10-CM reference caching, and frontend vendor splitting.
+MEDORA is in a stronger position for a controlled institutional and investor showcase. The review covered tenant isolation, session revalidation, audit signing, Investor Showcase simulation, offline-storage boundaries, CSRF and proxy-header handling, AI Markdown rendering, NLM ICD-10-CM reference caching, and frontend vendor splitting.
 
 The latest verification completed successfully with **90 test files passing, 301 tests passing, and 5 tests safely skipped**. TypeScript compilation and the production build passed. The largest frontend vendor chunk is approximately 478.81 KB before compression and 141.13 KB after gzip.
 
@@ -56,8 +56,8 @@ For other Arabic jurisdictions, each country requires its own configurable profi
 
 ## Presentation decision
 
-ALDORA is suitable for a controlled investor and institutional showcase of its internal capabilities. It can be demonstrated to pharmacies, pharmacy chains, distributors, hospitals, laboratories, manufacturers, and public-sector stakeholders as an internally secured platform with deferred external integrations.
+MEDORA is suitable for a controlled investor and institutional showcase of its internal capabilities. It can be demonstrated to pharmacies, pharmacy chains, distributors, hospitals, laboratories, manufacturers, and public-sector stakeholders as an internally secured platform with deferred external integrations.
 
 It must not yet be described as officially certified, government-connected, GAHAR-accredited, legally compliant in every Arabic country, or unconditionally ready for unsupervised clinical production. Independent penetration testing, SAST/DAST, backup restoration, tenant-conflict testing, formal role review, real recovery-channel activation, and user acceptance testing remain required for live deployment.
 
-**Supporting evidence:** Arabic report: `aldora-comprehensive-audit-2026-08-15.md`; regulatory evidence: `regulatory-evidence-2026-08-15.md`; portal review: `showcase-portal-review-final.md`.
+**Supporting evidence:** Arabic report: `medora-comprehensive-audit-2026-08-15.md`; regulatory evidence: `regulatory-evidence-2026-08-15.md`; portal review: `showcase-portal-review-final.md`.

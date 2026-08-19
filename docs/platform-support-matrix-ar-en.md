@@ -1,8 +1,8 @@
-# ALDORA Platform and Resilience Support Matrix
+# MEDORA Platform and Resilience Support Matrix
 
 ## Purpose
 
-This matrix defines a truthful support baseline for ALDORA. A responsive web application can target many devices, but every operating-system version, browser, printer, scanner, storage quota, and network condition must be accepted through representative testing before being called supported.
+This matrix defines a truthful support baseline for MEDORA. A responsive web application can target many devices, but every operating-system version, browser, printer, scanner, storage quota, and network condition must be accepted through representative testing before being called supported.
 
 | Environment | Target posture | Current evidence | Acceptance still required |
 |---|---|---|---|

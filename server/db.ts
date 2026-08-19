@@ -99,9 +99,9 @@ export async function getInternalCredentialByUsername(username: string) {
 }
 
 const SHOWCASE_USERNAME = "test";
-const SHOWCASE_OPEN_ID = "aldora-showcase-internal-user-v1";
-const SHOWCASE_ORGANIZATION_NAME = "ALDORA Investor Showcase";
-const SHOWCASE_BRANCH_CODE = "ALDORA-SHOWCASE-001";
+const SHOWCASE_OPEN_ID = "medora-showcase-internal-user-v1";
+const SHOWCASE_ORGANIZATION_NAME = "MEDORA Investor Showcase";
+const SHOWCASE_BRANCH_CODE = "MEDORA-SHOWCASE-001";
 
 /**
  * Ensures the deliberately isolated, non-production showcase identity exists.
@@ -131,7 +131,7 @@ export async function ensureShowcaseAccount(username: string) {
       } else {
         await tx.insert(users).values({
           openId: SHOWCASE_OPEN_ID,
-          name: "ALDORA Showcase User",
+          name: "MEDORA Showcase User",
           loginMethod: "internal_showcase",
           role: "manager",
           lastSignedIn: new Date(),
@@ -148,7 +148,7 @@ export async function ensureShowcaseAccount(username: string) {
     if (!showcaseOrganization) {
       await tx.insert(organizations).values({
         organizationType: "pharmacy",
-        legalName: "ALDORA Investor Showcase — Non-production",
+        legalName: "MEDORA Investor Showcase — Non-production",
         displayName: SHOWCASE_ORGANIZATION_NAME,
         countryCode: "EG",
         status: "active",

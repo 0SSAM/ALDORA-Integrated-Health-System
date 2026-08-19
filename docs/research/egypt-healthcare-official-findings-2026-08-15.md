@@ -14,7 +14,7 @@
 
 ## Implementation implications
 
-ALDORA can implement internal hospital, referral, provider, eligibility, preauthorization, claims, audit, and accreditation-readiness workflows. It must not claim live UHIA/EHA submission or eligibility verification until the responsible authority supplies an endpoint contract, authentication and certificate requirements, message schemas, acknowledgement/error semantics, test environment, acceptance evidence, and production authorization.
+MEDORA can implement internal hospital, referral, provider, eligibility, preauthorization, claims, audit, and accreditation-readiness workflows. It must not claim live UHIA/EHA submission or eligibility verification until the responsible authority supplies an endpoint contract, authentication and certificate requirements, message schemas, acknowledgement/error semantics, test environment, acceptance evidence, and production authorization.
 
 The published EHA operating model requires the Egypt pack to represent primary-care entry, referral, facility levels, emergency, diagnostic, therapeutic, and rehabilitation pathways rather than only generic hospital inventory and prescription screens.
 
@@ -23,19 +23,19 @@ The published EHA operating model requires the Egypt pack to represent primary-c
 3. Healthcare Accreditation and Regulatory Authority (GAHAR): https://gahar.gov.eg/ar/content-layout/accreditation-standards
    - GAHAR states that it develops and applies healthcare accreditation standards under Egypt's Universal Health Insurance Law No. 2 of 2018.
    - The official standards portal lists separate standards for hospitals, primary healthcare, physiotherapy centers, medical laboratories, diagnostic/therapeutic radiology centers, mental-health hospitals, and extended-care/convalescent facilities.
-   - The standards are organized around patient-centered and organization-centered dimensions. ALDORA should therefore provide evidence/readiness tracking rather than claim accreditation.
+   - The standards are organized around patient-centered and organization-centered dimensions. MEDORA should therefore provide evidence/readiness tracking rather than claim accreditation.
 
 4. Egyptian Tax Authority e-Invoicing and e-Receipt SDK: https://sdk.invoicing.eta.gov.eg/
    - The official SDK publishes APIs for ERP/POS systems, authentication, document submission, search, and receipt operations.
-   - ALDORA can prepare a versioned tax adapter contract and test payload boundary, but production activation requires taxpayer registration, signing/certificate configuration, official environment access, and acceptance testing.
+   - MEDORA can prepare a versioned tax adapter contract and test payload boundary, but production activation requires taxpayer registration, signing/certificate configuration, official environment access, and acceptance testing.
 
 5. Egyptian Drug Authority: http://edaegypt.gov.eg/
    - The official site exposes drug traceability and regulatory databases and publishes information about implementation of drug-tracking and GTIN/package data initiatives.
-   - ALDORA should keep product provenance, GTIN/Data Matrix syntax, batch/expiry/serial fields, and traceability readiness internal until EDA supplies the exact active API/portal contract and credentials.
+   - MEDORA should keep product provenance, GTIN/Data Matrix syntax, batch/expiry/serial fields, and traceability readiness internal until EDA supplies the exact active API/portal contract and credentials.
 
 ## Source boundary
 
-These sources establish the official actors and published scope. They do not, by themselves, provide an authorized production API contract, credentials, or acceptance evidence for ALDORA. External adapters remain fail-closed pending those items.
+These sources establish the official actors and published scope. They do not, by themselves, provide an authorized production API contract, credentials, or acceptance evidence for MEDORA. External adapters remain fail-closed pending those items.
 
 
 ## Implementation status after internal Egypt package expansion

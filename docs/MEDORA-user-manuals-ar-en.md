@@ -1,4 +1,4 @@
-# ALDORA | دليل الاستخدام حسب الدور
+# MEDORA | دليل الاستخدام حسب الدور
 
 ## Bilingual role-based user manual — Arabic / English
 
@@ -79,6 +79,6 @@ If a shortcut or button is missing, it is usually due to role, branch, or readin
 
 ## References
 
-1. [ALDORA comprehensive platform audit](comprehensive-platform-audit-2026-08-15.md)
-2. [ALDORA operations guide](operations.md)
-3. [ALDORA product description](ALDORA-product-description-ar-en.md)
+1. [MEDORA comprehensive platform audit](comprehensive-platform-audit-2026-08-15.md)
+2. [MEDORA operations guide](operations.md)
+3. [MEDORA product description](MEDORA-product-description-ar-en.md)

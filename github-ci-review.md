@@ -1,6 +1,6 @@
 # GitHub CI Review — 2026-08-16
 
-Repository: https://github.com/0SSAM/ALDORA-Integrated-Health-System
+Repository: https://github.com/0SSAM/MEDORA-Integrated-Health-System
 
 Findings from GitHub API and Actions logs:
 
@@ -13,9 +13,9 @@ Findings from GitHub API and Actions logs:
 - These failures are repository-plan/feature configuration failures, not evidence that TypeScript, Vitest, or the production build failed.
 
 Sources:
-- Repository API: https://api.github.com/repos/0SSAM/ALDORA-Integrated-Health-System
-- Branch protection API: https://api.github.com/repos/0SSAM/ALDORA-Integrated-Health-System/branches/main/protection
-- Actions run: https://github.com/0SSAM/ALDORA-Integrated-Health-System/actions/runs/31919383687
-- CodeQL status: https://github.com/0SSAM/ALDORA-Integrated-Health-System/security/code-scanning/tools/CodeQL/status/
-- Security analysis settings: https://github.com/0SSAM/ALDORA-Integrated-Health-System/settings/security_analysis
+- Repository API: https://api.github.com/repos/0SSAM/MEDORA-Integrated-Health-System
+- Branch protection API: https://api.github.com/repos/0SSAM/MEDORA-Integrated-Health-System/branches/main/protection
+- Actions run: https://github.com/0SSAM/MEDORA-Integrated-Health-System/actions/runs/31919383687
+- CodeQL status: https://github.com/0SSAM/MEDORA-Integrated-Health-System/security/code-scanning/tools/CodeQL/status/
+- Security analysis settings: https://github.com/0SSAM/MEDORA-Integrated-Health-System/settings/security_analysis
 - Organization: https://github.com/orgs/ALDO-Health-Care-Eco-System/repositories

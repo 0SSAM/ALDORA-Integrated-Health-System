@@ -12,7 +12,7 @@ const claimStatus = z.enum(["draft", "ready", "submitted", "received", "under_re
 function encryptPatientValue(value: string) {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new TRPCError({ code: "PRECONDITION_FAILED", message: "Clinical encryption key is not configured" });
-  const key = createHash("sha256").update(`ALDORA-EG-CLINICAL:${secret}`).digest();
+  const key = createHash("sha256").update(`MEDORA-EG-CLINICAL:${secret}`).digest();
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", key, iv);
   const ciphertext = Buffer.concat([cipher.update(value, "utf8"), cipher.final()]);

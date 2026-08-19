@@ -1,17 +1,17 @@
-# ALDORA Government Integration Readiness Handover
+# MEDORA Government Integration Readiness Handover
 
 > **Status / الحالة:** This is a preparation and acceptance-control packet. It does **not** activate a government connection, submit data, or certify regulatory compliance.  
 > هذه حزمة تجهيز وتحكم في القبول. وهي **لا** تفعّل اتصالاً حكومياً، ولا ترسل بيانات، ولا تمثل شهادة امتثال تنظيمي.
 
 ## Purpose / الغرض
 
-This handover defines the evidence and review trail ALDORA requires before a separately authorized production activation can be considered. It supports the Egypt government connector boundary currently shown as `egypt-government`, including UPA, EDA, ETA, and UHIA-related workstreams where applicable. It does not assume that every authority shares a single API, credential, or acceptance process.
+This handover defines the evidence and review trail MEDORA requires before a separately authorized production activation can be considered. It supports the Egypt government connector boundary currently shown as `egypt-government`, including UPA, EDA, ETA, and UHIA-related workstreams where applicable. It does not assume that every authority shares a single API, credential, or acceptance process.
 
 تحدد هذه الوثيقة الأدلة ومسار المراجعة المطلوبين قبل النظر في تفعيل إنتاجي منفصل ومصرح به. وهي تدعم حد الموصل الحكومي المصري الظاهر باسم `egypt-government`، بما في ذلك مسارات UPA وEDA وETA وUHIA عند انطباقها. ولا تفترض أن جميع الجهات تستخدم واجهة أو اعتمادًا أو عملية قبول موحدة.
 
 ## Mandatory acceptance packet / حزمة القبول الإلزامية
 
-| Gate / البوابة | Required artifact / الدليل المطلوب | Owner / المسؤول | ALDORA treatment / معالجة ألدورا |
+| Gate / البوابة | Required artifact / الدليل المطلوب | Owner / المسؤول | MEDORA treatment / معالجة ميدورا |
 | --- | --- | --- | --- |
 | Official technical specification / المواصفة التقنية الرسمية | Dated authority specification, allowed operations, schema and version | Regulatory and technical owners | Record provenance in the jurisdiction compliance pack; do not infer unsupported fields |
 | Authority authorization / إذن الجهة المختصة | Written authorization identifying the organization, service and environment | Regulatory owner | Keep the connector blocked until independently reviewed |
@@ -32,9 +32,9 @@ This handover defines the evidence and review trail ALDORA requires before a sep
 
 ## Security and evidence rules / قواعد الأمن والأدلة
 
-ALDORA treats unavailable authorization, stale compliance evidence, missing jurisdiction scope, unavailable server confirmation, missing secret reference, or incomplete acceptance evidence as a hard block. The readiness packet is admin-only, returns no credential values, and emits a tamper-evident review record. A tamper-evident log improves investigation but does not replace access control, encryption, retention controls, or legal authorization.
+MEDORA treats unavailable authorization, stale compliance evidence, missing jurisdiction scope, unavailable server confirmation, missing secret reference, or incomplete acceptance evidence as a hard block. The readiness packet is admin-only, returns no credential values, and emits a tamper-evident review record. A tamper-evident log improves investigation but does not replace access control, encryption, retention controls, or legal authorization.
 
-تعامل ألدورا غياب الإذن، أو تقادم دليل الامتثال، أو غياب نطاق الاختصاص، أو عدم توفر تأكيد الخادم، أو غياب مرجع السر، أو نقص أدلة القبول بوصفه حجبًا إلزاميًا. حزمة الجاهزية متاحة للمسؤول فقط، ولا تعيد أي قيمة اعتماد، وتنتج سجل مراجعة مقاومًا للعبث. ولا يحل سجل التدقيق محل التحكم في الوصول أو التشفير أو الاحتفاظ أو الإذن القانوني.
+تعامل ميدورا غياب الإذن، أو تقادم دليل الامتثال، أو غياب نطاق الاختصاص، أو عدم توفر تأكيد الخادم، أو غياب مرجع السر، أو نقص أدلة القبول بوصفه حجبًا إلزاميًا. حزمة الجاهزية متاحة للمسؤول فقط، ولا تعيد أي قيمة اعتماد، وتنتج سجل مراجعة مقاومًا للعبث. ولا يحل سجل التدقيق محل التحكم في الوصول أو التشفير أو الاحتفاظ أو الإذن القانوني.
 
 ## Explicit non-goals / ما لا تقوم به هذه الحزمة
 

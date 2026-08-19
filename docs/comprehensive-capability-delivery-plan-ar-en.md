@@ -1,6 +1,6 @@
-# ALDORA — Comprehensive Capability Delivery Plan
+# MEDORA — Comprehensive Capability Delivery Plan
 
-> **Delivery principle / مبدأ التسليم:** ALDORA expands only through server-enforced organization, branch, jurisdiction, role, audit, and privacy boundaries. A feature is not considered complete merely because it has a screen. Every completed increment requires a data model where needed, protected procedure, user experience, auditability, and regression coverage.
+> **Delivery principle / مبدأ التسليم:** MEDORA expands only through server-enforced organization, branch, jurisdiction, role, audit, and privacy boundaries. A feature is not considered complete merely because it has a screen. Every completed increment requires a data model where needed, protected procedure, user experience, auditability, and regression coverage.
 
 ## Delivery map / خريطة التنفيذ
 

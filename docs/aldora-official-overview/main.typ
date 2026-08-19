@@ -1,8 +1,8 @@
 #import "report-theme.typ": report-accent, report-theme
 
 #show: report-theme.with(
-  title: "ALDORA | Official Overview",
-  author: "ALDORA Product Documentation",
+  title: "MEDORA | Official Overview",
+  author: "MEDORA Product Documentation",
   rhythm: "report",
   running-header: true,
 )
@@ -21,7 +21,7 @@
 #page(margin: (top: 22%, x: 2.2cm), numbering: none, header: none)[
   #set par(first-line-indent: 0em, justify: false)
   #align(center)[
-    #text(size: 34pt, weight: "bold", fill: report-accent)[ALDORA]
+    #text(size: 34pt, weight: "bold", fill: report-accent)[MEDORA]
     #v(0.45em)
     #text(size: 17pt, weight: "bold")[منظومة الرعاية الصحية المتكاملة]
     #v(0.7em)
@@ -48,23 +48,23 @@
 = الملخص التنفيذي | Executive Summary
 
 #ar[
-  *ALDORA* هي منظومة تشغيل صحية معيارية تهدف إلى جمع العمليات اليومية للصيدليات والفروع والجهات الصحية المتصلة بها في مساحة تشغيل واحدة، مع الحفاظ على عزل المؤسسة والفرع والاختصاص، وتسجيل العمليات الحساسة، وإظهار حدود التكاملات الرسمية بوضوح. لا تقوم فلسفة المنصة على الادعاء بأن كل اتصال أو اعتماد متاح تلقائياً، بل على بناء أساس مهني يمكن اختباره وتوسيعه عندما تتوافر الأدلة والصلاحيات الرسمية.
+  *MEDORA* هي منظومة تشغيل صحية معيارية تهدف إلى جمع العمليات اليومية للصيدليات والفروع والجهات الصحية المتصلة بها في مساحة تشغيل واحدة، مع الحفاظ على عزل المؤسسة والفرع والاختصاص، وتسجيل العمليات الحساسة، وإظهار حدود التكاملات الرسمية بوضوح. لا تقوم فلسفة المنصة على الادعاء بأن كل اتصال أو اعتماد متاح تلقائياً، بل على بناء أساس مهني يمكن اختباره وتوسيعه عندما تتوافر الأدلة والصلاحيات الرسمية.
 ]
 
 #en[
-  *ALDORA* is a modular healthcare operations platform designed to bring together daily pharmacy, branch, and adjacent healthcare workflows in one operating space. It preserves organization, branch, and jurisdiction boundaries; records sensitive actions; and makes the status of official integrations explicit. Its philosophy is not to imply that every connection or approval is automatically available, but to provide a professional, testable foundation that can be extended when authoritative evidence and credentials are available.
+  *MEDORA* is a modular healthcare operations platform designed to bring together daily pharmacy, branch, and adjacent healthcare workflows in one operating space. It preserves organization, branch, and jurisdiction boundaries; records sensitive actions; and makes the status of official integrations explicit. Its philosophy is not to imply that every connection or approval is automatically available, but to provide a professional, testable foundation that can be extended when authoritative evidence and credentials are available.
 ]
 
 #callout([المبدأ الحاكم | Governing principle], [كل عملية منظمة يجب أن تكون مرتبطة بالمؤسسة والفرع والاختصاص، وأن تتحول إلى مسودة واضحة أو تتوقف بأمان عند غياب الاتصال أو الاعتماد أو الدليل المطلوب. / Every regulated action is organization-, branch-, and jurisdiction-scoped and becomes an explicit draft or stops safely when connectivity, authorization, or required evidence is missing.])
 
-= أين تعمل ALDORA؟ | Where Does ALDORA Operate?
+= أين تعمل MEDORA؟ | Where Does MEDORA Operate?
 
 #ar[
-  صُممت *ALDORA* لتكون منصة تشغيل صحية متكاملة، وليست برنامجاً محصوراً في الصيدليات فقط. وهي تجمع بين إدارة العمليات، ونقاط البيع، والمخزون، والوصفات، الفوترة، خدمة العملاء، المتابعة، التقارير، التدقيق، والجاهزية للتكاملات الرسمية. ويختلف نطاق التفعيل حسب نوع المؤسسة وصلاحياتها واللوائح المعتمدة في الدولة أو الاختصاص.
+  صُممت *MEDORA* لتكون منصة تشغيل صحية متكاملة، وليست برنامجاً محصوراً في الصيدليات فقط. وهي تجمع بين إدارة العمليات، ونقاط البيع، والمخزون، والوصفات، الفوترة، خدمة العملاء، المتابعة، التقارير، التدقيق، والجاهزية للتكاملات الرسمية. ويختلف نطاق التفعيل حسب نوع المؤسسة وصلاحياتها واللوائح المعتمدة في الدولة أو الاختصاص.
 ]
 
 #en[
-  *ALDORA* is designed as an integrated healthcare operations platform, not as a pharmacy-only application. It combines operations management, POS, inventory, prescriptions, invoicing, customer care, follow-up, reporting, auditability, and readiness boundaries for official integrations. The activated scope varies by institution type, permissions, and the applicable jurisdictional rules.
+  *MEDORA* is designed as an integrated healthcare operations platform, not as a pharmacy-only application. It combines operations management, POS, inventory, prescriptions, invoicing, customer care, follow-up, reporting, auditability, and readiness boundaries for official integrations. The activated scope varies by institution type, permissions, and the applicable jurisdictional rules.
 ]
 
 #table(
@@ -83,16 +83,16 @@
 )
 
 #ar[
-  وبصيغة عملية، يمكن تقديم ALDORA باعتبارها *طبقة التشغيل والإدارة والتتبع* التي تربط الموظفين والفروع والبيانات والعمليات داخل المؤسسة الصحية. وهي لا تستبدل الجهة التنظيمية أو شركة التأمين أو نظام الحكومة، بل تهيئ المؤسسة لإدارة أعمالها داخلياً بطريقة منظمة، ثم تفتح التكاملات الخارجية عندما تصبح المتطلبات القانونية والفنية متاحة.
+  وبصيغة عملية، يمكن تقديم MEDORA باعتبارها *طبقة التشغيل والإدارة والتتبع* التي تربط الموظفين والفروع والبيانات والعمليات داخل المؤسسة الصحية. وهي لا تستبدل الجهة التنظيمية أو شركة التأمين أو نظام الحكومة، بل تهيئ المؤسسة لإدارة أعمالها داخلياً بطريقة منظمة، ثم تفتح التكاملات الخارجية عندما تصبح المتطلبات القانونية والفنية متاحة.
 ]
 
 #en[
-  In practical terms, ALDORA is the *operating, management, and traceability layer* connecting staff, branches, data, and workflows inside a healthcare organization. It does not replace a regulator, payer, or government system; it prepares the organization to operate coherently and opens external integrations only when legal and technical prerequisites become available.
+  In practical terms, MEDORA is the *operating, management, and traceability layer* connecting staff, branches, data, and workflows inside a healthcare organization. It does not replace a regulator, payer, or government system; it prepares the organization to operate coherently and opens external integrations only when legal and technical prerequisites become available.
 ]
 
-#callout([الإجابة المختصرة | Short answer], [ALDORA is designed for pharmacies, pharmacy chains, hospitals, distributors, insurers and payers, laboratories, rehabilitation centers, pharmaceutical and medical-supply companies, and public-sector healthcare operations—using a modular scope that activates only what the organization is authorized and prepared to operate. / صُممت ALDORA للصيدليات وسلاسلها والمستشفيات والموزعين والتأمين والمعامل ومراكز التأهيل وشركات الأدوية والمستلزمات والجهات الصحية العامة، بنطاق معياري لا يفعّل إلا ما تسمح به صلاحيات المؤسسة واستعدادها.])
+#callout([الإجابة المختصرة | Short answer], [MEDORA is designed for pharmacies, pharmacy chains, hospitals, distributors, insurers and payers, laboratories, rehabilitation centers, pharmaceutical and medical-supply companies, and public-sector healthcare operations—using a modular scope that activates only what the organization is authorized and prepared to operate. / صُممت MEDORA للصيدليات وسلاسلها والمستشفيات والموزعين والتأمين والمعامل ومراكز التأهيل وشركات الأدوية والمستلزمات والجهات الصحية العامة، بنطاق معياري لا يفعّل إلا ما تسمح به صلاحيات المؤسسة واستعدادها.])
 
-= ماذا يعني اسم ALDORA؟ | What Does ALDORA Mean?
+= ماذا يعني اسم MEDORA؟ | What Does MEDORA Mean?
 
 #ar[
   *ALDO* ليس اختصاراً قانونياً أو اسماً لجهة حكومية، وإنما هو تفسير هوياتي وتسويقي مقصود يمكن استخدامه عند التعريف بالمنصة:
@@ -105,7 +105,7 @@
 ]
 
 #ar[
-  وتعني *Accessible* أن النظام مصمم ليكون قابلاً للوصول عبر واجهة ويب متجاوبة، و*Localized* أنه يستوعب اللغة العربية والسياق المحلي وحزم القواعد الخاصة بكل دولة، و*Dependable Operations* أنه يركز على التشغيل القابل للتتبع والفشل الآمن والوضوح العملي. أما *ALDORA* فهي امتداد صوتي وهووي لـ *ALDO* مع دلالة الرعاية والاتساع المؤسسي، ويمكن تقديم الاسم تجارياً بصيغة: *ALDORA | Integrated Health System*.
+  وتعني *Accessible* أن النظام مصمم ليكون قابلاً للوصول عبر واجهة ويب متجاوبة، و*Localized* أنه يستوعب اللغة العربية والسياق المحلي وحزم القواعد الخاصة بكل دولة، و*Dependable Operations* أنه يركز على التشغيل القابل للتتبع والفشل الآمن والوضوح العملي. أما *MEDORA* فهي امتداد صوتي وهووي لـ *ALDO* مع دلالة الرعاية والاتساع المؤسسي، ويمكن تقديم الاسم تجارياً بصيغة: *MEDORA | Integrated Health System*.
 ]
 
 #en[
@@ -119,22 +119,22 @@
 ]
 
 #en[
-  *Accessible* describes browser-based, responsive access; *Localized* describes Arabic-first operation, local terminology, and country-specific rule packs; and *Dependable Operations* describes traceable workflows, safe failure, and operational clarity. *ALDORA* extends the ALDO identity with a broader healthcare and institutional character. This is a brand interpretation, not a historical claim about the origin of the name.
+  *Accessible* describes browser-based, responsive access; *Localized* describes Arabic-first operation, local terminology, and country-specific rule packs; and *Dependable Operations* describes traceable workflows, safe failure, and operational clarity. *MEDORA* extends the ALDO identity with a broader healthcare and institutional character. This is a brand interpretation, not a historical claim about the origin of the name.
 ]
 
 = فلسفة البناء | Building Philosophy
 
 #ar[
-  بُنيت ALDORA على فكرة أن النظام الصحي المهني ليس مجرد شاشة بيع أو قاعدة بيانات أصناف. إنما هو طبقات مترابطة تبدأ من هوية المؤسسة والفرع، ثم الصلاحيات، ثم البيانات ذات المصدر، ثم قواعد التشغيل، ثم السجل التدقيقي، ثم المخرجات والتكاملات. لذلك تُعامل العمليات المنظمة، مثل الوصفات والفواتير والتكاملات الحكومية، بدرجة حماية أعلى من المسودات التشغيلية غير المنظمة.
+  بُنيت MEDORA على فكرة أن النظام الصحي المهني ليس مجرد شاشة بيع أو قاعدة بيانات أصناف. إنما هو طبقات مترابطة تبدأ من هوية المؤسسة والفرع، ثم الصلاحيات، ثم البيانات ذات المصدر، ثم قواعد التشغيل، ثم السجل التدقيقي، ثم المخرجات والتكاملات. لذلك تُعامل العمليات المنظمة، مثل الوصفات والفواتير والتكاملات الحكومية، بدرجة حماية أعلى من المسودات التشغيلية غير المنظمة.
 ]
 
 #en[
-  ALDORA is built on the premise that a professional healthcare system is more than a sales screen or an item database. It is a set of connected layers: organization and branch identity, authorization, sourced data, operational rules, audit evidence, outputs, and integrations. Regulated actions such as prescriptions, invoices, and government connectors therefore receive stronger safeguards than non-regulated working drafts.
+  MEDORA is built on the premise that a professional healthcare system is more than a sales screen or an item database. It is a set of connected layers: organization and branch identity, authorization, sourced data, operational rules, audit evidence, outputs, and integrations. Regulated actions such as prescriptions, invoices, and government connectors therefore receive stronger safeguards than non-regulated working drafts.
 ]
 
 #figure(
-  image("aldora-architecture.png", width: 100%),
-  caption: [ALDORA architecture: modular healthcare operations with scoped controls.]
+  image("medora-architecture.png", width: 100%),
+  caption: [MEDORA architecture: modular healthcare operations with scoped controls.]
 )
 
 #table(
@@ -175,7 +175,7 @@
 ]
 
 #figure(
-  image("aldora-resilience.png", width: 100%),
+  image("medora-resilience.png", width: 100%),
   caption: [Safe resilience flow: explicit offline drafts, controlled reconnect synchronization, and conflict review.]
 )
 
@@ -194,11 +194,11 @@
 = التشغيل عبر الأجهزة | Cross-Platform Operation
 
 #ar[
-  تعمل ALDORA أساساً كتطبيق ويب متجاوب يمكن فتحه من متصفح حديث على الكمبيوتر أو الهاتف أو الجهاز اللوحي. لذلك لا يحتاج المستخدم إلى نسخة مختلفة لكل نظام تشغيل في نموذج الويب/PWA. ويمكن تثبيته كتطبيق ويب على الأجهزة التي يدعم متصفحها التثبيت، مع بقاء السياسات الأمنية والتوافق مرتبطة بإصدار المتصفح والجهاز الفعلي.
+  تعمل MEDORA أساساً كتطبيق ويب متجاوب يمكن فتحه من متصفح حديث على الكمبيوتر أو الهاتف أو الجهاز اللوحي. لذلك لا يحتاج المستخدم إلى نسخة مختلفة لكل نظام تشغيل في نموذج الويب/PWA. ويمكن تثبيته كتطبيق ويب على الأجهزة التي يدعم متصفحها التثبيت، مع بقاء السياسات الأمنية والتوافق مرتبطة بإصدار المتصفح والجهاز الفعلي.
 ]
 
 #en[
-  ALDORA is primarily delivered as a responsive web application that can be opened in a modern browser on a computer, phone, or tablet. The web/PWA model avoids requiring a separate application build for each operating system. Where supported by the browser, it may be installed as a web app; security and compatibility still depend on the actual device and browser version.
+  MEDORA is primarily delivered as a responsive web application that can be opened in a modern browser on a computer, phone, or tablet. The web/PWA model avoids requiring a separate application build for each operating system. Where supported by the browser, it may be installed as a web app; security and compatibility still depend on the actual device and browser version.
 ]
 
 #table(
@@ -212,7 +212,7 @@
   [iPhone / iPad], [افتح الرابط في Safari، ثم استخدم Add to Home Screen عند توفره.], [قد تختلف حدود التخزين والعمل الخلفي بحسب إصدار iOS وسياسات Safari.],
 )
 
-#callout([الإجابة المختصرة عند العرض | Short presentation answer], [ALDORA is one secure, responsive healthcare workspace. It runs through the browser across supported Windows, macOS, Android, and iOS devices; when the connection is weak, it preserves eligible drafts and communicates the state clearly; when the connection returns, it synchronizes only what policy allows. / ALDORA مساحة تشغيل صحية آمنة ومتجاوبة، تعمل عبر المتصفح على الأجهزة المدعومة، وتتعامل مع الاتصال الضعيف بمسودات مؤهلة ومؤشرات واضحة، ثم تزامن ما تسمح به السياسة عند عودة الاتصال.])
+#callout([الإجابة المختصرة عند العرض | Short presentation answer], [MEDORA is one secure, responsive healthcare workspace. It runs through the browser across supported Windows, macOS, Android, and iOS devices; when the connection is weak, it preserves eligible drafts and communicates the state clearly; when the connection returns, it synchronizes only what policy allows. / MEDORA مساحة تشغيل صحية آمنة ومتجاوبة، تعمل عبر المتصفح على الأجهزة المدعومة، وتتعامل مع الاتصال الضعيف بمسودات مؤهلة ومؤشرات واضحة، ثم تزامن ما تسمح به السياسة عند عودة الاتصال.])
 
 = ما المطلوب للتشغيل؟ | What Is Required?
 
@@ -248,26 +248,26 @@
 = الخاتمة | Closing Statement
 
 #ar[
-  *ALDORA* ليست مجرد نظام لإدارة المبيعات، بل إطار تشغيل صحي يوازن بين سهولة الاستخدام، التوطين، العزل الأمني، التتبع، والمرونة. وعندما يُسأل عن معنى الاسم يمكن الإجابة باختصار: *ALDO تعني Accessible, Localized, Dependable Operations؛ أي تشغيل صحي متاح، محلي، ويمكن الاعتماد عليه.* أما فلسفة النظام فهي أن السرعة لا تسبق السلامة، وأن العمل دون اتصال لا يتحول إلى نجاح وهمي، وأن كل تكامل رسمي يُفتح فقط عندما تتوافر الأدلة والصلاحيات.
+  *MEDORA* ليست مجرد نظام لإدارة المبيعات، بل إطار تشغيل صحي يوازن بين سهولة الاستخدام، التوطين، العزل الأمني، التتبع، والمرونة. وعندما يُسأل عن معنى الاسم يمكن الإجابة باختصار: *ALDO تعني Accessible, Localized, Dependable Operations؛ أي تشغيل صحي متاح، محلي، ويمكن الاعتماد عليه.* أما فلسفة النظام فهي أن السرعة لا تسبق السلامة، وأن العمل دون اتصال لا يتحول إلى نجاح وهمي، وأن كل تكامل رسمي يُفتح فقط عندما تتوافر الأدلة والصلاحيات.
 ]
 
 #en[
-  *ALDORA* is not merely a sales-management system. It is a healthcare operating framework that balances usability, localization, security boundaries, traceability, and resilience. When asked what the name means, the concise answer is: *ALDO means Accessible, Localized, Dependable Operations.* The system philosophy is that speed never overrides safety, offline work never becomes a false success, and official integrations open only when the required evidence and authority are present.
+  *MEDORA* is not merely a sales-management system. It is a healthcare operating framework that balances usability, localization, security boundaries, traceability, and resilience. When asked what the name means, the concise answer is: *ALDO means Accessible, Localized, Dependable Operations.* The system philosophy is that speed never overrides safety, offline work never becomes a false success, and official integrations open only when the required evidence and authority are present.
 ]
 
 #align(center)[
   #v(1em)
-  #text(size: 16pt, weight: "bold", fill: report-accent)[ALDORA | Integrated Health System]
+  #text(size: 16pt, weight: "bold", fill: report-accent)[MEDORA | Integrated Health System]
   #v(0.5em)
   #text(size: 10pt, fill: luma(85))[Official bilingual overview • Product documentation • Version 2026-08-15]
 ]
 
 = المراجع | References
 
-- ALDORA Product Description and Identity Brief, internal project documentation, 2026-08-15.
-- ALDORA Comprehensive Platform Audit, internal project documentation, 2026-08-15.
-- ALDORA Operations and Resilience Documentation, internal project documentation, 2026-08-15.
-- ALDORA Ownership Evidence Bundle, internal project documentation, 2026-08-15.
+- MEDORA Product Description and Identity Brief, internal project documentation, 2026-08-15.
+- MEDORA Comprehensive Platform Audit, internal project documentation, 2026-08-15.
+- MEDORA Operations and Resilience Documentation, internal project documentation, 2026-08-15.
+- MEDORA Ownership Evidence Bundle, internal project documentation, 2026-08-15.
 
 #pagebreak()
 #align(center)[

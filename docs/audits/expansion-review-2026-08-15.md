@@ -1,4 +1,4 @@
-# ALDORA Expansion Review — 2026-08-15
+# MEDORA Expansion Review — 2026-08-15
 
 ## Scope
 

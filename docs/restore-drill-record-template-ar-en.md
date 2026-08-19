@@ -1,4 +1,4 @@
-# ALDORA Encrypted Backup Restore Drill Record
+# MEDORA Encrypted Backup Restore Drill Record
 
 ## Record identity
 

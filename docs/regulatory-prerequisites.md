@@ -1,4 +1,4 @@
-# ألدورا | منظومة الرعاية الصحية المتكاملة — Regulatory Prerequisites Register
+# ميدورا | منظومة الرعاية الصحية المتكاملة — Regulatory Prerequisites Register
 
 > **Status:** working register, not a legal or regulatory certification. I am an AI, not a lawyer or regulatory affairs professional; a qualified local counsel, pharmacist, data-protection officer, and competent authority must review each country pack before production activation.
 

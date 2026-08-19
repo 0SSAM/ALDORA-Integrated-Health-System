@@ -17,9 +17,9 @@
 ]
 
 #align(center)[
-  #text(size: 25pt, weight: "bold", fill: rgb("0B6477"))[ALDORA]
+  #text(size: 25pt, weight: "bold", fill: rgb("0B6477"))[MEDORA]
   #v(0.25em)
-  #text(size: 17pt, weight: "bold")[إعدادات التشغيل المحلي لنظام ALDORA]
+  #text(size: 17pt, weight: "bold")[إعدادات التشغيل المحلي لنظام MEDORA]
   #v(0.4em)
   #text(size: 12pt, fill: rgb("475569"))[Local Setup and Registration Guide]
   #v(1em)
@@ -36,7 +36,7 @@
 
 = نطاق الدليل
 
-هذا الدليل يشرح الطريقة الصحيحة لتجهيز نسخة تطوير محلية من نظام ALDORA. يشمل ذلك تثبيت الاعتماديات، إعداد متغيرات البيئة، إنشاء قاعدة بيانات MySQL أو TiDB، تطبيق مخطط Drizzle، تشغيل الخادم، وإجراء فحوصات الجاهزية الأساسية.
+هذا الدليل يشرح الطريقة الصحيحة لتجهيز نسخة تطوير محلية من نظام MEDORA. يشمل ذلك تثبيت الاعتماديات، إعداد متغيرات البيئة، إنشاء قاعدة بيانات MySQL أو TiDB، تطبيق مخطط Drizzle، تشغيل الخادم، وإجراء فحوصات الجاهزية الأساسية.
 
 #callout[حدود مهمة][هذا الدليل مخصص لبيئة التطوير المحلية. لا تستخدم قاعدة بيانات الإنتاج، ولا تضع مفاتيح حقيقية داخل المستودع أو ملفات الكود.]
 
@@ -57,7 +57,7 @@
 بعد فك ضغط ملفات المشروع، افتح الطرفية داخل المجلد الذي يحتوي على `package.json`:
 
 #codeblock[
-cd ALDORA-project
+cd MEDORA-project
 pnpm install
 ]
 
@@ -68,9 +68,9 @@ pnpm install
 أنشئ قاعدة منفصلة للتطوير باستخدام MySQL. نفّذ الأوامر التالية من حساب إداري، مع تغيير كلمة المرور إلى قيمة قوية وفريدة:
 
 #codeblock[
-CREATE DATABASE aldora_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'aldora_app'@'localhost' IDENTIFIED BY 'ضع_كلمة_مرور_قوية_هنا';
-GRANT ALL PRIVILEGES ON aldora_dev.\* TO 'aldora_app'@'localhost';
+CREATE DATABASE medora_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'medora_app'@'localhost' IDENTIFIED BY 'ضع_كلمة_مرور_قوية_هنا';
+GRANT ALL PRIVILEGES ON medora_dev.\* TO 'medora_app'@'localhost';
 FLUSH PRIVILEGES;
 ]
 
@@ -82,7 +82,7 @@ FLUSH PRIVILEGES;
 
 #codeblock[
 NODE_ENV=development
-DATABASE_URL=mysql://aldora_app:ضع_كلمة_المرور@127.0.0.1:3306/aldora_dev
+DATABASE_URL=mysql://medora_app:ضع_كلمة_المرور@127.0.0.1:3306/medora_dev
 JWT_SECRET=ضع_قيمة_عشوائية_طويلة_وفريدة
 
 VITE_APP_ID=معرّف_تطبيق_OAuth
@@ -126,7 +126,7 @@ pnpm db:push
 يمكن تصدير المتغير مؤقتاً على Linux أو macOS للتشخيص:
 
 #codeblock[
-export DATABASE_URL='mysql://aldora_app:password@127.0.0.1:3306/aldora_dev'
+export DATABASE_URL='mysql://medora_app:password@127.0.0.1:3306/medora_dev'
 ]
 
 = الفحوصات قبل التشغيل
@@ -159,7 +159,7 @@ http://localhost:3000
 
 = تسجيل الدخول والمصادقة
 
-يستخدم ALDORA مسار OAuth محمياً. لتفعيل تسجيل الدخول محلياً يجب أن تكون بيانات OAuth صحيحة وأن يكون عنوان callback التالي مسجلاً لدى مزود المصادقة:
+يستخدم MEDORA مسار OAuth محمياً. لتفعيل تسجيل الدخول محلياً يجب أن تكون بيانات OAuth صحيحة وأن يكون عنوان callback التالي مسجلاً لدى مزود المصادقة:
 
 #codeblock[
 http://localhost:3000/api/oauth/callback
@@ -190,5 +190,5 @@ http://localhost:3000/api/oauth/callback
   #v(1em)
   #line(length: 70%, stroke: 1.5pt + rgb("1AB7B1"))
   #v(0.6em)
-  #text(size: 9pt, fill: rgb("64748B"))[ALDORA · منظومة الرعاية الصحية المتكاملة]
+  #text(size: 9pt, fill: rgb("64748B"))[MEDORA · منظومة الرعاية الصحية المتكاملة]
 ]

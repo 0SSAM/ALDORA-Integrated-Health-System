@@ -27,6 +27,6 @@ describe.skipIf(!enabled)("managed showcase login smoke", () => {
     });
     expect(meResponse.status).toBe(200);
     const mePayload = await meResponse.json() as Array<{ result?: { data?: { json?: { openId?: string } } } }>;
-    expect(mePayload[0]?.result?.data?.json?.openId).toBe("aldora-showcase-internal-user-v1");
+    expect(mePayload[0]?.result?.data?.json?.openId).toBe("medora-showcase-internal-user-v1");
   }, 30_000);
 });

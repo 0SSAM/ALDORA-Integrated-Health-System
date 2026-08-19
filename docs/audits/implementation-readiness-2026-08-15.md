@@ -1,4 +1,4 @@
-# ألدورا | منظومة الرعاية الصحية المتكاملة — Implementation Readiness
+# ميدورا | منظومة الرعاية الصحية المتكاملة — Implementation Readiness
 
 ## Purpose
 
