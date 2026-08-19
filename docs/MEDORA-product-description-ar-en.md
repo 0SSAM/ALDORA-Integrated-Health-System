@@ -13,14 +13,14 @@
 
 **English.** MEDORA is a modular healthcare operations platform focused on pharmacies, branches, and adjacent healthcare workflows. It brings together daily operations, POS, inventory, provenance-aware catalog review, e-prescription, customer care, call-centre foundations, local tax invoicing, notifications, audit evidence, and readiness boundaries for official integrations. Its core principle is that regulated actions are organization-, branch-, and jurisdiction-scoped and fail closed when required evidence or authorization is missing.
 
-## ماذا يعني ALDO؟ | What does ALDO mean?
+## هوية MEDORA | MEDORA identity
 
-ALDO ليس اختصاراً قانونياً أو اسماً لجهة حكومية. يمكن تقديمه كهوية لفظية مقصودة تحمل الرسالة التالية:
+**MEDORA** هو اسم الهوية التجارية للمنصة، ويُستخدم في الواجهة والوثائق والعروض باعتباره علامة لمنظومة تشغيل صحي متكاملة. لا يُقدَّم الاسم على أنه اختصار قانوني أو اسم جهة حكومية أو شهادة اعتماد.
 
-> **ALDO = Accessible, Localized, Dependable Operations**  
-> **ميدورا = تشغيل صحي متاح، محلي، ويمكن الاعتماد عليه.**
+> **MEDORA | Integrated Health System**
+> **ميدورا | منظومة الرعاية الصحية المتكاملة**
 
-وهذا شرح تسويقي للهوية وليس ادعاءً تاريخياً عن أصل الاسم. أما **MEDORA** فيُشرح تجارياً باعتباره امتداداً صوتياً وهوياً لـ **ALDO** مع دلالة الرعاية والاتساع المؤسسي، ويمكن استخدام العبارة الرسمية: **MEDORA | Integrated Health System**.
+الرسالة التجارية للهوية هي تقديم تشغيل صحي متاح، محلي، ويمكن الاعتماد عليه، مع الحفاظ على حدود واضحة بين ما هو منفذ داخل المنتج وما يتطلب اعتماداً أو تكاملاً خارجياً.
 
 ## القيمة الأساسية | Core value
 
