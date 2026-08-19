@@ -15,3 +15,5 @@
 ## Honest readiness note
 
 The package distinguishes implemented behavior from partial, blocked, or deferred capabilities. Government, insurer, ETA, EDA, and payment connectivity remain fail-closed until formal specifications, credentials, test access, and acceptance evidence are supplied. Offline mode supports non-regulated drafts only; regulated financial, inventory, prescription, and invoice mutations require online server confirmation.
+
+> Maintainer note: the product-description entry's "explanation of ALDO" wording was a legacy string retained from the pre-rebrand document; superseded by the MEDORA-branded `MEDORA-product-description-ar-en.md` in this package.
