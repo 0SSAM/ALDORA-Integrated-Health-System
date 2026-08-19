@@ -1,9 +1,12 @@
 <div align="center">
 
-# 🏥 MEDORA — منظومة الرعاية الصحية المتكاملة
-### MEDORA Integrated Health System — منظومة الرعاية الصحية المتكاملة
+# MEDORA | ميدورا
 
-**🌍 Multi-Country Healthcare Ecosystem | منظومة رعاية صحية مؤسسية متعددة الدول**
+### The operating layer for connected healthcare / طبقة التشغيل للرعاية الصحية المتصلة
+
+> **MEDORA turns complex healthcare operations into one trusted, bilingual workflow — from the first sale and stock movement to prescription review, auditability, and growth across branches.**
+>
+> **تحوّل ميدورا تعقيدات التشغيل الصحي إلى مسار عمل ثنائي اللغة وموثوق — من أول عملية بيع وحركة مخزون إلى مراجعة الوصفة والتدقيق والتوسع عبر الفروع.**
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -15,26 +18,38 @@
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 
-[![CI Status](https://img.shields.io/github/actions/workflow/status/0SSAM/MEDORA-Integrated-Health-System/ci.yml?style=for-the-badge&label=CI%2FCD&logo=githubactions&logoColor=white)](https://github.com/0SSAM/MEDORA-Integrated-Health-System/actions/workflows/ci.yml)
-[![CodeQL](https://img.shields.io/badge/CodeQL-Security%20Verified-green?style=for-the-badge&logo=github&logoColor=white)](https://github.com/0SSAM/MEDORA-Integrated-Health-System/security/code-scanning)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/0SSAM/ALDORA-Integrated-Health-System/ci.yml?style=for-the-badge&label=CI%2FCD&logo=githubactions&logoColor=white)](https://github.com/0SSAM/ALDORA-Integrated-Health-System/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/badge/CodeQL-Security%20Verified-green?style=for-the-badge&logo=github&logoColor=white)](https://github.com/0SSAM/ALDORA-Integrated-Health-System/security/code-scanning)
 [![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)]()
-[![Last Commit](https://img.shields.io/github/last-commit/0SSAM/MEDORA-Integrated-Health-System?style=for-the-badge&logo=git&logoColor=white)]()
+[![Last Commit](https://img.shields.io/github/last-commit/0SSAM/ALDORA-Integrated-Health-System?style=for-the-badge&logo=git&logoColor=white)]()
 
-🔗 **[🌐 Live Demo — العرض المباشر](https://medorapharm-fwilugbd.manus.space)**
+🔗 **[🌐 Live Demo — العرض المباشر](https://aldorapharm-fwilugbd.manus.space)**
 
 ---
 
 ### 🇬🇧 English Overview
 
-**MEDORA** is a **comprehensive, enterprise-grade healthcare operations platform** designed for multi-country pharmacy chains, hospitals, and healthcare networks. It seamlessly integrates **Point-of-Sale (POS)**, **inventory management**, **prescription AI**, **regulatory compliance** (Egypt MOH, EDA, ETA, NFSA, UHIA), and **financial operations** into a single, secure, offline-capable Progressive Web Application.
+**MEDORA** is an enterprise healthcare operations platform for pharmacy groups, hospitals, and healthcare networks. It brings **POS, inventory, prescription intelligence, financial controls, regulatory workflows, multi-tenant access, and offline-first execution** into one coherent product surface—so operators can see the whole operation, act with context, and scale with control.
 
 ### 🇪🇬 نظرة عامة بالعربية
 
-**ميدورا** هي **منظومة متكاملة على مستوى المؤسسات** مصممة لسلاسل الصيدليات والمستشفيات وشبكات الرعاية الصحية متعددة الدول. تدمج بسلاسة **نقاط البيع (POS)**، **إدارة المخزون**، **الذكاء الاصطناعي للوصفات الطبية**، **الامتثال التنظيمي** (وزارة الصحة المصرية، الهيئة المصرية للدواء، مصلحة الضرائب)، **والعمليات المالية** في تطبيق ويب تقدمي (PWA) آمن واحد يعمل بدون اتصال بالإنترنت.
+**ميدورا** هي منصة تشغيل صحية مؤسسية لسلاسل الصيدليات والمستشفيات وشبكات الرعاية الصحية. تجمع **نقاط البيع، وإدارة المخزون، وذكاء الوصفات، والضوابط المالية، ومسارات الامتثال، وتعدد المستأجرين، والتشغيل دون اتصال** في منظومة واحدة تساعد المشغلين على رؤية العملية كاملة، واتخاذ القرار في سياقه، والتوسع مع الحفاظ على السيطرة.
 
 ---
 
 </div>
+
+## Product promise | وعد المنتج
+
+MEDORA is designed to help healthcare operators **see the whole operation, act with context, and scale with control**. The repository documents the implemented platform foundation, its security boundaries, and the integration surfaces required for future expansion; roadmap items are intentionally distinguished from live capabilities.
+
+صُممت ميدورا لمساعدة مشغلي الرعاية الصحية على **رؤية العملية كاملة، واتخاذ القرار في سياقه، والتوسع مع الحفاظ على السيطرة**. يوثق المستودع الأساس البرمجي المنفذ وحدود الأمان وواجهات التكامل اللازمة للتوسع المستقبلي، مع تمييز واضح بين الميزات الحالية وعناصر خارطة الطريق.
+
+| English | العربية |
+|---|---|
+| **One operational picture:** connect revenue, inventory, clinical review, finance, and compliance instead of managing disconnected tools. | **صورة تشغيلية واحدة:** ربط الإيرادات والمخزون والمراجعة السريرية والمالية والامتثال بدل إدارة أدوات متفرقة. |
+| **Built for continuity:** Arabic-first RTL workflows, installable PWA experiences, offline queues, and branch-aware operations. | **مصممة للاستمرارية:** مسارات RTL عربية، وتجربة PWA قابلة للتثبيت، وقوائم انتظار دون اتصال، وتشغيل واعٍ بالفروع. |
+| **Trust by design:** role boundaries, tenant isolation, tamper-evident audit trails, and human confirmation around prescription intelligence. | **الثقة في صميم التصميم:** حدود صلاحيات واضحة، وعزل للمستأجرين، وسجلات تدقيق مقاومة للتلاعب، وتأكيد بشري حول ذكاء الوصفات. |
 
 ## 📊 Quick Stats | إحصائيات سريعة
 
@@ -136,8 +151,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/0SSAM/MEDORA-Integrated-Health-System.git
-cd MEDORA-Integrated-Health-System
+git clone https://github.com/0SSAM/ALDORA-Integrated-Health-System.git
+cd ALDORA-Integrated-Health-System
 
 # Install dependencies with pnpm
 pnpm install
@@ -155,7 +170,7 @@ pnpm build
 ## 📁 Project Structure | هيكل المشروع
 
 ```
-MEDORA-Integrated-Health-System/
+ALDORA-Integrated-Health-System/
 ├── client/          # 🖥️ React frontend (85+ components)
 ├── server/          # 🔧 Node.js backend (214+ modules)
 ├── shared/          # 🔗 Shared types & utilities
