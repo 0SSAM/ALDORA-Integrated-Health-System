@@ -46,7 +46,7 @@ export function OfflineStatusIndicator({ online, drafts, serverPendingCount = 0,
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      navigator.serviceWorker?.controller?.postMessage({ type: "ALDO_SYNC_STATUS" });
+      navigator.serviceWorker?.controller?.postMessage({ type: "MEDORA_SYNC_STATUS" });
       await onRefresh();
       if (online) {
         const now = Date.now();

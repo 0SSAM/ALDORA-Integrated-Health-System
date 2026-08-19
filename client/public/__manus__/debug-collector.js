@@ -1,5 +1,5 @@
 /**
- * ALDO Debug Collector (agent-friendly)
+ * MEDORA Debug Collector (agent-friendly)
  *
  * Captures:
  * 1) Console logs
@@ -761,7 +761,7 @@
   try {
     installUiEventListeners();
   } catch (e) {
-    console.warn("[ALDO] Failed to install UI listeners:", e);
+    console.warn("[MEDORA] Failed to install UI listeners:", e);
   }
 
   // Mark as initialized
@@ -771,5 +771,5 @@
     forceReport: reportLogs,
   };
 
-  console.debug("[ALDO] Debug collector initialized (no rrweb, UI events only)");
+  console.debug("[MEDORA] Debug collector initialized (no rrweb, UI events only)");
 })();

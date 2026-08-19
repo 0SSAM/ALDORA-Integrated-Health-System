@@ -99,7 +99,7 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [logoutError, setLogoutError] = useState("");
   const localization = useLocalization();
-  const salesContactUrl = import.meta.env.VITE_ALDO_SALES_CONTACT_URL as string | undefined;
+  const salesContactUrl = import.meta.env.VITE_MEDORA_SALES_CONTACT_URL as string | undefined;
   const [online, setOnline] = useState(() => typeof navigator === "undefined" ? true : navigator.onLine);
   const [offlineDrafts, setOfflineDrafts] = useState<OfflineDraft[]>([]);
   const serverDrafts = trpc.erp.offlineDrafts.listMine.useQuery(undefined, { enabled: Boolean(user) });
@@ -212,7 +212,7 @@ export default function Home() {
     const onOffline = () => setOnline(false);
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
-    navigator.serviceWorker?.controller?.postMessage({ type: "ALDO_SYNC_STATUS" });
+    navigator.serviceWorker?.controller?.postMessage({ type: "MEDORA_SYNC_STATUS" });
     void syncEligibleDrafts();
     return () => { window.removeEventListener("online", onOnline); window.removeEventListener("offline", onOffline); };
   }, [online, user, serverDrafts, enqueueDraft]);

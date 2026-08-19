@@ -1,8 +1,8 @@
-const CACHE_NAME = "aldo-health-care-shell-v3";
-const LEGACY_CACHE_NAMES = ["bdf-pharma-shell-v2"];
+const CACHE_NAME = "medora-health-care-shell-v4";
+const LEGACY_CACHE_NAMES = ["aldo-health-care-shell-v3", "bdf-pharma-shell-v2"];
 const APP_SHELL = ["/", "/manifest.webmanifest"];
-const REGULATED_HEADER = "X-ALDO-Regulated-Operation";
-const DRAFT_HEADER = "X-ALDO-Offline-Draft";
+const REGULATED_HEADER = "X-MEDORA-Regulated-Operation";
+const DRAFT_HEADER = "X-MEDORA-Offline-Draft";
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
@@ -28,7 +28,7 @@ self.addEventListener("fetch", event => {
 });
 
 self.addEventListener("message", event => {
-  if (event.data?.type === "ALDO_SYNC_STATUS") {
-    event.source?.postMessage({ type: "ALDO_SYNC_STATUS", online: self.navigator?.onLine ?? true });
+  if (event.data?.type === "MEDORA_SYNC_STATUS") {
+    event.source?.postMessage({ type: "MEDORA_SYNC_STATUS", online: self.navigator?.onLine ?? true });
   }
 });
