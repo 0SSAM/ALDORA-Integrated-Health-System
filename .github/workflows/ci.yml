@@ -116,47 +116,11 @@ jobs:
       - name: Run isolated database lifecycle contract
         run: pnpm exec vitest run server/integration/test-database-lifecycle.test.ts
 
-  codeql:
-    name: CodeQL security analysis
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript-typescript
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build for CodeQL
-        run: pnpm build
-
-      - name: Analyze
-        uses: github/codeql-action/analyze@v3
-
   dependency-review:
     name: Dependency review (advisory)
     # GitHub reports dependency-review-action as unsupported because this repository
     # does not expose the Dependency Graph API. Keep this advisory job disabled rather
-    # than presenting a permanent false failure; CodeQL remains enabled below.
+    # than presenting a permanent false failure; CodeQL remains enabled through GitHub default setup.
     if: ${{ false }}
     continue-on-error: true
     runs-on: ubuntu-latest
