@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "pdf": "/home/ubuntu/bdf-pharma-erp/docs/aldora-local-setup/main.pdf",
+  "pdf": "/home/ubuntu/bdf-pharma-erp/docs/medora-local-setup/main.pdf",
   "profile": "text-document",
   "overall": "PASS",
   "checks": [

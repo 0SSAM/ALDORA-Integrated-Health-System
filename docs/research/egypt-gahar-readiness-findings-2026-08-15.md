@@ -6,12 +6,12 @@
 - The page states that GAHAR develops healthcare accreditation standards under Egypt Law No. 2 of 2018 relating to Universal Health Insurance, and that the authority is responsible for setting quality standards, accrediting healthcare facilities, and monitoring application for sustainability.
 - The page describes two principal orientations in the standards: **patient-centered** and **organization-centered** care. The patient-centered orientation addresses responsiveness to patients and families; the organization-centered orientation addresses a safe and effective work environment for staff, patients, and families.
 - The official portal lists separate standard families for hospitals, primary healthcare, physiotherapy centers, medical laboratories, specialized medical centers and ambulatory surgery, diagnostic/therapeutic radiology centers, mental-health hospitals, and convalescent/extended-care/medical-wellness facilities. It also references public pharmacies and private clinics as annexes in the specialized/ambulatory-surgery material.
-- The portal says standards are reviewed by internal and external experts and subjected to field testing and prospective study before approval by the authority’s board. Therefore ALDORA may provide readiness evidence management and self-assessment, but must not claim official accreditation.
+- The portal says standards are reviewed by internal and external experts and subjected to field testing and prospective study before approval by the authority’s board. Therefore MEDORA may provide readiness evidence management and self-assessment, but must not claim official accreditation.
 - Official contact details shown on the page are Marketing@gahar.gov.eg and (+20) 220547614; these are recorded only as public reference contacts, not as an integration credential or endpoint.
 
 ## Implementation boundary
 
-ALDORA should model facility type, standard family, standard version/effective date, domain, criterion, evidence, owner, review cycle, corrective action, incident linkage, and approval state. External submission, inspection scheduling, accreditation decision, and any official data exchange remain fail-closed until GAHAR provides authoritative specifications, credentials, a test environment, acceptance criteria, and written authorization.
+MEDORA should model facility type, standard family, standard version/effective date, domain, criterion, evidence, owner, review cycle, corrective action, incident linkage, and approval state. External submission, inspection scheduling, accreditation decision, and any official data exchange remain fail-closed until GAHAR provides authoritative specifications, credentials, a test environment, acceptance criteria, and written authorization.
 
 ## تنفيذ حزمة الجاهزية الداخلية
 

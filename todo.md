@@ -771,7 +771,7 @@
 
 # Current Forecast Integration TODO
 
-- [x] Complete the reusable `aldora-healthcare-delivery` skill and validate its frontmatter/content.
+- [x] Complete the reusable `medora-healthcare-delivery` skill and validate its frontmatter/content.
 - [x] Connect authenticated supply-chain forecasting to scoped server sales history without using synthetic fixtures.
 - [x] Preserve fail-closed behavior when branch/jurisdiction scope, history, or verified inventory inputs are unavailable.
 - [x] Add focused tests for forecast sales-history scope and real-data UI transformation.
@@ -873,7 +873,7 @@
 - [x] Identify free or open alternatives for disease classification and terminology lookup, including official national/open datasets and public APIs.
 - [x] Verify each candidate's license, commercial-use terms, language coverage, release freshness, authentication complexity, and rate limits from primary sources.
 - [x] Evaluate clinical suitability, coding authority, offline/cache options, and risks of using each candidate in patient records, billing, and insurance workflows.
-- [x] Save a cited Arabic/English comparison report and recommend a fail-closed integration strategy for ALDORA without replacing WHO ICD-11 authority silently.
+- [x] Save a cited Arabic/English comparison report and recommend a fail-closed integration strategy for MEDORA without replacing WHO ICD-11 authority silently.
 
 
 # Reusable Healthcare Research Skill and NLM ICD-10-CM Connector
@@ -881,7 +881,7 @@
 - [x] Plan and package the reusable healthcare research, source-validation, licensing, fail-closed integration, and evidence-reporting skill.
 - [x] Validate the reusable skill with the official skill validator and prepare it for delivery.
 - [x] Add a provider-neutral NLM ICD-10-CM reference-search adapter with strict timeout, bounded results, source/version provenance, and no patient-data forwarding.
-- [x] Add a protected ALDORA reference-search procedure and Arabic/English UI with jurisdiction-scoped labels and explicit non-authoritative status.
+- [x] Add a protected MEDORA reference-search procedure and Arabic/English UI with jurisdiction-scoped labels and explicit non-authoritative status.
 - [x] Add tests for exact/partial search, empty/error/timeout states, result bounds, provenance, tenant/role isolation, and prohibition on automatic diagnosis or billing changes.
 - [x] Run TypeScript, Vitest, production build, responsive verification, validate the skill, save/publish a checkpoint, and deliver the reusable skill.
 
@@ -889,7 +889,7 @@
 # NLM Reference Search Cache and Skill Iteration
 
 - [x] Define a bounded, provider-scoped cache policy for NLM reference results, including TTL, key normalization, stale behavior, and privacy boundaries.
-- [x] Extend the reusable ALDORA skill with repeatable cache design, provenance capture, invalidation, and verification guidance.
+- [x] Extend the reusable MEDORA skill with repeatable cache design, provenance capture, invalidation, and verification guidance.
 - [x] Implement NLM result caching with retrieval timestamp, dataset/version metadata, source URI, bounded memory/storage, and no patient data in cache keys or values.
 - [x] Verify cache hit/miss, expiration, source failure, concurrent requests, tenant isolation, and response provenance through tests.
 - [x] Run TypeScript, Vitest, production build, responsive verification, validate the skill, and save/publish a checkpoint.
@@ -897,7 +897,7 @@
 
 # Admin-Only NLM Cache Refresh
 
-- [x] Update the reusable ALDORA skill with an admin-only cache invalidation workflow, audit requirements, and UI/server separation.
+- [x] Update the reusable MEDORA skill with an admin-only cache invalidation workflow, audit requirements, and UI/server separation.
 - [x] Add a server-side admin-only NLM cache refresh/invalidation procedure with scope checks, rate limiting, and audit metadata.
 - [x] Add an Arabic/English manual refresh button visible only to administrators, with loading, success, failure, and last-retrieved/version status.
 - [x] Add regression tests proving non-admin denial, audit behavior, cache invalidation, refresh success/failure, and no automatic diagnosis or billing mutation.
@@ -928,7 +928,7 @@
 - [x] Add regression tests proving showcase transactions never cross organization boundaries or mutate production balances.
 
 # Investor Showcase TODO
-- [x] Create isolated ALDORA Investor Showcase organization, branch, and test account records
+- [x] Create isolated MEDORA Investor Showcase organization, branch, and test account records
 - [x] Populate showcase-only synthetic products, inventory, and sales data
 - [x] Verify showcase login, scope isolation, and server-side mutation simulation guard
 - [x] Finalize showcase UI labels and access documentation
@@ -936,7 +936,7 @@
 - [x] Review Pharma eMarket and UPA portals for read-only integration requirements and official evidence
 - [x] Switch tamper-evident audit signing from short JWT_SECRET to validated AUDIT_SIGNING_KEY and pass its regression test
 
-# Comprehensive ALDORA Audit TODO
+# Comprehensive MEDORA Audit TODO
 - [x] Audit repository architecture, runtime boundaries, schema, migrations, routes, UI, and dependency risks.
 - [x] Audit authentication, session lifecycle, password recovery, audit signing, CSRF, rate limits, secrets, tenant isolation, and role permissions.
 - [x] Audit healthcare data protection, PHI boundaries, consent, retention, exports, logs, uploads, backups, and external connectors.
@@ -1046,7 +1046,7 @@
 - [x] Add safe local-starter catalog import path preserving PENDING_REVIEW provenance and idempotency; commit remains guarded by an explicit production scope.
 - [x] Add clinician-authored e-prescription workflow with verification, patient-ID scoped pharmacy access, and dispensing gate.
 - [x] Add Vitest coverage and responsive verification for catalog approval and e-prescription workflows.
-- [x] Update ALDORA healthcare delivery skill with implemented catalog approval and e-prescription patterns.
+- [x] Update MEDORA healthcare delivery skill with implemented catalog approval and e-prescription patterns.
 
 # Bulk Catalog Import Workspace 2026-08-15
 
@@ -1063,7 +1063,7 @@
 - [x] Add an accessible shortcuts help dialog with conflict detection, focus-safe behavior, and no sensitive-data exposure.
 - [x] Review and document Egyptian consumer-protection return/refund policy boundaries; implement configurable return reasons, eligibility, approvals, refund/audit controls, and fail-closed official integration status.
 - [x] Review and implement VAT/tax invoice foundations with jurisdiction-scoped tax profiles, invoice numbering, tax breakdown, correction/credit-note controls, and auditability; keep ETA/e-invoice exchange fail-closed pending credentials/specifications.
-- [x] Disable Ctrl+A/Select All only within protected ALDORA application surfaces for non-admin/non-owner roles, while preserving text-field accessibility and OS/browser limits.
+- [x] Disable Ctrl+A/Select All only within protected MEDORA application surfaces for non-admin/non-owner roles, while preserving text-field accessibility and OS/browser limits.
 - [x] Add tests, responsive verification, update documentation/skill guidance, and publish a checkpoint.
 
 # Sales Returns and Tax Invoice Workspace 2026-08-15
@@ -1087,7 +1087,7 @@
 - [x] Add organization-scoped tax invoice template editor and preview controls to SalesFinanceWorkspace.
 - [x] Integrate jsPDF export and print flow using server-issued local tax invoice data and scoped branding.
 - [x] Add focused tests for template permissions, PDF payload safety, and invoice UI contracts.
-- [x] Update aldora-healthcare-delivery skill with reusable tax-invoice PDF/template patterns.
+- [x] Update medora-healthcare-delivery skill with reusable tax-invoice PDF/template patterns.
 - [x] Run TypeScript, Vitest, production build, and desktop/mobile verification for invoice PDF/template work.
 
 Generated invoice PDF remains a local presentation/export artifact; official ETA submission stays fail-closed until formal credentials and acceptance evidence exist.
@@ -1099,7 +1099,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add focused tests and verify TypeScript, Vitest, production build, and responsive UI before checkpoint.
 
 # Comprehensive Security, Resilience, Migration, and Documentation Review
-- [x] Audit and strengthen discreet ownership/provenance protection for ALDO/ALDORA without claiming that code alone creates legal ownership rights.
+- [x] Audit and strengthen discreet ownership/provenance protection for ALDO/MEDORA without claiming that code alone creates legal ownership rights.
 - [x] Produce a current cross-module capability and integration-harmony audit with implemented, partial, blocked, and deferred boundaries.
 - [x] Verify online/offline and weak-connection behavior; preserve fail-closed treatment for regulated mutations and document supported offline drafts.
 - [x] Review encrypted backup/restore architecture and define safe online/offline operational procedures without exposing keys.
@@ -1118,7 +1118,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 # Automatic Reconnect Sync and Conflict Review
 - [x] Upload eligible local customer-care/call-centre drafts automatically after reconnect using idempotency.
 - [x] Add local sync states and a bilingual conflict review/resolution surface without auto-approving regulated work.
-- [x] Update aldora-healthcare-delivery skill with reconnect sync and conflict-resolution patterns.
+- [x] Update medora-healthcare-delivery skill with reconnect sync and conflict-resolution patterns.
 - [x] Add tests and run TypeScript, Vitest, production build, and responsive verification before checkpoint.
 
 # Reusable Reconnect Sync Skill
@@ -1132,40 +1132,40 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Reconcile documentation, archives, reusable skills, and delivery artifacts with the requirement matrix.
 - [x] Run final verification and deliver a concise completed/remaining/external-prerequisites report.
 
-# ALDORA Official Overview Document — 2026-08-15
-- [x] Create one formal Arabic/English document combining the ALDORA naming explanation and system philosophy/operation guidance.
+# MEDORA Official Overview Document — 2026-08-15
+- [x] Create one formal Arabic/English document combining the MEDORA naming explanation and system philosophy/operation guidance.
 - [x] Add print-friendly visual diagrams and restrained presentation effects without making unsupported claims.
 - [x] Validate and deliver the single downloadable document file.
 
-# ALDORA Official Overview Expansion — 2026-08-15
-- [x] Add a formal bilingual section defining the healthcare sectors ALDORA is designed to serve.
+# MEDORA Official Overview Expansion — 2026-08-15
+- [x] Add a formal bilingual section defining the healthcare sectors MEDORA is designed to serve.
 - [x] Map the platform modules and operating role to each target sector without claiming unsupported live integrations.
 - [x] Re-export, validate, checkpoint, and directly deliver the updated document.
 
-# ALDORA Full Project Archive — 2026-08-15
+# MEDORA Full Project Archive — 2026-08-15
 - [x] Inventory project files and define safe archive exclusions for secrets, environment files, generated dependencies, and runtime logs.
 - [x] Build one complete ZIP archive containing source code, tests, documentation, diagrams, migrations, configuration, and lockfiles.
 - [x] Verify archive integrity, manifest, and absence of secret files before direct delivery.
 
 # Enduro Raw Local Setup PDF — 2026-08-15
-- [x] Create a formal Arabic local-setup guide titled «إعدادات التشغيل المحلي لنظام ALDORA» based on the provided setup instructions.
+- [x] Create a formal Arabic local-setup guide titled «إعدادات التشغيل المحلي لنظام MEDORA» based on the provided setup instructions.
 - [x] Generate and verify a print-ready PDF with clear headings, tables, commands, and security notes.
 - [x] Deliver the PDF directly as a downloadable attachment.
 
-# ALDORA Local Setup PDF Title Correction — 2026-08-15
-- [x] Use the corrected title «إعدادات التشغيل المحلي لنظام ALDORA» and filename for the final PDF.
+# MEDORA Local Setup PDF Title Correction — 2026-08-15
+- [x] Use the corrected title «إعدادات التشغيل المحلي لنظام MEDORA» and filename for the final PDF.
 
-# ALDORA Account Access Sheet — 2026-08-15
+# MEDORA Account Access Sheet — 2026-08-15
 - [x] Confirm which account identifiers and roles are documented, without exposing password hashes or unverified secrets.
 - [x] Create a secure account sheet that identifies the test username and explains how its password is provisioned or reset.
 - [x] Verify and deliver the account sheet directly to the user.
 
-# ALDORA Continuous Integration — 2026-08-15
+# MEDORA Continuous Integration — 2026-08-15
 - [x] Review package scripts and existing GitHub workflow configuration.
 - [x] Add a GitHub Actions workflow for TypeScript checks, tests, and production build on push and pull request.
 - [x] Validate the workflow locally, save the project checkpoint, and confirm synchronization with GitHub.
 
-# ALDORA CI Security and Maintenance Guardrails — 2026-08-15
+# MEDORA CI Security and Maintenance Guardrails — 2026-08-15
 - [x] Add lint/format validation, dependency security audit, CodeQL analysis, and dependency review to CI. Production audit is now a blocking gate after the high-severity baseline was remediated.
 - [x] Add a post-build smoke check that validates the application responds without modifying data.
 - [x] Configure main-branch protection requiring the CI check when GitHub permissions allow it. (Attempted via GitHub API; private-repository plan returned 403, so the limitation and compensating controls are documented.)
@@ -1181,7 +1181,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Enable Dependabot security updates and configure safe dependency update grouping/scheduling without auto-merging major changes.
 - [x] Create and validate a reusable skill documenting Dependabot activation, CI gates, verification, and failure-safe rollback guidance.
 
-# ALDORA Local-Ready Archive Refresh — 2026-08-15
+# MEDORA Local-Ready Archive Refresh — 2026-08-15
 - [x] Inventory the latest project files, CI, Dependabot, security policy, tests, and documentation for safe packaging.
 - [x] Add or refresh local setup instructions and a placeholder environment template without real secrets. (Added LOCAL_SETUP.md; real environment files remain excluded by design.)
 
@@ -1258,7 +1258,7 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Verify database schema/migrations, tenant and branch isolation, authorization boundaries, audit trails, uploads, schedules, disabled external integrations, and runtime logs.
 - [x] Repair every reproducible defect or conflict found, with regression tests where applicable.
 - [x] Document audit coverage, fixes, test results, residual limitations, and GitHub synchronization outcome.
-- [x] Save a validated checkpoint and synchronize the validated project state with 0SSAM/ALDORA-Integrated-Health-System.
+- [x] Save a validated checkpoint and synchronize the validated project state with 0SSAM/MEDORA-Integrated-Health-System.
 
 > Manual verification cannot bypass authentication or invent production data. Where a protected flow requires a real account, credentials, or external staging service, record the limitation and verify the server-side contract and safe failure behavior instead.
 

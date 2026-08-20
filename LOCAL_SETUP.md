@@ -1,6 +1,6 @@
-# ALDORA Local Setup
+# MEDORA Local Setup
 
-هذا الملف يشرح تشغيل ALDORA محلياً. لا يحتوي الأرشيف على الأسرار أو ملفات البيئة الحقيقية عمداً.
+هذا الملف يشرح تشغيل MEDORA محلياً. لا يحتوي الأرشيف على الأسرار أو ملفات البيئة الحقيقية عمداً.
 
 ## المتطلبات
 
@@ -17,9 +17,9 @@ pnpm install --frozen-lockfile
 نفّذ من حساب إداري في MySQL:
 
 ```sql
-CREATE DATABASE aldora_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'aldora_app'@'localhost' IDENTIFIED BY 'ضع_كلمة_مرور_محلية_قوية';
-GRANT ALL PRIVILEGES ON aldora_dev.* TO 'aldora_app'@'localhost';
+CREATE DATABASE medora_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'medora_app'@'localhost' IDENTIFIED BY 'ضع_كلمة_مرور_محلية_قوية';
+GRANT ALL PRIVILEGES ON medora_dev.* TO 'medora_app'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
@@ -29,13 +29,13 @@ FLUSH PRIVILEGES;
 
 ```dotenv
 NODE_ENV=development
-DATABASE_URL=mysql://aldora_app:LOCAL_PASSWORD@127.0.0.1:3306/aldora_dev
+DATABASE_URL=mysql://medora_app:LOCAL_PASSWORD@127.0.0.1:3306/medora_dev
 JWT_SECRET=GENERATE_A_LONG_RANDOM_VALUE
 VITE_APP_ID=YOUR_OAUTH_APP_ID
 OAUTH_SERVER_URL=YOUR_OAUTH_SERVER_URL
 VITE_OAUTH_PORTAL_URL=YOUR_OAUTH_PORTAL_URL
 OWNER_OPEN_ID=YOUR_OWNER_OPEN_ID
-OWNER_NAME=ALDORA Owner
+OWNER_NAME=MEDORA Owner
 ```
 
 الخدمات المدمجة قد تحتاج أيضاً إلى `BUILT_IN_FORGE_API_URL` و`BUILT_IN_FORGE_API_KEY` و`VITE_FRONTEND_FORGE_API_URL` و`VITE_FRONTEND_FORGE_API_KEY`. لا تضع مفاتيح حقيقية في الكود أو في هذا الملف.

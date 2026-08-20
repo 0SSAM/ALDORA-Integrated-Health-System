@@ -1,17 +1,17 @@
-# ALDORA | Proposal
+# MEDORA | Proposal
 
 ## منظومة الرعاية الصحية المتكاملة — Integrated Health System
 
 **Prepared for:** Healthcare operators, pharmacy groups, distributors, hospitals, laboratories, rehabilitation centers, insurers, and public-sector stakeholders  
-**Prepared by:** ALDORA product team  
+**Prepared by:** MEDORA product team  
 **Date:** 2026-08-15  
 **Status:** Non-binding product and implementation proposal
 
 ## 1. Vision
 
-ALDORA proposes a secure, modular operating foundation for healthcare organizations that need pharmacy-grade inventory and sales controls together with patient-facing, clinical-adjacent, customer-care, and integration-readiness workflows.
+MEDORA proposes a secure, modular operating foundation for healthcare organizations that need pharmacy-grade inventory and sales controls together with patient-facing, clinical-adjacent, customer-care, and integration-readiness workflows.
 
-تقدم ALDORA أساساً تشغيلياً آمناً ومركباً للمؤسسات الصحية التي تحتاج إلى ضبط المخزون والمبيعات على مستوى الصيدلية، مع مسارات وصفة إلكترونية وخدمة عملاء وعمليات تكميلية، واستعداد منظم للتكاملات الرسمية.
+تقدم MEDORA أساساً تشغيلياً آمناً ومركباً للمؤسسات الصحية التي تحتاج إلى ضبط المخزون والمبيعات على مستوى الصيدلية، مع مسارات وصفة إلكترونية وخدمة عملاء وعمليات تكميلية، واستعداد منظم للتكاملات الرسمية.
 
 ## 2. Problem
 
@@ -21,11 +21,11 @@ Healthcare organizations often operate across disconnected systems, spreadsheets
 
 ## 3. Proposed solution
 
-ALDORA brings scope-aware modules into one controlled workspace: ERP/POS, inventory and batches, local returns and tax invoices, catalog provenance and review, e-prescription, customer care, call-centre foundations, notifications, audit evidence, and connector readiness. Regulated connectors remain fail-closed until the target authority provides specifications, credentials, test access, and acceptance evidence.
+MEDORA brings scope-aware modules into one controlled workspace: ERP/POS, inventory and batches, local returns and tax invoices, catalog provenance and review, e-prescription, customer care, call-centre foundations, notifications, audit evidence, and connector readiness. Regulated connectors remain fail-closed until the target authority provides specifications, credentials, test access, and acceptance evidence.
 
 ## 4. Differentiators
 
-| Area | ALDORA approach |
+| Area | MEDORA approach |
 |---|---|
 | Safety | Server-authoritative scope and role checks |
 | Locality | Versioned country and jurisdiction policy boundaries |
@@ -45,7 +45,7 @@ Migration is performed through profiling, field mapping, dry-run, conflict quara
 
 ## 7. Security and compliance posture
 
-ALDORA is designed with least privilege, tenant isolation, audit evidence, secret separation, security headers, rate limits, and fail-closed external integration boundaries. It should be presented as a security-focused product foundation, not as a substitute for a formal penetration test, legal review, country certification, or government acceptance.
+MEDORA is designed with least privilege, tenant isolation, audit evidence, secret separation, security headers, rate limits, and fail-closed external integration boundaries. It should be presented as a security-focused product foundation, not as a substitute for a formal penetration test, legal review, country certification, or government acceptance.
 
 ## 8. Commercial discovery questions
 
@@ -64,10 +64,10 @@ Before a binding commercial offer, the implementation team should confirm the nu
 
 ## 10. Closing
 
-ALDORA offers a credible path from pharmacy operations to a broader healthcare ecosystem while keeping official integrations, legal claims, and regulated mutations governed by evidence. The next step is a controlled discovery workshop and a customer-owned acceptance plan.
+MEDORA offers a credible path from pharmacy operations to a broader healthcare ecosystem while keeping official integrations, legal claims, and regulated mutations governed by evidence. The next step is a controlled discovery workshop and a customer-owned acceptance plan.
 
 ## References
 
-1. [ALDORA product description](ALDORA-product-description-ar-en.md)
-2. [ALDORA comprehensive audit](comprehensive-platform-audit-2026-08-15.md)
-3. [ALDORA IT/admin/owner guide](ALDORA-it-admin-owner-guide-ar-en.md)
+1. [MEDORA product description](MEDORA-product-description-ar-en.md)
+2. [MEDORA comprehensive audit](comprehensive-platform-audit-2026-08-15.md)
+3. [MEDORA IT/admin/owner guide](MEDORA-it-admin-owner-guide-ar-en.md)

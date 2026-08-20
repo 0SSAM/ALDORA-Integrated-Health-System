@@ -1,11 +1,11 @@
-# ALDORA — Independent Copy Release Readiness
+# MEDORA — Independent Copy Release Readiness
 
 **Date:** 16 August 2026  
 **Scope:** Internal operational expansion, regulatory-connection readiness, technical hardening, governed AI, and workplace-monitoring readiness.
 
 ## Arabic Summary
 
-هذه النسخة المستقلة من ALDORA جاهزة للاستخدام الداخلي المنضبط وللتهيئة التدريجية قبل الإنتاج. تم توسيع عمليات الموارد البشرية والمشتريات وإدارة علاقات العملاء، وتثبيت حدود التقارير والعمل دون اتصال، وتحسين حماية HTTP والجلسات والحدود الموثوقة للوكيل، ومراجعة حدود الصلاحيات والتكاملات. كما أضيفت حزمة جاهزية ثنائية اللغة للربط التنظيمي، تظل جميع موصلات الجهات الحكومية والتأمين فيها **معطلة افتراضيًا ومقفلة عند الفشل**.
+هذه النسخة المستقلة من MEDORA جاهزة للاستخدام الداخلي المنضبط وللتهيئة التدريجية قبل الإنتاج. تم توسيع عمليات الموارد البشرية والمشتريات وإدارة علاقات العملاء، وتثبيت حدود التقارير والعمل دون اتصال، وتحسين حماية HTTP والجلسات والحدود الموثوقة للوكيل، ومراجعة حدود الصلاحيات والتكاملات. كما أضيفت حزمة جاهزية ثنائية اللغة للربط التنظيمي، تظل جميع موصلات الجهات الحكومية والتأمين فيها **معطلة افتراضيًا ومقفلة عند الفشل**.
 
 تضم المنظومة أيضًا طبقة حوكمة للذكاء الاصطناعي مخصصة للاستخدامات التشغيلية غير الحساسة، مع مراجعة بشرية وتدقيق ومنع صريح للقرارات السريرية أو الوظيفية أو التنظيمية التلقائية. وتبقى مراقبة مواقع العمل غير مفعلة: لا يوجد اتصال بكاميرات أو ميكروفونات، وتمنع السياسات التعرف على الوجوه والهوية البيومترية واستنتاج المشاعر والتسجيل الخفي وتقييم العاملين تلقائيًا.
 
@@ -35,7 +35,7 @@
 
 ## English Summary
 
-This independent ALDORA copy is ready for controlled internal use and staged pre-production preparation. Internal operations, regulatory-connection readiness, reporting and offline safety boundaries, HTTP and proxy hardening, AI governance, and privacy-first workplace-monitoring readiness have been implemented and reviewed. All government, insurer, camera, microphone, notification, and recurring-production connections remain disabled until the documented external approvals, credentials, sandbox validation, and accountable ownership requirements are satisfied.
+This independent MEDORA copy is ready for controlled internal use and staged pre-production preparation. Internal operations, regulatory-connection readiness, reporting and offline safety boundaries, HTTP and proxy hardening, AI governance, and privacy-first workplace-monitoring readiness have been implemented and reviewed. All government, insurer, camera, microphone, notification, and recurring-production connections remain disabled until the documented external approvals, credentials, sandbox validation, and accountable ownership requirements are satisfied.
 
 ## Release Notes
 

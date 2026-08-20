@@ -1,4 +1,4 @@
-# ألدورا | منظومة الرعاية الصحية المتكاملة — Open Prerequisites Index
+# ميدورا | منظومة الرعاية الصحية المتكاملة — Open Prerequisites Index
 
 **Date:** 2026-08-15  
 **Purpose:** Separate implementable engineering work from dependencies that must remain blocked until authoritative evidence, isolated infrastructure, or explicit credentials are available.

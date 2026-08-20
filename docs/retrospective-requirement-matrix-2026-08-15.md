@@ -1,7 +1,7 @@
-# ALDORA — Retrospective Requirement Matrix
+# MEDORA — Retrospective Requirement Matrix
 
 **Date:** 2026-08-15  
-**Purpose:** This document reconciles the comprehensive requirements previously requested for ALDORA with the current implementation evidence. It distinguishes implemented capabilities from partial foundations, intentionally deferred integrations, unverified external prerequisites, and items that require independent legal, regulatory, security, or operational validation.
+**Purpose:** This document reconciles the comprehensive requirements previously requested for MEDORA with the current implementation evidence. It distinguishes implemented capabilities from partial foundations, intentionally deferred integrations, unverified external prerequisites, and items that require independent legal, regulatory, security, or operational validation.
 
 > **Important scope statement:** A software implementation can provide technical controls, provenance records, audit evidence, and contractual documentation. It cannot by itself create or guarantee copyright, trademark, patent, ownership, regulatory approval, medical safety, tax approval, or legal enforceability. Those rights require appropriate registration, contracts, evidence custody, and professional advice in the relevant jurisdiction.
 
@@ -25,11 +25,11 @@
 
 ### 1. Rights, identity, and non-tampering
 
-The project now contains a discreet product identity and provenance boundary: ALDORA naming, ownership notes, a manifest, a hash, signed audit records, release checkpoints, and a delivery index. The identity is not exposed through intrusive personal data. The relevant evidence is in `docs/ownership-notes.md`, `docs/ownership-manifest.json`, `docs/ownership-manifest.sha256`, audit-signing tests, and the release history.
+The project now contains a discreet product identity and provenance boundary: MEDORA naming, ownership notes, a manifest, a hash, signed audit records, release checkpoints, and a delivery index. The identity is not exposed through intrusive personal data. The relevant evidence is in `docs/ownership-notes.md`, `docs/ownership-manifest.json`, `docs/ownership-manifest.sha256`, audit-signing tests, and the release history.
 
 The remaining work is not a claim that code can make ownership “impossible to erase.” The technically feasible controls are tamper-evident release manifests, signed audit chains, protected repository history, access separation, backup custody, watermarking or attribution in official documents, and contractual notices. The legally effective controls are registration, assignment/licence agreements, employment and contractor clauses, contributor records, and evidence preservation under professional advice.
 
-The recommended meaning of **ALDO** is a brand narrative rather than a false legal acronym: **ALDO — Adaptive Healthcare, Logistics, Data, and Operations**. In Arabic, it can be presented as **ألدورا: منظومة صحية متكاملة للبيانات والعمليات والرعاية**. The phrase is a positioning explanation and should not be represented as the registered legal expansion of the mark unless the owner formally adopts and registers it.
+The recommended meaning of **ALDO** is a brand narrative rather than a false legal acronym: **ALDO — Adaptive Healthcare, Logistics, Data, and Operations**. In Arabic, it can be presented as **ميدورا: منظومة صحية متكاملة للبيانات والعمليات والرعاية**. The phrase is a positioning explanation and should not be represented as the registered legal expansion of the mark unless the owner formally adopts and registers it.
 
 ### 2. Security and governance
 
@@ -63,7 +63,7 @@ The practical support statement should therefore be: modern supported browsers o
 
 ### 7. Documentation and delivery
 
-The bilingual product description, role-based manuals, IT/admin/owner guide, proposal, architecture diagrams, resilience diagram, migration template, backup/restore runbook, and delivery index have been created. The reusable skills `aldora-healthcare-delivery` and `reconnect-sync-conflict-resolution` capture repeatable implementation patterns.
+The bilingual product description, role-based manuals, IT/admin/owner guide, proposal, architecture diagrams, resilience diagram, migration template, backup/restore runbook, and delivery index have been created. The reusable skills `medora-healthcare-delivery` and `reconnect-sync-conflict-resolution` capture repeatable implementation patterns.
 
 The documentation package must be versioned together with the release and tailored before external presentation. It must not include real credentials, patient data, private keys, or unsupported claims of government approval. The proposal should describe the system as implementation-ready for formal onboarding and integration, not already approved by EDA, ETA, UHIA, insurers, or any other authority.
 
@@ -85,4 +85,4 @@ Official government and insurer integration requires the owning authority’s co
 
 ## Decision
 
-ALDORA has a substantial secure, multi-tenant, fail-closed foundation and a documented delivery package. It is appropriate to present the product as an implementation-ready platform and technical demonstration. It is not accurate to present it as universally complete, officially integrated, legally protected by software alone, clinically approved, or proven on every device and network condition. The remaining work is now clearly separated into feasible product enhancements, deployment operations, external evidence, and formal approvals.
+MEDORA has a substantial secure, multi-tenant, fail-closed foundation and a documented delivery package. It is appropriate to present the product as an implementation-ready platform and technical demonstration. It is not accurate to present it as universally complete, officially integrated, legally protected by software alone, clinically approved, or proven on every device and network condition. The remaining work is now clearly separated into feasible product enhancements, deployment operations, external evidence, and formal approvals.

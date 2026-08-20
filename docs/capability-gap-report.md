@@ -1,4 +1,4 @@
-# ألدورا | منظومة الرعاية الصحية المتكاملة — Capability and Gap Report
+# ميدورا | منظومة الرعاية الصحية المتكاملة — Capability and Gap Report
 
 **Audit basis.** This report is based on the current repository routes, schema, client pages, domain policies, tests, scheduled handlers, and deployment checks. It is not a claim of feature parity with Odoo, Microsoft Dynamics, SAP, Oracle, or any other enterprise suite.
 

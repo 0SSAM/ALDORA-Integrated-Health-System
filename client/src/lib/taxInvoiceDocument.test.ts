@@ -11,8 +11,8 @@ describe("local tax invoice document contract", () => {
 
   it("sanitizes invoice numbers before they become download names", () => {
     expect(sanitizeTaxInvoiceFileName("INV/2026 <script>")) .toBe("INV-2026-script");
-    expect(sanitizeTaxInvoiceFileName("   ")).toBe("aldora-tax-invoice");
-    expect(sanitizeTaxInvoiceFileName("فاتورة ١٢٣")).toBe("aldora-tax-invoice");
+    expect(sanitizeTaxInvoiceFileName("   ")).toBe("medora-tax-invoice");
+    expect(sanitizeTaxInvoiceFileName("فاتورة ١٢٣")).toBe("medora-tax-invoice");
   });
 
   it("keeps currency formatting deterministic and presentation-only", () => {

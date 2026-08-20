@@ -1,5 +1,5 @@
 
-# ALDORA Integration Review — 2026-08-15
+# MEDORA Integration Review — 2026-08-15
 
 ## Connected workflows
 

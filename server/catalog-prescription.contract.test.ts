@@ -7,7 +7,7 @@ const router = readFileSync(resolve(root, "server/routers/erp.ts"), "utf8");
 const schema = readFileSync(resolve(root, "drizzle/schema.ts"), "utf8");
 const home = readFileSync(resolve(root, "client/src/pages/Home.tsx"), "utf8");
 
-describe("ALDORA catalog and e-prescription release contracts", () => {
+describe("MEDORA catalog and e-prescription release contracts", () => {
   it("keeps catalog review and approval server-enforced", () => {
     expect(router).toContain("reviewQueue");
     expect(router).toContain("approveItem");

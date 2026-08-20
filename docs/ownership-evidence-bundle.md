@@ -1,8 +1,8 @@
-# ALDORA Ownership and Provenance Evidence Bundle
+# MEDORA Ownership and Provenance Evidence Bundle
 
 ## Purpose
 
-This document defines a discreet, repeatable evidence bundle for ALDORA releases. It protects continuity of product identity and authorship evidence without placing personal data, credentials, private keys, or intrusive attribution in the user interface.
+This document defines a discreet, repeatable evidence bundle for MEDORA releases. It protects continuity of product identity and authorship evidence without placing personal data, credentials, private keys, or intrusive attribution in the user interface.
 
 > **Legal boundary:** This bundle is technical evidence. It is not a substitute for copyright, trademark, patent, assignment, employment, licensing, notarisation, or other legal registration and contracts.
 
@@ -15,7 +15,7 @@ This document defines a discreet, repeatable evidence bundle for ALDORA releases
 | Manifest hash | Detects changes to the manifest | Verify before presentation or migration |
 | Signed audit verification result | Shows the audit chain can be verified | Keep the signing key outside the repository and archive |
 | Repository commit/checkpoint reference | Links the evidence to the source history | Preserve read-only copies and access logs |
-| Product identity statement | Records the ALDORA name and approved brand narrative | Use the approved owner-controlled wording |
+| Product identity statement | Records the MEDORA name and approved brand narrative | Use the approved owner-controlled wording |
 | Delivery index | Lists documentation, diagrams, tests, and limitations | Version together with the product release |
 | Verification log | Records who verified the bundle, when, and with which tool version | Keep immutable or append-only where possible |
 
@@ -27,9 +27,9 @@ The verifier must record the result as **verified**, **verified with exceptions*
 
 ## Approved product identity wording
 
-**English:** ALDORA Integrated Health System is the approved product identity for this release. ALDO may be explained as the brand narrative **Adaptive Healthcare, Logistics, Data, and Operations** when a concise expansion is useful; this narrative is not a legal registration statement unless separately adopted by the rights holder.
+**English:** MEDORA Integrated Health System is the approved product identity for this release. ALDO may be explained as the brand narrative **Adaptive Healthcare, Logistics, Data, and Operations** when a concise expansion is useful; this narrative is not a legal registration statement unless separately adopted by the rights holder.
 
-**العربية:** الاسم المعتمد للمنتج في هذا الإصدار هو **منظومة ALDORA المتكاملة للرعاية الصحية**. ويمكن شرح ALDO تسويقياً باعتباره **Adaptive Healthcare, Logistics, Data, and Operations**، أي منظومة متكيفة للرعاية الصحية واللوجستيات والبيانات والعمليات، ولا يُعد ذلك بياناً قانونياً للتسجيل إلا إذا اعتمده صاحب الحق رسمياً.
+**العربية:** الاسم المعتمد للمنتج في هذا الإصدار هو **منظومة MEDORA المتكاملة للرعاية الصحية**. ويمكن شرح ALDO تسويقياً باعتباره **Adaptive Healthcare, Logistics, Data, and Operations**، أي منظومة متكيفة للرعاية الصحية واللوجستيات والبيانات والعمليات، ولا يُعد ذلك بياناً قانونياً للتسجيل إلا إذا اعتمده صاحب الحق رسمياً.
 
 ## Access separation
 

@@ -1,4 +1,4 @@
-# ألدورا | منظومة الرعاية الصحية المتكاملة — Anti-Tampering and Workplace Monitoring Policy
+# ميدورا | منظومة الرعاية الصحية المتكاملة — Anti-Tampering and Workplace Monitoring Policy
 
 **Date:** 2026-08-15
 

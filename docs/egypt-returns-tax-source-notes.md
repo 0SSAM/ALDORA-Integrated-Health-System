@@ -22,4 +22,4 @@ The ETA guides page references taxpayer introductory material, readiness/registr
 
 ## Design boundaries
 
-The ALDORA foundation should support jurisdiction-scoped tax profiles, effective dates, invoice numbering, taxable/non-taxable lines, tax breakdown, corrections/credit notes, immutable audit events, and pending/submission/rejected/accepted statuses. No ETA submission, tax calculation claim, or legal-compliance certification should be represented as active without approved Egyptian evidence and credentials.
+The MEDORA foundation should support jurisdiction-scoped tax profiles, effective dates, invoice numbering, taxable/non-taxable lines, tax breakdown, corrections/credit notes, immutable audit events, and pending/submission/rejected/accepted statuses. No ETA submission, tax calculation claim, or legal-compliance certification should be represented as active without approved Egyptian evidence and credentials.

@@ -1,6 +1,6 @@
 # Egyptian Medicine Data Workbook — Methodology and Coverage Status
 
-**Project:** ألدورا | منظومة الرعاية الصحية المتكاملة
+**Project:** ميدورا | منظومة الرعاية الصحية المتكاملة
 **Review date:** 2026-08-14  
 **Status:** Pending source-backed workbook delivery
 

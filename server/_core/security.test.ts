@@ -27,28 +27,28 @@ describe("security middleware boundaries", () => {
     const request = {
       ip: "203.0.113.8",
       protocol: "http",
-      hostname: "aldora.example",
+      hostname: "medora.example",
       headers: {
         "x-forwarded-host": "attacker.example",
         "x-forwarded-proto": "https",
       },
-      get: (name: string) => name === "host" ? "aldora.example" : undefined,
+      get: (name: string) => name === "host" ? "medora.example" : undefined,
     } as never;
-    expect(securityInternals.requestOrigin(request)).toBe("http://aldora.example");
+    expect(securityInternals.requestOrigin(request)).toBe("http://medora.example");
   });
 
   it("uses HTTPS and hostname already resolved by the trusted proxy", () => {
     const request = {
       ip: "203.0.113.8",
       protocol: "https",
-      hostname: "aldorapharm.example",
+      hostname: "medorapharm.example",
       headers: {
         "x-forwarded-host": "attacker.example",
         "x-forwarded-proto": "https",
       },
       get: (name: string) => name === "host" ? "127.0.0.1:3000" : undefined,
     } as never;
-    expect(securityInternals.requestOrigin(request)).toBe("https://aldorapharm.example");
+    expect(securityInternals.requestOrigin(request)).toBe("https://medorapharm.example");
   });
 
   it("applies stricter limits to authentication and upload routes", () => {

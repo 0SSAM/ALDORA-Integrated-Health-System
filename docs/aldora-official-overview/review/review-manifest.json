@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "pdf": "/home/ubuntu/bdf-pharma-erp/docs/aldora-official-overview/main.pdf",
+  "pdf": "/home/ubuntu/bdf-pharma-erp/docs/medora-official-overview/main.pdf",
   "mode": "standard",
   "page_count": 9,
   "selected_pages": [
@@ -12,15 +12,15 @@
     9
   ],
   "rendered_pages": [
-    "/home/ubuntu/bdf-pharma-erp/docs/aldora-official-overview/review/pages/page-0001.png",
-    "/home/ubuntu/bdf-pharma-erp/docs/aldora-official-overview/review/pages/page-0003.png",
-    "/home/ubuntu/bdf-pharma-erp/docs/aldora-official-overview/review/pages/page-0004.png",
-    "/home/ubuntu/bdf-pharma-erp/docs/aldora-official-overview/review/pages/page-0006.png",
-    "/home/ubuntu/bdf-pharma-erp/docs/aldora-official-overview/review/pages/page-0007.png",
-    "/home/ubuntu/bdf-pharma-erp/docs/aldora-official-overview/review/pages/page-0009.png"
+    "/home/ubuntu/bdf-pharma-erp/docs/medora-official-overview/review/pages/page-0001.png",
+    "/home/ubuntu/bdf-pharma-erp/docs/medora-official-overview/review/pages/page-0003.png",
+    "/home/ubuntu/bdf-pharma-erp/docs/medora-official-overview/review/pages/page-0004.png",
+    "/home/ubuntu/bdf-pharma-erp/docs/medora-official-overview/review/pages/page-0006.png",
+    "/home/ubuntu/bdf-pharma-erp/docs/medora-official-overview/review/pages/page-0007.png",
+    "/home/ubuntu/bdf-pharma-erp/docs/medora-official-overview/review/pages/page-0009.png"
   ],
   "contact_sheets": [
-    "/home/ubuntu/bdf-pharma-erp/docs/aldora-official-overview/review/sheets/sheet-01.jpg"
+    "/home/ubuntu/bdf-pharma-erp/docs/medora-official-overview/review/sheets/sheet-01.jpg"
   ],
   "settings": {
     "dpi": 110,

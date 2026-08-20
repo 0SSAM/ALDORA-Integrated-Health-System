@@ -1,4 +1,4 @@
-# ALDORA | منظومة الرعاية الصحية المتكاملة
+# MEDORA | منظومة الرعاية الصحية المتكاملة
 
 ## وثيقة تعريف المنتج والهوية — Product Description and Identity Brief
 
@@ -9,18 +9,18 @@
 
 ## الملخص التنفيذي | Executive summary
 
-**العربية.** ALDORA هي منظومة تشغيل صحية معيارية تركز على الصيدليات والفروع والعمليات الصحية المتصلة بها. صُممت لتجمع التشغيل اليومي، نقاط البيع، المخزون، الكتالوج ذي المصدر، الوصفة الإلكترونية، خدمة العملاء، مركز الاتصال، الفواتير المحلية، التنبيهات، سجلات التدقيق، والجاهزية للتكاملات الرسمية في مساحة واحدة. جوهرها هو أن كل عملية منظمة يجب أن تكون مرتبطة بالمؤسسة والفرع والاختصاص، وأن تتوقف بأمان عند غياب الاعتماد أو الدليل المطلوب.
+**العربية.** MEDORA هي منظومة تشغيل صحية معيارية تركز على الصيدليات والفروع والعمليات الصحية المتصلة بها. صُممت لتجمع التشغيل اليومي، نقاط البيع، المخزون، الكتالوج ذي المصدر، الوصفة الإلكترونية، خدمة العملاء، مركز الاتصال، الفواتير المحلية، التنبيهات، سجلات التدقيق، والجاهزية للتكاملات الرسمية في مساحة واحدة. جوهرها هو أن كل عملية منظمة يجب أن تكون مرتبطة بالمؤسسة والفرع والاختصاص، وأن تتوقف بأمان عند غياب الاعتماد أو الدليل المطلوب.
 
-**English.** ALDORA is a modular healthcare operations platform focused on pharmacies, branches, and adjacent healthcare workflows. It brings together daily operations, POS, inventory, provenance-aware catalog review, e-prescription, customer care, call-centre foundations, local tax invoicing, notifications, audit evidence, and readiness boundaries for official integrations. Its core principle is that regulated actions are organization-, branch-, and jurisdiction-scoped and fail closed when required evidence or authorization is missing.
+**English.** MEDORA is a modular healthcare operations platform focused on pharmacies, branches, and adjacent healthcare workflows. It brings together daily operations, POS, inventory, provenance-aware catalog review, e-prescription, customer care, call-centre foundations, local tax invoicing, notifications, audit evidence, and readiness boundaries for official integrations. Its core principle is that regulated actions are organization-, branch-, and jurisdiction-scoped and fail closed when required evidence or authorization is missing.
 
 ## ماذا يعني ALDO؟ | What does ALDO mean?
 
 ALDO ليس اختصاراً قانونياً أو اسماً لجهة حكومية. يمكن تقديمه كهوية لفظية مقصودة تحمل الرسالة التالية:
 
 > **ALDO = Accessible, Localized, Dependable Operations**  
-> **ألدورا = تشغيل صحي متاح، محلي، ويمكن الاعتماد عليه.**
+> **ميدورا = تشغيل صحي متاح، محلي، ويمكن الاعتماد عليه.**
 
-وهذا شرح تسويقي للهوية وليس ادعاءً تاريخياً عن أصل الاسم. أما **ALDORA** فيُشرح تجارياً باعتباره امتداداً صوتياً وهوياً لـ **ALDO** مع دلالة الرعاية والاتساع المؤسسي، ويمكن استخدام العبارة الرسمية: **ALDORA | Integrated Health System**.
+وهذا شرح تسويقي للهوية وليس ادعاءً تاريخياً عن أصل الاسم. أما **MEDORA** فيُشرح تجارياً باعتباره امتداداً صوتياً وهوياً لـ **ALDO** مع دلالة الرعاية والاتساع المؤسسي، ويمكن استخدام العبارة الرسمية: **MEDORA | Integrated Health System**.
 
 ## القيمة الأساسية | Core value
 
@@ -41,7 +41,7 @@ ALDO ليس اختصاراً قانونياً أو اسماً لجهة حكوم�
 
 ## بصرياً | At a glance
 
-![ALDORA architecture](aldora-architecture.png)
+![MEDORA architecture](medora-architecture.png)
 
 ## رحلة العملية | Operating journey
 
@@ -53,7 +53,7 @@ ALDO ليس اختصاراً قانونياً أو اسماً لجهة حكوم�
 
 ## أهمية المنصة | Why it matters
 
-تحتاج المؤسسات الصحية إلى التوفيق بين سرعة التشغيل، دقة المخزون، حماية البيانات، وتنوع المتطلبات المحلية. تقدم ALDORA إطاراً تدريجياً يسمح بإضافة بلد أو جهة أو موصل بعد التحقق من مصدره، بدلاً من تفعيل تكامل غير موثق قد يعرّض المؤسسة للمخاطر. هذا يجعل المنصة مناسبة للعرض على الصيدليات، السلاسل، الموزعين، المستشفيات، معامل التحاليل، مراكز التأهيل، وشركات التأمين باعتبارها منصة قابلة للتوسع، مع تحديد واضح لما هو جاهز وما يحتاج إلى اعتماد خارجي.
+تحتاج المؤسسات الصحية إلى التوفيق بين سرعة التشغيل، دقة المخزون، حماية البيانات، وتنوع المتطلبات المحلية. تقدم MEDORA إطاراً تدريجياً يسمح بإضافة بلد أو جهة أو موصل بعد التحقق من مصدره، بدلاً من تفعيل تكامل غير موثق قد يعرّض المؤسسة للمخاطر. هذا يجعل المنصة مناسبة للعرض على الصيدليات، السلاسل، الموزعين، المستشفيات، معامل التحاليل، مراكز التأهيل، وشركات التأمين باعتبارها منصة قابلة للتوسع، مع تحديد واضح لما هو جاهز وما يحتاج إلى اعتماد خارجي.
 
 ## نموذج الأمان | Security model
 
@@ -61,7 +61,7 @@ ALDO ليس اختصاراً قانونياً أو اسماً لجهة حكوم�
 
 ## المرونة الآمنة | Safe resilience
 
-![ALDORA resilience flow](aldora-resilience.png)
+![MEDORA resilience flow](medora-resilience.png)
 
 ## حدود صريحة | Explicit boundaries
 
@@ -75,13 +75,13 @@ ALDO ليس اختصاراً قانونياً أو اسماً لجهة حكوم�
 
 ## خاتمة | Closing statement
 
-ALDORA ليست مجرد شاشة بيع أو قاعدة بيانات أصناف؛ إنها اتجاه هندسي لبناء تشغيل صحي محلي، قابل للتدقيق، متعدد المؤسسات، وقابل للتوسع. قوتها الأساسية في الصراحة والحدود الأمنية: ما تم تنفيذه يمكن اختباره، وما يحتاج جهة خارجية يظل مغلقاً حتى تتوافر الأدلة.
+MEDORA ليست مجرد شاشة بيع أو قاعدة بيانات أصناف؛ إنها اتجاه هندسي لبناء تشغيل صحي محلي، قابل للتدقيق، متعدد المؤسسات، وقابل للتوسع. قوتها الأساسية في الصراحة والحدود الأمنية: ما تم تنفيذه يمكن اختباره، وما يحتاج جهة خارجية يظل مغلقاً حتى تتوافر الأدلة.
 
-**ALDORA | Accessible, Localized, Dependable Operations for healthcare.**
+**MEDORA | Accessible, Localized, Dependable Operations for healthcare.**
 
 ## References
 
-1. [ALDORA comprehensive platform audit](comprehensive-platform-audit-2026-08-15.md)
-2. [ALDORA capability gap report](capability-gap-report.md)
-3. [ALDORA ownership notes](ownership-notes.md)
-4. [ALDORA operations guide](operations.md)
+1. [MEDORA comprehensive platform audit](comprehensive-platform-audit-2026-08-15.md)
+2. [MEDORA capability gap report](capability-gap-report.md)
+3. [MEDORA ownership notes](ownership-notes.md)
+4. [MEDORA operations guide](operations.md)

@@ -1,12 +1,12 @@
-# ALDORA | Comprehensive Platform Audit
+# MEDORA | Comprehensive Platform Audit
 
-**Version:** 2026-08-15  
-**Product identity:** ألدورا | منظومة الرعاية الصحية المتكاملة — **ALDORA | Integrated Health System**  
+**Version:** 2026-08-15
+**Product identity:** ميدورا | منظومة الرعاية الصحية المتكاملة — **MEDORA | Integrated Health System**
 **Audit posture:** Engineering and readiness review; not a legal certification, penetration-test certificate, government approval, or proof of compliance with every country.
 
 ## Executive conclusion
 
-ALDORA currently provides a security-focused, multi-organization healthcare and pharmacy ERP foundation. Its strongest verified areas are organization and branch scope, jurisdiction-aware policies, pharmacy POS, catalog provenance and review, electronic prescription workflow, customer care and call-centre foundations, local returns and tax-invoice foundations, notifications, audit evidence, and limited offline drafts. The repository’s own capability report correctly states that ALDORA is **not yet a complete replacement for SAP, Oracle, Dynamics, Odoo, or a full hospital information system**.[^1]
+MEDORA currently provides a security-focused, multi-organization healthcare and pharmacy ERP foundation. Its strongest verified areas are organization and branch scope, jurisdiction-aware policies, pharmacy POS, catalog provenance and review, electronic prescription workflow, customer care and call-centre foundations, local returns and tax-invoice foundations, notifications, audit evidence, and limited offline drafts. The repository’s own capability report correctly states that MEDORA is **not yet a complete replacement for SAP, Oracle, Dynamics, Odoo, or a full hospital information system**.[^1]
 
 The safest product claim is therefore: **“A modular, security-first healthcare operations platform for pharmacy and branch workflows, designed for expansion through country packs and controlled integrations.”** This wording is strong, accurate, and defensible. It avoids claiming that a policy helper or navigation entry is equivalent to a complete regulated module.
 
@@ -14,11 +14,11 @@ The safest product claim is therefore: **“A modular, security-first healthcare
 
 The current design uses server-authoritative authorization, organization/branch/jurisdiction checks, rate limits, security headers, protected secrets, audit records, and fail-closed regulated mutations. Audit hashes provide tamper evidence, but they do not replace access control, encryption, retention, backup, legal registration, or an officially governed ledger.[^2]
 
-The project already includes a discreet ownership/provenance direction: the ALDORA identity, a professional attribution note, a non-secret ownership manifest, and SHA-256 verification guidance. This is appropriate because it preserves authorship without exposing the owner’s phone, email, address, photograph, or personal profiles.[^3]
+The project already includes a discreet ownership/provenance direction: the MEDORA identity, a professional attribution note, a non-secret ownership manifest, and SHA-256 verification guidance. This is appropriate because it preserves authorship without exposing the owner’s phone, email, address, photograph, or personal profiles.[^3]
 
 | Protection | Current position | Safe interpretation | Recommended owner action |
 |---|---|---|---|
-| Product identity | ALDORA naming and repository records | Good provenance aid | Keep dated source archives, checkpoints, manifests, and release notes together |
+| Product identity | MEDORA naming and repository records | Good provenance aid | Keep dated source archives, checkpoints, manifests, and release notes together |
 | Non-secret fingerprint | Manifest hash and repository history | Evidence of continuity, not title by itself | Preserve hashes with signed release records |
 | Audit integrity | Hash-linked audit records | Tamper-evident operational history | Add periodic verification report and alert on broken links |
 | Access control | Server-side role and scope checks on audited paths | Strong current boundary | Extend tests whenever a new table or router is added |
@@ -43,7 +43,7 @@ The project already includes a discreet ownership/provenance direction: the ALDO
 
 ## Online, offline, and weak-connection behavior
 
-ALDORA can preserve the application shell and support clearly labelled non-regulated drafts when connectivity is absent. Regulated operations such as sales, inventory deduction, prescriptions, invoices, insurance submission, payroll approval, and government submission require server confirmation.[^4] This is a deliberate safety feature, not a deficiency to hide.
+MEDORA can preserve the application shell and support clearly labelled non-regulated drafts when connectivity is absent. Regulated operations such as sales, inventory deduction, prescriptions, invoices, insurance submission, payroll approval, and government submission require server confirmation.[^4] This is a deliberate safety feature, not a deficiency to hide.
 
 For unstable or slow networks, the safe target is **resilient online operation**, not silent offline completion. The client should show connection state, keep request identifiers stable for safe retries, use bounded retry with backoff only for idempotent reads or explicitly retry-safe operations, avoid duplicate financial mutations, and preserve an auditable manual-review state after interruption. Browser storage must never be treated as device attestation.
 
@@ -61,7 +61,7 @@ The operational guide defines the database as the source of operational truth an
 
 ## Legacy migration contract
 
-Migration from any old system must be treated as a controlled import, not a direct database copy. The source must first be profiled and mapped into a canonical ALDORA import format. Sensitive and regulated records must remain quarantined until validation and human approval.
+Migration from any old system must be treated as a controlled import, not a direct database copy. The source must first be profiled and mapped into a canonical MEDORA import format. Sensitive and regulated records must remain quarantined until validation and human approval.
 
 | Stage | Control |
 |---|---|
@@ -89,8 +89,8 @@ The next safest engineering priorities are to add an explicit connection-state a
 
 ## References
 
-[^1]: [ALDORA capability gap report](capability-gap-report.md)
-[^2]: [ALDORA secure healthcare delivery principles](../skills/secure-healthcare-platform-delivery/SKILL.md)
-[^3]: [ALDORA ownership notes](ownership-notes.md)
-[^4]: [ALDORA operations guide](operations.md)
-[^5]: [ALDORA operations guide — backup and restore](operations.md#backup-and-restore)
+[^1]: [MEDORA capability gap report](capability-gap-report.md)
+[^2]: [MEDORA secure healthcare delivery principles](../skills/secure-healthcare-platform-delivery/SKILL.md)
+[^3]: [MEDORA ownership notes](ownership-notes.md)
+[^4]: [MEDORA operations guide](operations.md)
+[^5]: [MEDORA operations guide — backup and restore](operations.md#backup-and-restore)

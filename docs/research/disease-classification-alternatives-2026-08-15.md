@@ -4,13 +4,13 @@
 
 ## Executive conclusion
 
-The simplest production-ready alternative for ALDORA is the U.S. National Library of Medicine (NLM) Clinical Table Search Service for **ICD-10-CM** lookup. It is free of charge, requires no API key in the documented endpoint, and exposes a small search API suitable for autocomplete. It is not ICD-11, not a global classification, and is U.S.-specific; it must therefore be offered as a jurisdiction-scoped reference rather than a replacement for WHO ICD-11 or Egypt's officially mandated coding rules.
+The simplest production-ready alternative for MEDORA is the U.S. National Library of Medicine (NLM) Clinical Table Search Service for **ICD-10-CM** lookup. It is free of charge, requires no API key in the documented endpoint, and exposes a small search API suitable for autocomplete. It is not ICD-11, not a global classification, and is U.S.-specific; it must therefore be offered as a jurisdiction-scoped reference rather than a replacement for WHO ICD-11 or Egypt's officially mandated coding rules.
 
 A second option is the NLM **UMLS** API. It provides broader terminology and mappings, but it requires a UMLS/UTS account and license code. It is therefore more complex and should not be treated as an anonymous free API. SNOMED CT is clinically rich, but it is not automatically free for deployment in non-member territories; licensing, annual fees, and special permission may apply. It is not a low-complexity substitute for this project.
 
 ## Candidate comparison
 
-| Candidate | Access and cost | Coverage and language | Integration complexity | ALDORA recommendation |
+| Candidate | Access and cost | Coverage and language | Integration complexity | MEDORA recommendation |
 |---|---|---|---|---|
 | NLM Clinical Table Search Service – ICD-10-CM | Free of charge; public HTTPS search endpoint; no API key shown in the documented basic flow | ICD-10-CM diagnosis codes and long descriptions; English/U.S.-specific | Low; query `terms`, optional `count`, `offset`, `df`, `sf`, `ef` | Recommended as an optional U.S. jurisdiction lookup/reference only |
 | NLM Clinical Table Search Service – Medical Conditions | Public service with a curated list of medical conditions and suggested ICD-10-CM codes | Useful autocomplete layer, but smaller and not a complete national classification | Low | Suitable for search assistance, never final coding authority |
@@ -20,9 +20,9 @@ A second option is the NLM **UMLS** API. It provides broader terminology and map
 
 ## Verified NLM ICD-10-CM API details
 
-The NLM endpoint is `https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search`. The `terms` parameter is required and supports a word or partial word; `count` and `offset` support bounded pagination, with a documented maximum count of 500 and a documented total retrieval limit of 7,500. Returned records expose a code and a long diagnosis description, with optional display and extra fields. NLM describes the service as provided “as is” and free of charge, so ALDORA should add timeouts, caching controls, health states, and a visible source/version label rather than treating availability as guaranteed.
+The NLM endpoint is `https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search`. The `terms` parameter is required and supports a word or partial word; `count` and `offset` support bounded pagination, with a documented maximum count of 500 and a documented total retrieval limit of 7,500. Returned records expose a code and a long diagnosis description, with optional display and extra fields. NLM describes the service as provided “as is” and free of charge, so MEDORA should add timeouts, caching controls, health states, and a visible source/version label rather than treating availability as guaranteed.
 
-The service currently identifies itself with the ICD-10-CM 2026 dataset in its page content. ALDORA must still record the retrieved release/version, source URL, retrieval timestamp, and jurisdiction. It must not silently combine NLM's U.S. ICD-10-CM data with Egypt, Jordan, Qatar, or Morocco coding rules.
+The service currently identifies itself with the ICD-10-CM 2026 dataset in its page content. MEDORA must still record the retrieved release/version, source URL, retrieval timestamp, and jurisdiction. It must not silently combine NLM's U.S. ICD-10-CM data with Egypt, Jordan, Qatar, or Morocco coding rules.
 
 ## Safe integration decision
 

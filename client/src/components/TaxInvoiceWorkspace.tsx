@@ -136,7 +136,7 @@ export function TaxInvoiceWorkspace({ branchId, jurisdictionId }: { branchId: nu
 
   const printInvoice = () => {
     if (!invoiceResult || !canExportLocalInvoice(invoiceResult)) return;
-    const popup = window.open("", "aldora-tax-invoice-print", "width=900,height=900");
+    const popup = window.open("", "medora-tax-invoice-print", "width=900,height=900");
     if (!popup) return;
     const lineRows = invoiceResult.lines.map(line => `<tr><td>${escapeHtml(line.sku)}</td><td>${line.quantity}</td><td>${numberText(line.unitPrice, invoiceResult.currencyCode)}</td><td>${numberText(line.tax, invoiceResult.currencyCode)}</td><td>${numberText(line.total, invoiceResult.currencyCode)}</td></tr>`).join("");
     const paperCss = paperSize === "receipt80" ? "80mm auto" : paperSize;

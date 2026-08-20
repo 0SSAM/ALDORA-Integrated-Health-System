@@ -1,4 +1,4 @@
-# ALDORA | دليل IT / Admin / Owner
+# MEDORA | دليل IT / Admin / Owner
 
 ## دليل الإدارة والتشغيل الآمن — Arabic / English
 
@@ -57,7 +57,7 @@ The system supports safe non-regulated drafts only when offline. IT must not con
 
 ## Supported deployment posture
 
-ALDORA is tested as a responsive web application on current Chromium/Edge, Safari iOS, and Chrome Android. Windows 7 requires a managed supported browser or wrapper and is not a blanket compatibility promise. Low-end devices should use reduced motion, paginated views, and limited simultaneous modules.
+MEDORA is tested as a responsive web application on current Chromium/Edge, Safari iOS, and Chrome Android. Windows 7 requires a managed supported browser or wrapper and is not a blanket compatibility promise. Low-end devices should use reduced motion, paginated views, and limited simultaneous modules.
 
 ## Acceptance checklist
 
@@ -73,7 +73,7 @@ ALDORA is tested as a responsive web application on current Chromium/Edge, Safar
 
 ## References
 
-1. [ALDORA comprehensive platform audit](comprehensive-platform-audit-2026-08-15.md)
-2. [ALDORA ownership notes](ownership-notes.md)
-3. [ALDORA operations guide](operations.md)
-4. [ALDORA capability gap report](capability-gap-report.md)
+1. [MEDORA comprehensive platform audit](comprehensive-platform-audit-2026-08-15.md)
+2. [MEDORA ownership notes](ownership-notes.md)
+3. [MEDORA operations guide](operations.md)
+4. [MEDORA capability gap report](capability-gap-report.md)

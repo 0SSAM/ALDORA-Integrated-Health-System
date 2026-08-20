@@ -1,4 +1,4 @@
-# ألدورا | منظومة الرعاية الصحية المتكاملة — External Inputs Request
+# ميدورا | منظومة الرعاية الصحية المتكاملة — External Inputs Request
 
 **Date:** 2026-08-15
 

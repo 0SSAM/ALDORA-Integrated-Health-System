@@ -1,4 +1,4 @@
-name: ALDORA CI
+name: MEDORA CI
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: aldora-ci-${{ github.workflow }}-${{ github.ref }}
+  group: medora-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -40,26 +40,26 @@ jobs:
           NODE_ENV=development \
           PORT=3000 \
           JWT_SECRET="ci-only-jwt-secret-not-for-production" \
-          DATABASE_URL="mysql://ci:ci@127.0.0.1:3306/aldora_ci" \
+          DATABASE_URL="mysql://ci:ci@127.0.0.1:3306/medora_ci" \
           AUDIT_SIGNING_KEY="ci-only-audit-signing-key-not-for-production-2026" \
           SHOWCASE_TEST_PASSWORD="CI-only-showcase-password-2026" \
           VITE_APP_ID="ci-smoke" \
-          VITE_APP_TITLE="ألدورا | منظومة الرعاية الصحية المتكاملة" \
-          VITE_APP_LOGO="https://example.invalid/aldora-ci-logo.png" \
+          VITE_APP_TITLE="ميدورا | منظومة الرعاية الصحية المتكاملة" \
+          VITE_APP_LOGO="https://example.invalid/medora-ci-logo.png" \
           VITE_ANALYTICS_ENDPOINT="https://analytics.invalid" \
           VITE_ANALYTICS_WEBSITE_ID="ci-smoke" \
           OAUTH_SERVER_URL="http://127.0.0.1:3999" \
           OWNER_OPEN_ID="ci-smoke" \
-          OWNER_NAME="ALDORA CI" \
+          OWNER_NAME="MEDORA CI" \
           BUILT_IN_FORGE_API_URL="https://ci.invalid" \
           BUILT_IN_FORGE_API_KEY="ci-only-disabled" \
-          pnpm dev > /tmp/aldora-ci-server.log 2>&1 &
-          echo $! > /tmp/aldora-ci-server.pid
+          pnpm dev > /tmp/medora-ci-server.log 2>&1 &
+          echo $! > /tmp/medora-ci-server.pid
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://127.0.0.1:3000/ >/dev/null; then exit 0; fi
             sleep 1
           done
-          cat /tmp/aldora-ci-server.log
+          cat /tmp/medora-ci-server.log
           exit 1
 
       - name: TypeScript check
@@ -77,11 +77,11 @@ jobs:
       - name: Stop isolated test server
         if: always()
         run: |
-          if [[ -f /tmp/aldora-ci-server.pid ]]; then
-            kill "$(cat /tmp/aldora-ci-server.pid)" 2>/dev/null || true
+          if [[ -f /tmp/medora-ci-server.pid ]]; then
+            kill "$(cat /tmp/medora-ci-server.pid)" 2>/dev/null || true
           fi
-          if [[ -f /tmp/aldora-ci-server.log ]]; then
-            tail -n 80 /tmp/aldora-ci-server.log || true
+          if [[ -f /tmp/medora-ci-server.log ]]; then
+            tail -n 80 /tmp/medora-ci-server.log || true
           fi
 
       - name: Dependency security audit

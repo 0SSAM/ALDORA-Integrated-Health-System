@@ -9,7 +9,7 @@ export const welcomeRoutes = { login: "/login", workspace: "/workspace" } as con
 
 function BrandMark() {
   return (
-    <div className="aldo-brand-mark grid h-14 w-14 place-items-center rounded-[1.35rem] shadow-lg shadow-cyan-900/10" aria-label="ألدورا">
+    <div className="aldo-brand-mark grid h-14 w-14 place-items-center rounded-[1.35rem] shadow-lg shadow-cyan-900/10" aria-label="ميدورا">
       <svg viewBox="0 0 48 48" role="img" aria-hidden="true" className="h-9 w-9">
         <path d="M24 4 40 10v12c0 10.5-6.7 18.2-16 22-9.3-3.8-16-11.5-16-22V10L24 4Z" fill="#0d1b2a" opacity=".92" />
         <path d="M24 12c-5.5 3.8-8.5 8.1-8.5 12.9 0 5.6 3.8 9.5 8.5 11.1 4.7-1.6 8.5-5.5 8.5-11.1C32.5 20.1 29.5 15.8 24 12Z" fill="#9ff2e4" />
@@ -27,7 +27,7 @@ export default function Welcome() {
 
   const copy = english
     ? {
-        eyebrow: "ALDORA | INTEGRATED HEALTH SYSTEM",
+        eyebrow: "MEDORA | INTEGRATED HEALTH SYSTEM",
         title: "One secure operating space for the healthcare journey.",
         subtitle: "A calm, intelligent foundation for pharmacies, hospitals, insurers, distributors, laboratories, and care teams across the Arab world.",
         login: "Sign in securely",
@@ -39,7 +39,7 @@ export default function Welcome() {
         footer: "Built to be clear for people and careful with sensitive healthcare work.",
       }
     : {
-        eyebrow: "ألدورا | منظومة الرعاية الصحية المتكاملة",
+        eyebrow: "ميدورا | منظومة الرعاية الصحية المتكاملة",
         title: "مساحة تشغيل آمنة وموحّدة لدورة الرعاية الصحية.",
         subtitle: "أساس هادئ وذكي للصيدليات والمستشفيات وشركات التأمين والتوزيع والمعامل وفرق الرعاية في العالم العربي.",
         login: "تسجيل الدخول بأمان",
@@ -57,11 +57,11 @@ export default function Welcome() {
       <div className="pointer-events-none absolute -right-24 bottom-0 h-96 w-96 rounded-full bg-violet-200/30 blur-3xl" aria-hidden="true" />
       <div className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-5 py-5 sm:px-8 lg:px-12">
         <header className="flex items-center justify-between gap-4">
-          <a href="/" className="flex items-center gap-3" aria-label="ألدورا | منظومة الرعاية الصحية المتكاملة">
+          <a href="/" className="flex items-center gap-3" aria-label="ميدورا | منظومة الرعاية الصحية المتكاملة">
             <BrandMark />
             <div>
-              <p className="text-sm font-bold tracking-tight sm:text-base">ألدورا | منظومة الرعاية الصحية المتكاملة</p>
-              <p className="text-[11px] text-slate-500">ALDORA | Integrated Health System</p>
+              <p className="text-sm font-bold tracking-tight sm:text-base">ميدورا | منظومة الرعاية الصحية المتكاملة</p>
+              <p className="text-[11px] text-slate-500">MEDORA | Integrated Health System</p>
             </div>
           </a>
           <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function Welcome() {
           <div className="relative">
             <div className="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-br from-cyan-200/50 via-white/20 to-violet-200/40 blur-2xl" aria-hidden="true" />
             <div className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-white/80 p-5 shadow-[0_24px_80px_rgba(13,27,42,0.14)] backdrop-blur-xl sm:p-7">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-5"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">ALDORA / WORKSPACE</p><p className="mt-1 text-lg font-bold">{english ? "A clear view of the operation" : "رؤية واضحة لسير العمل"}</p></div><div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 text-cyan-700"><CheckCircle2 className="h-5 w-5" /></div></div>
+              <div className="flex items-center justify-between border-b border-slate-100 pb-5"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">MEDORA / WORKSPACE</p><p className="mt-1 text-lg font-bold">{english ? "A clear view of the operation" : "رؤية واضحة لسير العمل"}</p></div><div className="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 text-cyan-700"><CheckCircle2 className="h-5 w-5" /></div></div>
               <div className="mt-6 grid gap-3 sm:grid-cols-2"><div className="rounded-2xl bg-[#0d1b2a] p-4 text-white sm:col-span-2"><p className="text-xs text-cyan-200">{english ? "One governed workspace" : "مساحة عمل منضبطة"}</p><p className="mt-2 text-2xl font-bold">{english ? "Care, operations, control" : "رعاية · تشغيل · رقابة"}</p><div className="mt-4 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full w-4/5 rounded-full bg-gradient-to-l from-cyan-300 to-teal-200" /></div></div><div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><p className="text-xs text-slate-500">{english ? "Access" : "الوصول"}</p><p className="mt-2 font-bold text-emerald-700">{english ? "Scoped & audited" : "منضبط ومدقق"}</p></div><div className="rounded-2xl border border-slate-100 bg-slate-50 p-4"><p className="text-xs text-slate-500">{english ? "Governance" : "الحوكمة"}</p><p className="mt-2 font-bold text-cyan-700">{english ? "Scoped & controlled" : "منضبطة ومتحكم بها"}</p></div></div>
               <div className="mt-6 rounded-2xl border border-cyan-100 bg-cyan-50/70 p-4"><div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-cyan-700" /><p className="text-sm leading-6 text-cyan-950">{copy.trust} — {copy.trustBody}</p></div></div>
             </div>
