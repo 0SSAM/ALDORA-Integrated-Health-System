@@ -1,3 +1,8 @@
+// MEDORA | ميدورا — Integrated Health Care System
+// Copyright (c) 2026 Hossam Naeim Osman | حسام نعيم عثمان. All rights reserved.
+// Proprietary and confidential. Unauthorized copying, distribution, or use of this
+// software, or of any portion of it, is strictly prohibited.
+// Source: https://github.com/0SSAM/MEDORA-Health-Care-Eco-System
 export type SearchableRecord = Record<string, unknown>;
 
 const arabicDiacritics = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g;

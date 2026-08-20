@@ -22,6 +22,18 @@ MEDORA follows a **fail-closed, least-privilege, tenant-isolated** approach. A f
 | AI safety | Prescription extraction is assistive only, requires pharmacist confirmation, and must not silently create a sale or dispense action. | استخراج الوصفات مساعد فقط، ويتطلب تأكيد الصيدلي، ولا ينشئ بيعًا أو صرفًا بصمت. |
 | Integrations | Regulatory, payment, and external-service boundaries fail safely when unavailable or unverified. | تفشل حدود التكاملات التنظيمية والدفع والخدمات الخارجية بأمان عند عدم توفرها أو التحقق منها. |
 
+## Supported Versions | الإصدارات المدعومة
+
+Only the current `main` branch is actively supported with security updates. Long-lived branches receive fixes only when actively developed. Dependency vulnerabilities reported by Dependabot and CodeQL are remediated in prioritized update waves. Private previews and showcase deployments follow the same fix cadence but are scoped to non-production synthetic data only.
+
+يشمل الدعم النشط بالإصلاحات الأمنية فرع `main` الحالي فقط. يُعالَج أي ضعف في الاعتماديات يبلغ عنه Dependabot أو CodeQL ضمن موجات تحديث مرتبة حسب الأولوية، وتُطبَّق نفس آلية الإصلاح على معاينات العرض مع حصرها على بيانات اصطناعية غير إنتاجية.
+
+## Security Model | نموذج الأمان
+
+MEDORA enforces a **defense-in-depth** posture across four layers: the transport layer (TLS-terminated, HSTS-ready), the application layer (server-side authentication and role authorization on every protected procedure, never trust-the-client), the data layer (tenant-scoped queries with authorization predicates applied before data access, parameterized statements through Drizzle ORM, and tamper-evident audit hash chains for consequential state transitions), and the operational layer (non-root container runtime, fail-closed integration boundaries, and secrets never present in source or build artifacts). Prescription AI outputs are assistive only: no AI-derived action can create a sale, dispense, invoice, or inventory movement without explicit pharmacist confirmation, and every AI-assisted event is recorded in the audit trail with its confidence state.
+
+تفرض ميدورا وضعية **الدفاع المتعمق** عبر أربع طبقات: طبقة النقل (TLS محمية وجاهزة لـ HSTS)، وطبقة التطبيق (مصادقة وتفويض أدوار على الخادم لكل إجراء محمي — لا يُوثق بأي شيء على العميل)، وطبقة البيانات (استعلامات محدودة النطاق بالمستأجر مع فرض التفويض قبل الوصول للبيانات، وعبارات معلمة عبر Drizzle ORM، وسلاسل تجزئة تدقيق مقاومة للتلاعب لانتقالات الحالة المؤثرة)، وطبقة التشغيل (حاوية غير جذر، وحدود تكامل مغلقة عند الفشل، وأسرار لا تظهر أبدًا في الكود أو مخرجات البناء). مخرجات ذكاء الوصفات مساعدة فقط: لا يمكن لأي إجراء مشتق من الذكاء الاصطناعي إنشاء بيع أو صرف أو فاتورة أو حركة مخزون دون تأكيد صيدلي صريح، ويُسجَّل كل حدث مدعوم بالذكاء الاصطناعي في سجل التدقيق مع حالة الثقة.
+
 ## Supported Security Practices | الممارسات الأمنية المدعومة
 
 The repository uses automated TypeScript checks, tests, production builds, isolated database lifecycle checks, CodeQL analysis, dependency review configuration, protected branches, and maintainer review for security-sensitive surfaces. These controls support engineering assurance; they do not replace a production penetration test, infrastructure review, formal regulatory approval, or an operational incident-response plan.
@@ -48,6 +60,12 @@ A useful report includes the affected component, route, procedure, or workflow; 
 If the issue involves an active production system, stop testing, preserve only minimal non-sensitive evidence, and notify the owner immediately. Do not attempt to access data belonging to another tenant, patient, organization, or user.
 
 إذا كانت المشكلة تتعلق بنظام إنتاج نشط، فأوقف الاختبار واحتفظ بأدلة غير حساسة وبالحد الأدنى فقط، وأبلغ المالك فورًا. لا تحاول الوصول إلى بيانات مستأجر أو مريض أو مؤسسة أو مستخدم آخر.
+
+## Incident Response | الاستجابة للحوادث
+
+Suspected breaches of a deployed MEDORA environment should trigger an immediate escalation sequence: isolate the affected environment from external access, preserve immutable evidence (audit hash chains, access logs, and server journals) without modifying it, rotate every credential that may have been exposed (JWT signing keys, session tokens, database credentials, storage keys, and integration secrets), and notify the repository owner through the private channel described above. Do not delete logs or attempt ad-hoc remediation before evidence is preserved; MEDORA's tamper-evident audit trails make forensic reconstruction possible precisely because they were never altered.
+
+يجب أن يُفعّل أي اشتباه باختراق بيئة ميدورا منشورة تسلسل تصعيد فوري: عزل البيئة المتأثرة عن الوصول الخارجي، والحفاظ على أدلة غير قابلة للتعديل (سلاسل تجزئة التدقيق وسجلات الوصول وسجلات الخادم)، وتدوير كل بيانات اعتماد قد تكون مكشوفة (مفاتيح توقيع JWT والرموز وبطاقات قاعدة البيانات ومفاتيح التخزين وأسرار التكاملات)، وإبلاغ مالك المستودع عبر القناة الخاصة. لا تحذف السجلات ولا تحاول إصلاحًا ارتجاليًا قبل حفظ الأدلة؛ فمسارات التدقيق المقاومة للتلاعب تجعل إعادة بناء التحقيقات الجنائية الرقمية ممكنة لأنّها لم تُعَدَّل أبدًا.
 
 ## Coordinated Disclosure | الإفصاح المنسق
 
