@@ -22,7 +22,7 @@ ENV PORT=3000
 
 LABEL org.opencontainers.image.title="MEDORA Integrated Health System" \
       org.opencontainers.image.description="Bilingual healthcare operations platform with Arabic RTL and English LTR support" \
-      org.opencontainers.image.source="https://github.com/0SSAM/ALDORA-Integrated-Health-System"
+      org.opencontainers.image.source="https://github.com/0SSAM/MEDORA-Health-Care-Eco-System"
 
 RUN groupadd --system --gid 1001 medora && \
     useradd --system --uid 1001 --gid medora --create-home --shell /usr/sbin/nologin medora
