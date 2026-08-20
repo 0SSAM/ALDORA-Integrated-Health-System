@@ -18,10 +18,10 @@
 ![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 
-[![CI Status](https://img.shields.io/github/actions/workflow/status/0SSAM/ALDORA-Integrated-Health-System/ci.yml?style=for-the-badge&label=CI%2FCD&logo=githubactions&logoColor=white)](https://github.com/0SSAM/ALDORA-Integrated-Health-System/actions/workflows/ci.yml)
-[![CodeQL](https://img.shields.io/badge/CodeQL-Security%20Verified-green?style=for-the-badge&logo=github&logoColor=white)](https://github.com/0SSAM/ALDORA-Integrated-Health-System/security/code-scanning)
+[![CI Status](https://img.shields.io/github/actions/workflow/status/0SSAM/MEDORA-Health-Care-Eco-System/ci.yml?style=for-the-badge&label=CI%2FCD&logo=githubactions&logoColor=white)](https://github.com/0SSAM/MEDORA-Health-Care-Eco-System/actions/workflows/ci.yml)
+[![CodeQL](https://img.shields.io/badge/CodeQL-Security%20Verified-green?style=for-the-badge&logo=github&logoColor=white)](https://github.com/0SSAM/MEDORA-Health-Care-Eco-System/security/code-scanning)
 [![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)]()
-[![Last Commit](https://img.shields.io/github/last-commit/0SSAM/ALDORA-Integrated-Health-System?style=for-the-badge&logo=git&logoColor=white)]()
+[![Last Commit](https://img.shields.io/github/last-commit/0SSAM/MEDORA-Health-Care-Eco-System?style=for-the-badge&logo=git&logoColor=white)]()
 
 🔗 **[🌐 Live Demo — العرض المباشر](https://aldorapharm-fwilugbd.manus.space)**
 
@@ -151,8 +151,8 @@ MEDORA is designed to help healthcare operators **see the whole operation, act w
 
 ```bash
 # Clone the repository
-git clone https://github.com/0SSAM/ALDORA-Integrated-Health-System.git
-cd ALDORA-Integrated-Health-System
+git clone https://github.com/0SSAM/MEDORA-Health-Care-Eco-System.git
+cd MEDORA-Health-Care-Eco-System
 
 # Install dependencies with pnpm
 pnpm install
@@ -170,7 +170,7 @@ pnpm build
 ## 📁 Project Structure | هيكل المشروع
 
 ```
-ALDORA-Integrated-Health-System/
+MEDORA-Health-Care-Eco-System/
 ├── client/          # 🖥️ React frontend (85+ components)
 ├── server/          # 🔧 Node.js backend (214+ modules)
 ├── shared/          # 🔗 Shared types & utilities
