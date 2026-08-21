@@ -118,7 +118,8 @@ Use this before concluding a maintenance cycle to ensure a clean state:
 2. **Quality Gate**: `pnpm check` (TypeScript), `pnpm test` (383 tests), and `pnpm build` (vite 8 production build).
 3. **Runtime Verification**: `scripts/ci-smoke.sh` (expects "MEDORA smoke check passed") and `pnpm exec playwright test` (E2E).
 4. **Security Audit**: `pnpm audit --prod` (must be 0 vulnerabilities).
-5. **Skill Preservation**: Ensure the `skills/medora-repo-ops/` folder is committed to the repository and the user is provided with the `SKILL.md` card for global account addition.
+5. **Test Account Documentation**: Ensure `docs/TEST_ACCOUNTS.md` is updated with current test credentials and linked in the main `README.md`.
+6. **Skill Preservation**: Ensure the `skills/medora-repo-ops/` folder is committed to the repository and the user is provided with the `SKILL.md` card for global account addition.
 
 ## Pitfalls learned
 

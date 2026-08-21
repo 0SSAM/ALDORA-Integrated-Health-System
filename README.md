@@ -167,6 +167,15 @@ pnpm test
 pnpm build
 ```
 
+### 🔑 Test Accounts | حسابات الاختبار
+
+For development and demonstration purposes, a default test account is available. See the full guide for details:
+لأغراض التطوير والعرض التوضيحي، يتوفر حساب اختبار افتراضي. راجع الدليل الكامل للحصول على التفاصيل:
+
+- **[Test Accounts & Credentials Guide](docs/TEST_ACCOUNTS.md)**
+- **[دليل حسابات الاختبار وبيانات الاعتماد](docs/TEST_ACCOUNTS.md)**
+
+
 ## 📁 Project Structure | هيكل المشروع
 
 ```
