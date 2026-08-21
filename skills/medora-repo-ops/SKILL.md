@@ -110,6 +110,16 @@ Use when `pnpm audit` reports advisories on main:
 4. Expect test breaks on major vite upgrades: vite 8 no longer applies the JSX transform in vitest runs — add `plugins: [react()]` (from `@vitejs/plugin-react`) to `vitest.config.ts` if TSX suites fail with "invalid JS syntax / import analysis".
 5. Re-run the full validation gate and `pnpm audit --prod` (must be 0). Commit as `chore(deps)` and push to main.
 
+## Workflow 9: Final Handover and Repository Health Verification
+
+Use this before concluding a maintenance cycle to ensure a clean state:
+
+1. **Git Integrity**: `git status` (must be "nothing to commit, working tree clean") and `git log -1 --oneline` (confirm remote `main` matches local `HEAD`).
+2. **Quality Gate**: `pnpm check` (TypeScript), `pnpm test` (383 tests), and `pnpm build` (vite 8 production build).
+3. **Runtime Verification**: `scripts/ci-smoke.sh` (expects "MEDORA smoke check passed") and `pnpm exec playwright test` (E2E).
+4. **Security Audit**: `pnpm audit --prod` (must be 0 vulnerabilities).
+5. **Skill Preservation**: Ensure the `skills/medora-repo-ops/` folder is committed to the repository and the user is provided with the `SKILL.md` card for global account addition.
+
 ## Pitfalls learned
 
 - The sandbox resets between sessions: always `git fetch` and re-sync before acting; write state to a notes file first.
