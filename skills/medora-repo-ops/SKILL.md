@@ -46,6 +46,7 @@ Choose by the user's request:
 | Harden copyright / legal / security posture | Workflow 6 |
 | Audit a deployed build for vulnerabilities + performance | Workflow 7 |
 | `pnpm audit` advisories to close | Workflow 8 |
+| Automated E2E Authentication Testing | Workflow 11 |
 
 ## Workflow 1: Full-repo synchronization and enrichment
 
@@ -136,3 +137,13 @@ Use this before concluding a maintenance cycle to ensure a clean state:
 - Dependabot alerts can exist on the default branch while `pnpm audit --prod` passes; they refer to transitive dev or non-shipped advisories.
 - When rebasing onto main, user-authored main files (README, SECURITY) can silently win conflicts with richer branch versions — always diff the merged tree against both parents and restore the superset.
 - GitHub's "Code Scanning AI" platform jobs can fail with internal 400s ("model not supported") — not a code failure and not among required checks.
+
+## Workflow 11: Automated E2E Authentication Testing
+
+Use this to verify login flows and documented test credentials:
+
+1. **Test Creation**: Create `e2e/medora-auth-showcase.spec.ts` to test documented credentials (`test` / `Test#@!12345`).
+2. **Robust Logic**: The test MUST handle the "No Database" constraint in sandbox/CI environments. Since `ensureShowcaseAccount()` requires `DATABASE_URL`, the test should verify that the UI gracefully handles the server-side verification error ("تعذر التحقق من البيانات") when no DB is connected, while including a `test.skip` for the full success path.
+3. **Execution**: Run with `export SHOWCASE_TEST_PASSWORD='...' && pnpm exec playwright test e2e/medora-auth-showcase.spec.ts`.
+4. **Verification**: Confirm the UI correctly captures the login attempt, shows appropriate feedback (error alert or redirect), and does not leak credentials in the DOM or logs.
+5. **CI Safety**: Ensure the test is committed to the repository so it runs in GitHub Actions, documenting the environment requirements for full success.
