@@ -49,7 +49,8 @@ fi
 cd "$SOURCE_DIR"
 git fetch --all --tags
 
-RELEASE_REF=${1:-main}
+# Sanitize input to prevent command injection
+RELEASE_REF=$(echo "${1:-main}" | tr -cd '[:alnum:]._-')
 echo -e "${BLUE}Checking out $RELEASE_REF...${NC}"
 git checkout "$RELEASE_REF"
 git pull origin "$RELEASE_REF"
