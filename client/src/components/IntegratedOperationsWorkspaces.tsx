@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PhoneCall, ShieldAlert } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type ScopeProps = { organizationId: number | null; jurisdictionId: number | null; branchId?: number | null };
 
@@ -201,5 +203,95 @@ export function FinanceWorkspace({ organizationId, jurisdictionId, branchId }: S
       </div>
       <ReportsWorkspace organizationId={organizationId} jurisdictionId={jurisdictionId} branchId={branchId} section="financial" />
     </div>
+  );
+}
+
+export function WhatsAppManagementWorkspace({ organizationId }: { organizationId: number | null }) {
+  const [to, setTo] = useState("");
+  const [text, setText] = useState("");
+  const [status, setStatus] = useState("");
+  const send = trpc.communication.sendWhatsApp.useMutation();
+  const sessionInfo = trpc.auth.sessionInfo.useQuery(undefined);
+  
+  const handleTestSend = async () => {
+    if (!to.trim() || !text.trim()) {
+      setStatus("يرجى إدخال رقم الهاتف ونص الرسالة.");
+      return;
+    }
+    try {
+      const result = await send.mutateAsync({ to, text });
+      setStatus(result.simulated ? "تمت محاكاة الإرسال بنجاح (وضع العرض)." : "تم إرسال الرسالة بنجاح عبر WhatsApp API.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "تعذر إرسال الرسالة.");
+    }
+  };
+
+  return (
+    <Card className="overflow-hidden border-0 bg-white shadow-sm">
+      <CardHeader className="flex-row items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <PhoneCall className="h-5 w-5 text-emerald-600" />
+            إدارة رسائل واتساب التلقائية
+          </CardTitle>
+          <p className="mt-1 text-sm text-slate-500">إعداد وتفعيل قوالب التواصل التلقائي مع العملاء والمرضى.</p>
+        </div>
+        <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-emerald-800">
+          WhatsApp Business API
+        </Badge>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="border-slate-100 bg-slate-50/50">
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">حالة الربط</p>
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-amber-500" />
+                <span className="text-sm font-medium text-slate-700">بانتظار الإعداد (وضع العرض)</span>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-slate-100 bg-slate-50/50">
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">القوالب المعتمدة</p>
+              <span className="text-xl font-bold text-slate-400">٠ قوالب</span>
+            </CardContent>
+          </Card>
+          <Card className="border-slate-100 bg-slate-50/50">
+            <CardContent className="p-4">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">جاهزية الأتمتة</p>
+              <span className="text-sm font-medium text-rose-600">غير مفعلة</span>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="rounded-2xl border border-amber-100 bg-amber-50/30 p-6 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+            <ShieldAlert className="h-6 w-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900">تفعيل WhatsApp Business API</h3>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">
+            يتطلب إرسال الرسائل الحقيقية ربط حساب Meta Business موثق، وتكوين مفاتيح الوصول (API Keys) في مدير الأسرار، واعتماد قوالب الرسائل من قبل Meta.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Button variant="outline" className="border-slate-200 bg-white text-slate-700">
+              دليل الإعداد التقني
+            </Button>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+              بدء عملية الربط
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-4 rounded-2xl border border-slate-200 p-4 opacity-50 grayscale pointer-events-none">
+          <h3 className="text-sm font-bold text-slate-900">اختبار إرسال سريع (مغلق)</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Input disabled placeholder="رقم الهاتف..." dir="ltr" />
+            <Input disabled placeholder="نص الرسالة..." />
+          </div>
+          <Button disabled className="bg-slate-200 text-slate-400">إرسال رسالة تجريبية</Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -8,10 +8,14 @@ export async function sendWhatsAppMessage(payload: WhatsAppMessagePayload) {
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
 
   if (!apiKey || !phoneNumberId) {
-    // In demo/dev mode without keys, we log but don't fail the operational flow
-    console.warn("[WhatsApp] Integration keys missing. Message logged to console instead of sent.");
-    console.info(`[WhatsApp Simulation] To: ${payload.to}, Body: ${payload.text || payload.templateName}`);
-    return { success: true, messageId: `sim_${Date.now()}`, simulated: true };
+    // Integration is blocked by default if credentials are missing.
+    // We return a controlled blocked state instead of simulating success.
+    return { 
+      success: false, 
+      state: "blocked", 
+      reason: "WhatsApp API credentials (API Key or Phone Number ID) are not configured in the secret manager.",
+      simulated: true 
+    };
   }
 
   // Real Meta WhatsApp Business API call

@@ -14,17 +14,18 @@ export function SecurityOverlay() {
   useEffect(() => {
     if (!user) return;
 
-    // Fast anti-screenshot / screen recording detection
-    // Using visibilitychange and blur for rapid response
+    // Heuristic privacy and focus detection
+    // Note: Web browsers cannot reliably block OS-level screenshots.
+    // These events act as a deterrent and focus-mode trigger.
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden") {
-        // Potential screenshot or app switching
+        // Blur content when tab is hidden to protect visible data
         setIsTampered(true);
       }
     };
 
     const handleBlur = () => {
-      // Blur often triggers when system-level screenshot tools are activated
+      // Deterrent: trigger overlay when window loses focus
       setIsTampered(true);
     };
 
@@ -58,26 +59,26 @@ export function SecurityOverlay() {
 
   return (
     <>
-      {/* Optimized Watermark: Subtle, professional, and less intrusive */}
+      {/* Professional Deterrent Watermark: Sanitized and subtle */}
       <div 
-        className="pointer-events-none fixed inset-0 z-[9998] overflow-hidden opacity-[0.03] select-none"
+        className="pointer-events-none fixed inset-0 z-[9998] overflow-hidden opacity-[0.02] select-none"
         style={{ 
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='12' fill='black' text-anchor='middle' transform='rotate(-30 100 100)'%3EMEDORA | ${user.name}%3C/text%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='10' fill='black' text-anchor='middle' transform='rotate(-25 110 110)'%3EMEDORA | ${encodeURIComponent(user.name || "User")}%3C/text%3E%3C/svg%3E")`,
           backgroundRepeat: 'repeat'
         }}
       />
 
-      {/* Immediate Anti-Screenshot Blur Overlay */}
+      {/* Privacy & Focus Deterrent Overlay */}
       {isTampered && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-2xl transition-opacity duration-75">
-          <div className="flex flex-col items-center gap-4 rounded-3xl bg-white/90 p-8 text-center shadow-2xl animate-in zoom-in-95 duration-150">
-            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-rose-50 text-rose-600">
-              <ShieldAlert className="h-10 w-10" />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/40 backdrop-blur-xl transition-opacity duration-150">
+          <div className="flex flex-col items-center gap-4 rounded-3xl bg-white/95 p-8 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-cyan-50 text-cyan-600">
+              <ShieldAlert className="h-8 w-8" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900">حماية المحتوى نشطة</h2>
-              <p className="mt-2 text-sm text-slate-500 max-w-[240px]">
-                يُمنع تصوير الشاشة أو تسجيل الفيديو لحماية بيانات المرضى والخصوصية المؤسسية.
+              <h2 className="text-lg font-bold text-slate-900">وضع حماية البيانات</h2>
+              <p className="mt-2 text-xs text-slate-500 max-w-[260px] leading-relaxed">
+                تم تمويه المحتوى لحماية بيانات المرضى والخصوصية المؤسسية. عد للنافذة للمتابعة.
               </p>
             </div>
           </div>

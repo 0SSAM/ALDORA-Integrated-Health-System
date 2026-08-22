@@ -274,11 +274,22 @@ export const appRouter = router({
         templateName: z.string().optional()
       }))
       .mutation(async ({ input, ctx }) => {
-        if (!["admin", "manager", "operations_manager"].includes(ctx.user.role)) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك صلاحية إرسال رسائل التواصل." });
+        // Enforce role-based access control based on valid application roles.
+        // The 'operations_manager' is a placeholder for future granular roles.
+        if (!["admin", "manager"].includes(ctx.user.role)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك صلاحية إرسال رسائل التواصل. تتطلب هذه العملية صلاحيات إدارية." });
         }
         const { sendWhatsAppMessage } = await import("./connectors/whatsapp");
-        return await sendWhatsAppMessage(input);
+        const result = await sendWhatsAppMessage(input);
+        
+        if (!result.success && result.state === "blocked") {
+          throw new TRPCError({ 
+            code: "PRECONDITION_FAILED", 
+            message: "خدمة WhatsApp غير مفعلة حالياً. يرجى إعداد مفاتيح API في لوحة التحكم." 
+          });
+        }
+        
+        return result;
       }),
   }),
   reference: router({
