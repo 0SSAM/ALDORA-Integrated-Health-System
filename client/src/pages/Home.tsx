@@ -29,6 +29,7 @@ const InsuranceWorkspace = lazy(() => import("@/components/IntegratedOperationsW
 const OrganizationWorkspace = lazy(() => import("@/components/IntegratedOperationsWorkspaces").then(module => ({ default: module.OrganizationWorkspace })));
 const PromotionsWorkspace = lazy(() => import("@/components/IntegratedOperationsWorkspaces").then(module => ({ default: module.PromotionsWorkspace })));
 const ReportsWorkspace = lazy(() => import("@/components/IntegratedOperationsWorkspaces").then(module => ({ default: module.ReportsWorkspace })));
+const FinanceWorkspace = lazy(() => import("@/components/IntegratedOperationsWorkspaces").then(module => ({ default: module.FinanceWorkspace })));
 const OperationsManagementWorkspace = lazy(() => import("@/components/OperationsManagementWorkspace").then(module => ({ default: module.OperationsManagementWorkspace })));
 const NlmIcd10ReferencePanel = lazy(() => import("@/components/NlmIcd10ReferencePanel").then(module => ({ default: module.NlmIcd10ReferencePanel })));
 const AuthenticationSettingsWorkspace = lazy(() => import("@/components/AuthenticationSettingsWorkspace").then(module => ({ default: module.AuthenticationSettingsWorkspace })));
@@ -302,7 +303,7 @@ function ModulePanel({ active, organizationId, branchId, jurisdictionId }: { act
   if (active === "supplyChain") return <SupplyChainWorkspace branchId={branchId} jurisdictionId={jurisdictionId} />;
   if (active === "egyptHealthcare") return <EgyptHealthcareWorkspace organizationId={organizationId} branchId={branchId} jurisdictionId={jurisdictionId} />;
   if (active === "insurance") return <InsuranceWorkspace organizationId={organizationId} jurisdictionId={jurisdictionId} branchId={branchId} />;
-  if (active === "finance") return <ReportsWorkspace organizationId={organizationId} jurisdictionId={jurisdictionId} branchId={branchId} />;
+  if (active === "finance") return <FinanceWorkspace organizationId={organizationId} jurisdictionId={jurisdictionId} branchId={branchId} />;
   if (active === "hr") return <div className="space-y-5"><OrganizationWorkspace organizationId={organizationId} /><OperationsManagementWorkspace organizationId={organizationId} branchId={branchId} jurisdictionId={jurisdictionId} section="hr" /></div>;
   if (active === "crm") return <OperationsManagementWorkspace organizationId={organizationId} branchId={branchId} jurisdictionId={jurisdictionId} section="crm" />;
   if (active === "promotions") return <PromotionsWorkspace organizationId={organizationId} jurisdictionId={jurisdictionId} branchId={branchId} />;
