@@ -131,7 +131,7 @@ jobs:
       - name: Apply repository migrations to isolated MySQL
         env:
           DATABASE_URL: mysql://ci:ci@127.0.0.1:3306/medora_ci
-        run: pnpm exec drizzle-kit push --force --accept-data-loss
+        run: pnpm exec drizzle-kit push --force
 
       - name: Run isolated database lifecycle contract
         env:
