@@ -8,7 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { calculateDemandRecommendation } from "../../../server/domain/demand-forecast-policy";
+import { calculateDemandRecommendation } from "@/../../shared/demand-forecast-policy";
 
 type SupplyChainWorkspaceProps = { branchId?: number | null; jurisdictionId?: number | null };
 

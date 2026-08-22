@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>MEDORA | ميدورا</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: linear-gradient(135deg, #001F3F 0%, #003366 50%, #00509E 100%);
+            color: #FFFFFF;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0.1;
+            background-image: radial-gradient(#00A3E0 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: 1;
+        }
+        .content-wrapper {
+            z-index: 2;
+            text-align: center;
+            max-width: 900px;
+        }
+        .logo-icon {
+            font-size: 80px;
+            color: #00A3E0;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 15px rgba(0, 163, 224, 0.4);
+        }
+        h1 {
+            font-size: 84px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .arabic-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            color: #E6F2FF;
+        }
+        .divider {
+            width: 150px;
+            height: 4px;
+            background: #00A3E0;
+            margin: 0 auto 30px auto;
+            border-radius: 2px;
+        }
+        h2 {
+            font-size: 32px;
+            font-weight: 400;
+            color: #B3D4FF;
+            margin-bottom: 15px;
+        }
+        .meta-info {
+            font-size: 18px;
+            color: #80BFFF;
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="bg-pattern"></div>
+        <div class="content-wrapper">
+            <i class="fas fa-heartbeat logo-icon"></i>
+            <h1>MEDORA</h1>
+            <div class="arabic-title">ميدورا</div>
+            <div class="divider"></div>
+            <h2>Project Status & Deployment Readiness</h2>
+            <h2 style="font-family: 'Cairo', sans-serif; font-size: 28px;">حالة المشروع وجاهزية النشر</h2>
+            
+            <div class="meta-info">
+                <div class="meta-item"><i class="far fa-calendar-alt"></i> August 2026</div>
+                <div class="meta-item"><i class="fas fa-code-branch"></i> Final Release Build</div>
+                <div class="meta-item"><i class="fas fa-shield-alt"></i> Verified & Secure</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

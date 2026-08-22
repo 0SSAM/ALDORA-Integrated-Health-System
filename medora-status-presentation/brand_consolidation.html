@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brand Consolidation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .header {
+            background: #003366;
+            color: white;
+            padding: 40px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 42px;
+            font-weight: 800;
+        }
+        .header .arabic-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #00A3E0;
+        }
+        /* Reduced content padding (top and bottom) to remove excess page height */
+        .content {
+            padding: 50px 60px 35px; /* top right/left bottom */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        /* Slightly tighter spacing between transition graphic and details */
+        .transition-graphic {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px; /* reduced from 60px */
+        }
+        /* Reduce internal padding of brand boxes so they consume less vertical space */
+        .brand-box {
+            padding: 20px 40px; /* reduced from 30px 50px */
+            border: 2px solid #E0E0E0;
+            text-align: center;
+            width: 350px;
+        }
+        .brand-box.old {
+            background: #F8F9FA;
+            color: #888888;
+            border-color: #CCCCCC;
+        }
+        .brand-box.new {
+            background: #E6F2FF;
+            border-color: #00A3E0;
+            color: #003366;
+        }
+        .brand-box h2 { font-size: 36px; font-weight: 800; margin-bottom: 10px; }
+        .brand-box .ar { font-family: 'Cairo', sans-serif; font-size: 28px; }
+        .arrow {
+            font-size: 48px;
+            color: #00A3E0;
+        }
+        /* Reduced gap in details grid to save vertical space */
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px; /* reduced from 40px */
+        }
+        .detail-item {
+            display: flex;
+            gap: 20px;
+        }
+        .detail-icon {
+            font-size: 32px;
+            color: #00A3E0;
+            padding-top: 5px;
+        }
+        .detail-text h3 {
+            font-size: 24px;
+            color: #003366;
+            margin-bottom: 10px;
+        }
+        .detail-text p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #555555;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1>Brand Consolidation & Identity</h1>
+            <div class="arabic-title">توحيد الهوية التجارية</div>
+        </div>
+        <div class="content">
+            <div class="transition-graphic">
+                <div class="brand-box old">
+                    <h2>ALDORA</h2>
+                    <div class="ar">الدورا</div>
+                </div>
+                <div class="arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="brand-box new">
+                    <h2>MEDORA</h2>
+                    <div class="ar">ميدورا</div>
+                </div>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-item">
+                    <div class="detail-icon"><i class="fas fa-search"></i></div>
+                    <div class="detail-text">
+                        <h3>100% Source Verification</h3>
+                        <p>A repository-wide text scan confirms zero remaining legacy brand tokens in source-controlled text, UI manifests, or configuration files.</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon"><i class="fas fa-broom"></i></div>
+                    <div class="detail-text">
+                        <h3>Artifact Cleanup</h3>
+                        <p>Stale generated artifacts and obsolete documentation (e.g., legacy PDFs) have been securely removed to prevent contradictory branding.</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon"><i class="fas fa-language"></i></div>
+                    <div class="detail-text">
+                        <h3>Bilingual Consistency</h3>
+                        <p>Complete alignment of the "MEDORA | ميدورا" identity across all English and Arabic interfaces, documentation, and user communications.</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon"><i class="fas fa-code-branch"></i></div>
+                    <div class="detail-text">
+                        <h3>Clean Working Tree</h3>
+                        <p>The consolidation applies cleanly to the current release tree on the main branch, maintaining the integrity of historical commits.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

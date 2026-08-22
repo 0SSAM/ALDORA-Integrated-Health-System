@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Technical Milestones</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        .slide-container {
+            width: 1280px;
+            min-height: 720px;
+            background: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .header {
+            background: #003366;
+            color: white;
+            padding: 40px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 42px;
+            font-weight: 800;
+        }
+        .header .arabic-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: #00A3E0;
+        }
+        .content {
+            padding: 60px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .milestones-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+        .milestone-column {
+            text-align: center;
+            padding: 20px;
+        }
+        .icon-wrapper {
+            width: 100px;
+            height: 100px;
+            background: #E6F2FF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px auto;
+            color: #003366;
+            font-size: 40px;
+            border: 2px solid #00A3E0;
+        }
+        .milestone-column h3 {
+            font-size: 28px;
+            color: #003366;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .milestone-column ul {
+            list-style: none;
+            text-align: left;
+        }
+        .milestone-column li {
+            font-size: 18px;
+            color: #555555;
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 25px;
+            line-height: 1.5;
+        }
+        .milestone-column li::before {
+            content: "\f00c";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: #00A3E0;
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="header">
+            <h1>Technical Milestones & Updates</h1>
+            <div class="arabic-title">الإنجازات والتحديثات التقنية</div>
+        </div>
+        <div class="content">
+            <div class="milestones-grid">
+                <div class="milestone-column">
+                    <div class="icon-wrapper"><i class="fas fa-rocket"></i></div>
+                    <h3>Core Upgrades</h3>
+                    <ul>
+                        <li>Migrated to Vite 8.2.1 for lightning-fast frontend builds.</li>
+                        <li>Upgraded to Vitest 4.1.11 for robust unit testing.</li>
+                        <li>Resolved dev-advisories via precise pnpm overrides (picomatch/esbuild).</li>
+                    </ul>
+                </div>
+                
+                <div class="milestone-column">
+                    <div class="icon-wrapper"><i class="fas fa-language"></i></div>
+                    <h3>Bilingual & RTL</h3>
+                    <ul>
+                        <li>Seamless Arabic/English switching across all UI components.</li>
+                        <li>Perfected Right-to-Left (RTL) layout integrity.</li>
+                        <li>Verified via automated Playwright E2E localization tests.</li>
+                    </ul>
+                </div>
+                
+                <div class="milestone-column">
+                    <div class="icon-wrapper"><i class="fas fa-database"></i></div>
+                    <h3>Backend Architecture</h3>
+                    <ul>
+                        <li>Drizzle ORM integrated with MySQL 8.4 backend.</li>
+                        <li>Isolated database lifecycle for CI environments.</li>
+                        <li>Hardened authentication routing and showcase account isolation.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
