@@ -14,6 +14,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LocalizationProvider } from "./contexts/LocalizationContext";
+import { SecurityOverlay } from "./components/SecurityOverlay";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -63,6 +64,7 @@ function App() {
         <LocalizationProvider>
           <TooltipProvider>
             <Toaster />
+            <SecurityOverlay />
             <Router />
           </TooltipProvider>
         </LocalizationProvider>

@@ -211,7 +211,7 @@ export const appRouter = router({
       const token = createInternalSessionToken();
       await createInternalSession({ token, userId: credential.userId, ...scope, sessionMode: credential.accountType === "showcase" ? "showcase" : "production", expiresAt: new Date(now.getTime() + INTERNAL_SESSION_TTL_MS) });
       await recordAuthenticationEvent({ username, userId: credential.userId, ...scope, eventType: "login_success", source: "internal" });
-      ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), maxAge: INTERNAL_SESSION_TTL_MS, path: "/" });
+      ctx.res.cookie(INTERNAL_SESSION_COOKIE, token, { httpOnly: true, sameSite: "lax", secure: isSecureRequest(ctx.req), path: "/" });
       return { success: true as const, mode: "internal" as const, scope, accountType: credential.accountType, sessionMode: credential.accountType === "showcase" ? "showcase" as const : "production" as const };
       } catch (error) {
         console.error("[Auth] internal login unavailable:", safeErrorLabel(error));
