@@ -25,9 +25,9 @@ This strategy defines how MEDORA verifies that Arabic and English interfaces rem
 
 ### 1. Static and Source-Level Checks | الفحوصات الثابتة وفحوصات المصدر
 
-Every pull request that changes UI, copy, locale behavior, or CSS should scan for hard-coded user-facing strings, stale brand keys, physical `left`/`right` properties where logical properties are required, missing direction attributes, and unsafe interpolation of translated content. The check should flag untranslated placeholders, accidental `ALDO` or `ALDORA` protocol names, and environment keys that do not use the MEDORA namespace.
+Every pull request that changes UI, copy, locale behavior, or CSS should scan for hard-coded user-facing strings, stale brand keys, physical `left`/`right` properties where logical properties are required, missing direction attributes, and unsafe interpolation of translated content. The check should flag untranslated placeholders, accidental `MEDORA` or `MEDORA` protocol names, and environment keys that do not use the MEDORA namespace.
 
-يجب على كل Pull Request يغيّر الواجهة أو النصوص أو سلوك اللغة أو CSS أن يفحص النصوص الظاهرة للمستخدم، ومفاتيح الهوية القديمة، وخصائص `left` و`right` الفيزيائية عندما تكون الخصائص المنطقية مطلوبة، وغياب سمات الاتجاه، وإدراج النصوص المترجمة بطريقة غير آمنة. يجب أن يكتشف الفحص العناصر غير المترجمة وأسماء البروتوكولات القديمة مثل `ALDO` أو `ALDORA` ومفاتيح البيئة التي لا تستخدم نطاق MEDORA.
+يجب على كل Pull Request يغيّر الواجهة أو النصوص أو سلوك اللغة أو CSS أن يفحص النصوص الظاهرة للمستخدم، ومفاتيح الهوية القديمة، وخصائص `left` و`right` الفيزيائية عندما تكون الخصائص المنطقية مطلوبة، وغياب سمات الاتجاه، وإدراج النصوص المترجمة بطريقة غير آمنة. يجب أن يكتشف الفحص العناصر غير المترجمة وأسماء البروتوكولات القديمة مثل `MEDORA` أو `MEDORA` ومفاتيح البيئة التي لا تستخدم نطاق MEDORA.
 
 ### 2. Unit and Component Tests | اختبارات الوحدة والمكونات
 

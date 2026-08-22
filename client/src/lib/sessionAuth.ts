@@ -13,6 +13,8 @@ type CachedHeader = {
 };
 
 const CACHE_WINDOW_MS = 10_000;
+const PREVIEW_FALLBACK_ENABLED =
+  import.meta.env.DEV || import.meta.env.VITE_MANUS_PREVIEW_AUTH_FALLBACK === "true";
 let cached: CachedHeader | null = null;
 
 export function getSessionAuthHeader(
@@ -22,6 +24,10 @@ export function getSessionAuthHeader(
   if (cached && cached.expiresAt > now) return cached.header;
 
   let header: Record<string, string> = {};
+  if (!PREVIEW_FALLBACK_ENABLED) {
+    cached = { expiresAt: now + CACHE_WINDOW_MS, header };
+    return header;
+  }
   try {
     const raw = storage?.getItem("manus-cookie");
     if (raw) {

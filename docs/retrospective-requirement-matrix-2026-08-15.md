@@ -29,7 +29,7 @@ The project now contains a discreet product identity and provenance boundary: ME
 
 The remaining work is not a claim that code can make ownership “impossible to erase.” The technically feasible controls are tamper-evident release manifests, signed audit chains, protected repository history, access separation, backup custody, watermarking or attribution in official documents, and contractual notices. The legally effective controls are registration, assignment/licence agreements, employment and contractor clauses, contributor records, and evidence preservation under professional advice.
 
-The recommended meaning of **ALDO** is a brand narrative rather than a false legal acronym: **ALDO — Adaptive Healthcare, Logistics, Data, and Operations**. In Arabic, it can be presented as **ميدورا: منظومة صحية متكاملة للبيانات والعمليات والرعاية**. The phrase is a positioning explanation and should not be represented as the registered legal expansion of the mark unless the owner formally adopts and registers it.
+The recommended meaning of **MEDORA** is a brand narrative rather than a false legal acronym: **MEDORA — Adaptive Healthcare, Logistics, Data, and Operations**. In Arabic, it can be presented as **ميدورا: منظومة صحية متكاملة للبيانات والعمليات والرعاية**. The phrase is a positioning explanation and should not be represented as the registered legal expansion of the mark unless the owner formally adopts and registers it.
 
 ### 2. Security and governance
 

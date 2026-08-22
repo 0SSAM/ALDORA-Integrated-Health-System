@@ -87,18 +87,12 @@ export function useAuth(options?: UseAuthOptions) {
     }
   }, [internalLogoutMutation, logoutMutation, utils]);
 
-  const state = useMemo(() => {
-    localStorage.setItem(
-      "manus-runtime-user-info",
-      JSON.stringify(meQuery.data)
-    );
-    return {
+  const state = useMemo(() => ({
       user: meQuery.data ?? null,
       loading: (meQuery.isLoading && !authCheckTimedOut) || internalLogoutMutation.isPending || logoutMutation.isPending,
       error: meQuery.error ?? logoutMutation.error ?? null,
       isAuthenticated: Boolean(meQuery.data),
-    };
-  }, [
+  }), [
     meQuery.data,
     meQuery.error,
     meQuery.isLoading,

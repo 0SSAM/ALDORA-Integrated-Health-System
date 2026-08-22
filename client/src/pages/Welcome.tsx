@@ -14,7 +14,7 @@ export const welcomeRoutes = { login: "/login", workspace: "/workspace" } as con
 
 function BrandMark() {
   return (
-    <div className="aldo-brand-mark grid h-14 w-14 place-items-center rounded-[1.35rem] shadow-lg shadow-cyan-900/10" aria-label="ميدورا">
+    <div className="medora-brand-mark grid h-14 w-14 place-items-center rounded-[1.35rem] shadow-lg shadow-cyan-900/10" aria-label="ميدورا">
       <svg viewBox="0 0 48 48" role="img" aria-hidden="true" className="h-9 w-9">
         <path d="M24 4 40 10v12c0 10.5-6.7 18.2-16 22-9.3-3.8-16-11.5-16-22V10L24 4Z" fill="#0d1b2a" opacity=".92" />
         <path d="M24 12c-5.5 3.8-8.5 8.1-8.5 12.9 0 5.6 3.8 9.5 8.5 11.1 4.7-1.6 8.5-5.5 8.5-11.1C32.5 20.1 29.5 15.8 24 12Z" fill="#9ff2e4" />

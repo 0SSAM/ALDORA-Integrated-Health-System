@@ -23,7 +23,7 @@
 [![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)]()
 [![Last Commit](https://img.shields.io/github/last-commit/0SSAM/MEDORA-Health-Care-Eco-System?style=for-the-badge&logo=git&logoColor=white)]()
 
-🔗 **[🌐 Live Demo — العرض المباشر](https://aldorapharm-fwilugbd.manus.space)**
+🔗 **[🌐 Live Demo — العرض المباشر](https://medorapharm-fwilugbd.manus.space)**
 
 ---
 

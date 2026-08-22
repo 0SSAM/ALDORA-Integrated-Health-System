@@ -59,7 +59,7 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [languageOverride, setLanguageOverride] = useState<"ar" | "en">(() => {
     if (typeof window === "undefined") return "ar";
-    return normalizeLanguage(window.localStorage.getItem("aldo-language"));
+    return normalizeLanguage(window.localStorage.getItem("medora-language"));
   });
   const branchRegistry = trpc.regional.myBranchJurisdictions.useQuery(undefined, { enabled: Boolean(user), retry: false, refetchOnWindowFocus: false });
   const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
@@ -70,7 +70,7 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
   const language = languageOverride;
   const setLanguage = (nextLanguage: "ar" | "en") => {
     setLanguageOverride(nextLanguage);
-    try { window.localStorage.setItem("aldo-language", nextLanguage); } catch {}
+    try { window.localStorage.setItem("medora-language", nextLanguage); } catch {}
   };
   const dictionary = dictionaries[language] ?? dictionaries.ar;
   const value = useMemo<ClientLocalization>(() => ({

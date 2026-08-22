@@ -2,7 +2,7 @@
 """Prepare per-chunk audit inputs: concatenate each chunk's files into a single text file."""
 import os, sys
 
-repo = "/home/ubuntu/ALDORA-Integrated-Health-System"
+repo = "/home/ubuntu/MEDORA-Integrated-Health-System"
 
 def chunk_files(chunk: str) -> list[str]:
     path = f"/tmp/audit_chunk_{chunk}"

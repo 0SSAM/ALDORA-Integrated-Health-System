@@ -12,9 +12,11 @@ test.describe("MEDORA Showcase Authentication", () => {
     // Verify we are on the login page (Arabic title)
     await expect(page.locator("h2#login-title")).toContainText("دخول آمن حسب الدور");
 
-    // Fill in the documented showcase credentials
+    // Fill in the reserved showcase username and CI/local managed password.
+    const password = process.env.SHOWCASE_TEST_PASSWORD;
+    test.skip(!password, "SHOWCASE_TEST_PASSWORD is required for the live showcase login flow");
     await page.fill('input[id="internal-username"]', "test");
-    await page.fill('input[id="internal-password"]', "Test#@!12345");
+    await page.fill('input[id="internal-password"]', password!);
 
     // Click the login button
     await page.click('button[type="submit"]');

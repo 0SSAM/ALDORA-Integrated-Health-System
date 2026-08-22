@@ -39,10 +39,10 @@ jobs:
         run: |
           NODE_ENV=development \
           PORT=3000 \
-          JWT_SECRET="ci-only-jwt-secret-not-for-production" \
+          JWT_SECRET="$(openssl rand -hex 48)" \
           DATABASE_URL="mysql://ci:ci@127.0.0.1:3306/medora_ci" \
-          AUDIT_SIGNING_KEY="ci-only-audit-signing-key-not-for-production-2026" \
-          SHOWCASE_TEST_PASSWORD="CI-only-showcase-password-2026" \
+          AUDIT_SIGNING_KEY="$(openssl rand -hex 48)" \
+          SHOWCASE_TEST_PASSWORD="CI-only-showcase-password-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-$(openssl rand -hex 18)" \
           VITE_APP_ID="ci-smoke" \
           VITE_APP_TITLE="ميدورا | منظومة الرعاية الصحية المتكاملة" \
           VITE_APP_LOGO="https://example.invalid/medora-ci-logo.png" \
@@ -96,7 +96,22 @@ jobs:
   isolated-database-lifecycle:
     name: Isolated database lifecycle
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: medora_ci
+          MYSQL_USER: ci
+          MYSQL_PASSWORD: ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uci -pci"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -113,7 +128,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Apply repository migrations to isolated MySQL
+        env:
+          DATABASE_URL: mysql://ci:ci@127.0.0.1:3306/medora_ci
+        run: pnpm exec drizzle-kit migrate
+
       - name: Run isolated database lifecycle contract
+        env:
+          TEST_DATABASE_URL: mysql://ci:ci@127.0.0.1:3306/medora_ci
+          TEST_DATABASE_ISOLATED: "true"
         run: pnpm exec vitest run server/integration/test-database-lifecycle.test.ts
 
   dependency-review:

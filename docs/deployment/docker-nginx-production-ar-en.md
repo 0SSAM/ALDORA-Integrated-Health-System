@@ -4,7 +4,7 @@
 
 **Version / الإصدار:** 1.0
 **Application / التطبيق:** MEDORA | ميدورا — Integrated Health System
-**Repository / المستودع:** [0SSAM/ALDORA-Integrated-Health-System](https://github.com/0SSAM/ALDORA-Integrated-Health-System)
+**Repository / المستودع:** [0SSAM/MEDORA-Integrated-Health-System](https://github.com/0SSAM/MEDORA-Integrated-Health-System)
 
 > This guide describes a repeatable production deployment for the MEDORA application as a Docker container behind Nginx. It intentionally separates application configuration, TLS termination, secrets, database operations, and operational verification. / يشرح هذا الدليل نشر تطبيق MEDORA بطريقة قابلة للتكرار داخل حاوية Docker خلف Nginx، مع فصل إعدادات التطبيق وإنهاء TLS والأسرار وقاعدة البيانات والتحقق التشغيلي.
 
@@ -40,7 +40,7 @@ Nginx terminates TLS, redirects HTTP to HTTPS, forwards the browser-visible host
 | Database | Reachable MySQL/TiDB instance with migrations approved for release | قاعدة MySQL/TiDB جاهزة |
 | Secrets | Runtime secret manager or protected environment file outside Git | مدير أسرار أو ملف محمي خارج Git |
 | Access | SSH access and a least-privilege deployment account | حساب نشر بصلاحيات محدودة |
-| Repository | Access to `0SSAM/ALDORA-Integrated-Health-System` and the approved release ref | صلاحية الوصول للمستودع |
+| Repository | Access to `0SSAM/MEDORA-Integrated-Health-System` and the approved release ref | صلاحية الوصول للمستودع |
 
 Use a supported Node/Docker base image from the repository Dockerfile. Do not install dependencies with an unlocked command in production; the image uses `pnpm install --frozen-lockfile`.
 
@@ -77,10 +77,10 @@ Do not commit `medora.env`, paste it into an issue, include it in a Docker build
 
 ## 4. Build and run the MEDORA image | بناء وتشغيل الصورة
 
-Clone or fetch only the approved integration/release ref. The current synchronization branch is `manus/auto-sync-aldora`; production should normally use an approved tag or reviewed commit rather than an unreviewed branch.
+Clone or fetch only the approved integration/release ref. The current synchronization branch is `manus/auto-sync-medora`; production should normally use an approved tag or reviewed commit rather than an unreviewed branch.
 
 ```bash
-git clone https://github.com/0SSAM/ALDORA-Integrated-Health-System.git /opt/medora/source
+git clone https://github.com/0SSAM/MEDORA-Integrated-Health-System.git /opt/medora/source
 cd /opt/medora/source
 git fetch --tags origin
 git checkout <approved-release-ref>

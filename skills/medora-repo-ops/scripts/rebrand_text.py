@@ -2,8 +2,8 @@
 """Safely replace brand text in an explicit set of text files.
 
 Usage:
-  rebrand_text.py --old ALDORA --new MEDORA --files README.md docs/overview.md
-  rebrand_text.py --old ALDORA --new MEDORA --files README.md --write
+  rebrand_text.py --old MEDORA --new MEDORA --files README.md docs/overview.md
+  rebrand_text.py --old MEDORA --new MEDORA --files README.md --write
 
 The default mode is dry-run. Binary files are rejected by extension and by a NUL-byte check.
 """

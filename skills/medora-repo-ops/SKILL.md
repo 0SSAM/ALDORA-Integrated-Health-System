@@ -1,20 +1,20 @@
 ---
 name: medora-repo-ops
-description: "Operate and maintain the MEDORA Integrated Health System GitHub repository (0SSAM/MEDORA-Health-Care-Eco-System, formerly ALDORA-Integrated-Health-System). Use for synchronizing a repo integration branch, full rebranding (ALDORA to MEDORA), writing bilingual Arabic/English docs, READMEs, security policies, and investor decks, CI/CodeQL fixes, branch-protection-aware PR merges with admin override, full PR revision audits, copyright and security hardening, post-deployment vulnerability and performance audits, and dependency vulnerability remediation (pnpm overrides, vite/vitest upgrades)."
+description: "Operate and maintain the MEDORA Integrated Health System GitHub repository (0SSAM/MEDORA-Health-Care-Eco-System, formerly MEDORA-Integrated-Health-System). Use for synchronizing a repo integration branch, full rebranding (MEDORA to MEDORA), writing bilingual Arabic/English docs, READMEs, security policies, and investor decks, CI/CodeQL fixes, branch-protection-aware PR merges with admin override, full PR revision audits, copyright and security hardening, post-deployment vulnerability and performance audits, and dependency vulnerability remediation (pnpm overrides, vite/vitest upgrades)."
 ---
 
 # MEDORA Repository Operations
 
-Operate the MEDORA health-system monorepo: React + Vite frontend, Express + Drizzle backend, pnpm 10, Vitest (~383 tests), Playwright (3 E2E tests), TailwindCSS, PWA service worker, bilingual Arabic/English UI with RTL. GitHub may redirect the old slug `0SSAM/ALDORA-Integrated-Health-System` to the new slug `0SSAM/MEDORA-Health-Care-Eco-System`; both work with `gh` CLI.
+Operate the MEDORA health-system monorepo: React + Vite frontend, Express + Drizzle backend, pnpm 10, Vitest (~383 tests), Playwright (3 E2E tests), TailwindCSS, PWA service worker, bilingual Arabic/English UI with RTL. GitHub may redirect the old slug `0SSAM/MEDORA-Integrated-Health-System` to the new slug `0SSAM/MEDORA-Health-Care-Eco-System`; both work with `gh` CLI.
 
 ## Hard rules
 
-- Work only inside the local clone (default path `/home/ubuntu/ALDORA-Integrated-Health-System`).
-- Push changes ONLY to the integration branch (`manus/auto-sync-aldora`); never push directly to `main`.
+- Work only inside the local clone (default path `/home/ubuntu/MEDORA-Integrated-Health-System`).
+- Push changes ONLY to the integration branch (`manus/auto-sync-medora`); never push directly to `main`.
 - Deliver work through one PR from the integration branch to `main`. Do not merge unless the user explicitly authorizes an admin-override merge (`gh pr merge --admin`).
 - Never commit secrets, `.env` files, `node_modules`, dependency caches, build artifacts (`dist/`), local logs, or `test-results/`.
 - All user-facing content must be bilingual (Arabic + English) and use the branding **MEDORA | ميدورا**.
-- The rebranding is complete: never re-introduce "ALDORA" branding in new files; legacy "ALDO_*" env names, old service-worker cache keys, and legacy docs are historical and deliberately preserved.
+- The rebranding is complete: never re-introduce "MEDORA" branding in new files; legacy "MEDORA_*" env names, old service-worker cache keys, and legacy docs are historical and deliberately preserved.
 
 ## Session-resume synchronization
 
@@ -39,7 +39,7 @@ Choose by the user's request:
 | Request | Workflow |
 |---|---|
 | Repo out of sync / new session / enrich metadata | Workflow 1 |
-| Rename branding ALDORA → MEDORA everywhere | Workflow 2 |
+| Rename branding MEDORA → MEDORA everywhere | Workflow 2 |
 | Write/update bilingual docs, README, SECURITY, investor deck | Workflow 3 |
 | Merge PR through protected branch | Workflow 4 (+ reference: `merge-and-ci-playbook.md`) |
 | Full review of every changed file in a PR | Workflow 5 |
@@ -51,13 +51,13 @@ Choose by the user's request:
 ## Workflow 1: Full-repo synchronization and enrichment
 
 1. `gh repo clone` if missing, then `git fetch origin` and inspect `origin/main` for new commits.
-2. Create or update the integration branch: `git checkout -b manus/auto-sync-aldora origin/main`, push with `--set-upstream`.
-3. Open PR: `gh pr create --base main --head manus/auto-sync-aldora` (bilingual title).
+2. Create or update the integration branch: `git checkout -b manus/auto-sync-medora origin/main`, push with `--set-upstream`.
+3. Open PR: `gh pr create --base main --head manus/auto-sync-medora` (bilingual title).
 4. Enrich repo metadata: bilingual README (value proposition, product promise table, architecture, quick-start), CONTRIBUTING.md, SECURITY.md, PR template, repository description, ~20 topics, homepage URL.
 
-## Workflow 2: Full rebrand (ALDORA → MEDORA)
+## Workflow 2: Full rebrand (MEDORA → MEDORA)
 
-1. Enumerate every ALDORA occurrence: `grep -rni 'aldora\|ALDORA\|ALDO_' . --exclude-dir=node_modules --exclude-dir=.git --exclude=pnpm-lock.yaml`.
+1. Enumerate every MEDORA occurrence: `grep -rni 'medora\|MEDORA\|MEDORA_' . --exclude-dir=node_modules --exclude-dir=.git --exclude=pnpm-lock.yaml`.
 2. Dry-run replacements with `scripts/rebrand_text.py` on the explicit file set (source, UI copy, service worker `sw.js` cache names, env defaults in `server/test.setup.ts`, package.json env names, CI workflow env keys).
 3. Rename files/dirs with `git mv`, update all import paths, then re-run the full validation gate — especially tests that assert env-key names.
 4. Update repo topics, description, and any showcase demo badge links to the new slug.
@@ -71,7 +71,7 @@ Create every user-facing artifact fully bilingual: English section followed by i
 - `docs/` — testing strategy (`testing-strategy-rtl-localization-ar-en.md`), Docker/Nginx deployment guide (`docker-nginx-production-ar-en.md`), delivery index (`MEDORA-delivery-index.md`).
 - Investor deck in `medora-investor-presentation/` (~10 HTML slides + `medora_investor_deck.md`): thesis, problem, solution, market, traction, architecture, business model, roadmap, ask.
 
-Before delivery run the content sweep: no stale ALDORA in badges/labels/manifest/index.html, no merge markers, no secrets.
+Before delivery run the content sweep: no stale MEDORA in badges/labels/manifest/index.html, no merge markers, no secrets.
 
 ## Workflow 4: Merge with branch protection and admin override
 
@@ -142,7 +142,7 @@ Use this before concluding a maintenance cycle to ensure a clean state:
 
 Use this to verify login flows and documented test credentials:
 
-1. **Test Creation**: Create `e2e/medora-auth-showcase.spec.ts` to test documented credentials (`test` / `Test#@!12345`).
+1. **Test Creation**: Create `e2e/medora-auth-showcase.spec.ts` to test documented credentials (`test` / `SHOWCASE_TEST_PASSWORD` (managed outside the repository)).
 2. **Robust Logic**: The test MUST handle the "No Database" constraint in sandbox/CI environments. Since `ensureShowcaseAccount()` requires `DATABASE_URL`, the test should verify that the UI gracefully handles the server-side verification error ("تعذر التحقق من البيانات") when no DB is connected, while including a `test.skip` for the full success path.
 3. **Execution**: Run with `export SHOWCASE_TEST_PASSWORD='...' && pnpm exec playwright test e2e/medora-auth-showcase.spec.ts`.
 4. **Verification**: Confirm the UI correctly captures the login attempt, shows appropriate feedback (error alert or redirect), and does not leak credentials in the DOM or logs.

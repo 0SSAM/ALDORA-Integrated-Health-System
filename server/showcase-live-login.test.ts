@@ -18,9 +18,9 @@ describe.skipIf(!enabled)("managed showcase login smoke", () => {
     expect(payload.result?.data?.json?.success).toBe(true);
     expect(payload.result?.data?.json?.sessionMode).toBe("showcase");
     const setCookie = response.headers.get("set-cookie");
-    expect(setCookie).toContain("aldo_internal_session=");
+    expect(setCookie).toContain("medora_internal_session=");
     const internalSessionCookie = setCookie?.split(";")[0];
-    expect(internalSessionCookie).toMatch(/^aldo_internal_session=/);
+    expect(internalSessionCookie).toMatch(/^medora_internal_session=/);
 
     const meResponse = await fetch(`${baseUrl}/api/trpc/auth.me?batch=1&input=${encodeURIComponent(JSON.stringify({ 0: { json: null } }))}`, {
       headers: { cookie: internalSessionCookie! },

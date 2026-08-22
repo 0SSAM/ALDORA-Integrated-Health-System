@@ -21,6 +21,7 @@ const DB_NAME = "bdf-pharma-offline";
 const STORE_NAME = "drafts";
 const SENSITIVE_KEY_PATTERN = /(?:patient|patientid|mrn|medicalrecord|nationalid|identity|prescription|diagnosis|icd|lab|laboratory|radiology|insurance|claim|password|token|secret|otp|phone|email|address|dob|birth|ssn|healthid)/i;
 const MAX_OFFLINE_PAYLOAD_BYTES = 64_000;
+const ALLOW_LOCAL_STORAGE_FALLBACK = import.meta.env.DEV;
 
 function makeKey() {
   return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -60,8 +61,11 @@ export function enqueueOfflineDraft(draft: Omit<OfflineDraft, "id" | "createdAt"
   if (!canQueueOfflineDraft(draft)) throw new Error("regulated-or-sensitive-offline-draft-blocked");
   const idempotencyKey = draft.idempotencyKey || makeKey();
   const item: OfflineDraft = { ...draft, id: idempotencyKey, idempotencyKey, createdAt: Date.now(), status: "queued" };
-  const current = JSON.parse(localStorage.getItem(KEY) ?? "[]") as OfflineDraft[];
-  localStorage.setItem(KEY, JSON.stringify([...current, item]));
+  if (typeof indexedDB === "undefined") {
+    if (!ALLOW_LOCAL_STORAGE_FALLBACK) throw new Error("secure-offline-storage-unavailable");
+    const current = JSON.parse(localStorage.getItem(KEY) ?? "[]") as OfflineDraft[];
+    localStorage.setItem(KEY, JSON.stringify([...current, item]));
+  }
   void persistDraft(item);
   return item;
 }
@@ -73,6 +77,7 @@ function isStoredDraftSafe(item: unknown): item is OfflineDraft {
 }
 
 export function listOfflineDrafts(): OfflineDraft[] {
+  if (!ALLOW_LOCAL_STORAGE_FALLBACK) return [];
   try {
     const stored = JSON.parse(localStorage.getItem(KEY) ?? "[]") as unknown[];
     const safe = stored.filter(isStoredDraftSafe);
@@ -85,7 +90,7 @@ export function listOfflineDrafts(): OfflineDraft[] {
 }
 
 export function removeOfflineDraft(id: string): void {
-  localStorage.setItem(KEY, JSON.stringify(listOfflineDrafts().filter(item => item.id !== id)));
+  if (ALLOW_LOCAL_STORAGE_FALLBACK) localStorage.setItem(KEY, JSON.stringify(listOfflineDrafts().filter(item => item.id !== id)));
   void deleteDraft(id);
 }
 
@@ -117,7 +122,7 @@ export async function listDurableOfflineDrafts(): Promise<OfflineDraft[]> {
 
 export async function updateOfflineDraft(id: string, patch: Pick<OfflineDraft, "status" | "conflictReason" | "lastError" | "lastAttemptAt">): Promise<void> {
   const drafts = listOfflineDrafts().map(item => item.id === id ? { ...item, ...patch } : item);
-  localStorage.setItem(KEY, JSON.stringify(drafts));
+  if (ALLOW_LOCAL_STORAGE_FALLBACK) localStorage.setItem(KEY, JSON.stringify(drafts));
   try {
     const db = await openDb();
     await new Promise<void>((resolve, reject) => {
@@ -130,7 +135,7 @@ export async function updateOfflineDraft(id: string, patch: Pick<OfflineDraft, "
     });
     db.close();
   } catch {
-    // localStorage fallback already contains the auditable state
+    if (!ALLOW_LOCAL_STORAGE_FALLBACK) throw new Error("secure-offline-storage-unavailable");
   }
 }
 
@@ -148,7 +153,7 @@ async function persistDraft(item: OfflineDraft) {
     });
     db.close();
   } catch {
-    // localStorage remains the supported synchronous fallback
+    if (!ALLOW_LOCAL_STORAGE_FALLBACK) throw new Error("secure-offline-storage-unavailable");
   }
 }
 
@@ -162,6 +167,6 @@ async function deleteDraft(id: string) {
     });
     db.close();
   } catch {
-    // localStorage fallback already removed the draft
+    if (!ALLOW_LOCAL_STORAGE_FALLBACK) throw new Error("secure-offline-storage-unavailable");
   }
 }

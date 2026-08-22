@@ -1,27 +1,25 @@
 # Test Accounts | حسابات الاختبار
 
-This document provides credentials for development, testing, and demonstration purposes. These accounts are for use in non-production environments only.
+This document intentionally contains **no passwords or reusable credentials**. Test credentials must be generated or injected outside the repository and must never be committed.
 
-يوفر هذا المستند بيانات الاعتماد لأغراض التطوير والاختبار والعرض التوضيحي. هذه الحسابات مخصصة للاستخدام في بيئات غير الإنتاج فقط.
+يوضح هذا المستند سياسة حسابات الاختبار دون تخزين أي كلمات مرور أو بيانات اعتماد قابلة لإعادة الاستخدام داخل المستودع. يجب إنشاء بيانات اعتماد الاختبار أو حقنها خارج المستودع، ولا يجوز Commit لها.
 
-## 1. Default Development Account | حساب التطوير الافتراضي
+## Default Development Account | حساب التطوير الافتراضي
 
 | Role | Username | Password |
 |---|---|---|
-| Administrator | `test` | `Test#@!12345` |
+| Administrator | `test` | **Managed outside the repository** |
 
 | الدور | اسم المستخدم | كلمة المرور |
 |---|---|---|
-| مسؤول | `test` | `Test#@!12345` |
+| مسؤول | `test` | **تُدار خارج المستودع** |
 
----
+## Usage | الاستخدام
 
-## 2. Usage Instructions | تعليمات الاستخدام
+For local or staging environments, inject a unique synthetic password through the environment or your secret manager. For CI, the workflow generates a per-run synthetic password and does not persist it in source control.
 
-Use these credentials to access the MEDORA platform in local development or staging environments. For production environments, please follow the official onboarding and security procedures defined in `SECURITY.md`.
+لبيئات التطوير أو الاختبار، أدخل كلمة مرور اصطناعية فريدة عبر متغيرات البيئة أو مدير الأسرار. أما CI فينشئ كلمة مرور اصطناعية مختلفة لكل تشغيل ولا يحفظها في المصدر.
 
-استخدم بيانات الاعتماد هذه للوصول إلى منصة ميدورا (MEDORA) في بيئات التطوير المحلية أو بيئات الاختبار. بالنسبة لبيئات الإنتاج، يرجى اتباع إجراءات التوظيف والأمان الرسمية المحددة في ملف `SECURITY.md`.
+Never use real patient, prescription, payment, production credential, or other sensitive data in test fixtures.
 
-> **Security Note:** Never use these credentials in a live production environment. All production access must be managed via the secure IAM (Identity and Access Management) protocols.
->
-> **ملاحظة أمنية:** لا تستخدم بيانات الاعتماد هذه مطلقًا في بيئة إنتاج حية. يجب إدارة جميع عمليات الوصول إلى الإنتاج عبر بروتوكولات IAM (إدارة الهوية والوصول) الآمنة.
+لا تستخدم مطلقًا بيانات مرضى أو وصفات أو مدفوعات أو بيانات اعتماد إنتاجية أو أي بيانات حساسة حقيقية داخل بيانات الاختبار.

@@ -279,9 +279,9 @@
 - [x] Scope customer-care and call-centre reads and writes to active branches assigned to the authenticated user; reject new unbound records for non-admin users.
 - [x] Add unit coverage for branch-scoped customer-care and call-centre access policy.
 
-# ALDO Ownership and Brand Protection
+# MEDORA Ownership and Brand Protection
 
-- [x] Rename the product-facing system identity to ALDO Health Care Eco System across app metadata, title, and visible brand surfaces.
+- [x] Rename the product-facing system identity to MEDORA Health Care Eco System across app metadata, title, and visible brand surfaces.
 - [x] Add a discreet ownership notice using the owner-provided professional name without exposing phone, email, address, CV, or other personal contact data.
 - [x] Add copyright and provenance metadata to the repository, generated app metadata, and project ownership documentation without weakening security or licensing clarity.
 - [x] Add a tamper-evident ownership manifest with a non-secret SHA-256 fingerprint and document the recovery/proof procedure.
@@ -367,7 +367,7 @@
 - [x] Implement only safe, supported additions identified by the audit, with tests and migration review where applicable.
 - [x] Deliver a concise capability-gap report and update project documentation with explicit limitations and activation prerequisites.
 
-# ALDO Health Care Eco System — Intelligent Reporting and Integration Hardening
+# MEDORA Health Care Eco System — Intelligent Reporting and Integration Hardening
 
 - [x] Convert the current capability-gap findings into an explicit implementation boundary for intelligent reports, insurer workflows, HR/payroll, promotions, and government connectors.
 - [x] Add a generalized report-definition and report-run model only if it can preserve organization/jurisdiction scope, recipient authorization, idempotency, and auditability.
@@ -471,21 +471,21 @@
 
 - [x] إصلاح اختبار commitSale الإيجابي: محاذاة mock لاستعلامات membership والاختصاص والمنظمة، وإضافة بيانات الدفعة وحقول وأدلة catalog المطلوبة؛ الاختبار المركز وTypeScript ناجحان.
 
-- [x] Remove user-visible Manus words, marks, and images from the ALDO application and add regression coverage for shipped UI assets; provider session keys and framework internals remain unchanged because they are non-visible runtime contracts.
+- [x] Remove user-visible Manus words, marks, and images from the MEDORA application and add regression coverage for shipped UI assets; provider session keys and framework internals remain unchanged because they are non-visible runtime contracts.
 
-- [x] Create ALDO Health Care Eco System logo, icon, backgrounds, visual effects, and replace visible/configurable bdf pharma erp branding throughout the project; updated Home, HTML metadata, PWA icon/manifest, package/template branding, and added branding regression tests.
+- [x] Create MEDORA Health Care Eco System logo, icon, backgrounds, visual effects, and replace visible/configurable bdf pharma erp branding throughout the project; updated Home, HTML metadata, PWA icon/manifest, package/template branding, and added branding regression tests.
 
 - [x] Harden scheduled inventory-alert transport errors: replace raw error, URL, and task UID response data with a fixed error code and add `inventory-policy.test.ts`; focused tests and TypeScript passed.
 
-- [x] Remove visible `manus-storage` branding paths from client HTML, CSS, and Home logo usage; use the local ALDO PWA icon, CSS background gradients, and inline ALDO SVG. Branding tests and TypeScript passed.
+- [x] Remove visible `manus-storage` branding paths from client HTML, CSS, and Home logo usage; use the local MEDORA PWA icon, CSS background gradients, and inline MEDORA SVG. Branding tests and TypeScript passed.
 
-- [x] Recheck the ALDO workspace after auth.me settles: desktop RTL dashboard, ALDO inline mark, CSS background, navigation, and scoped workspace messaging render successfully; the earlier loading screenshot was captured before the request completed.
+- [x] Recheck the MEDORA workspace after auth.me settles: desktop RTL dashboard, MEDORA inline mark, CSS background, navigation, and scoped workspace messaging render successfully; the earlier loading screenshot was captured before the request completed.
 
 - [x] Harden router policy-error responses in insurance, regional, and reports: removed `String(error)` from outward TRPC messages and replaced it with fixed non-sensitive messages; 150 tests passed, 4 optional database tests were skipped, TypeScript passed, and the production build passed.
 
 - [x] Re-run full regression after ERP error-surface hardening: 150 tests passed, 4 optional live-database tests skipped, TypeScript passed, production build passed, and the server-wide raw error interpolation scan returned no matches.
 
-- [x] Replace the plain auth loading screen with a branded ALDO loading card, inline mark, subtle CSS orbs, progress motion, and reduced-motion fallback; TypeScript, branding/auth tests (4), and production build passed.
+- [x] Replace the plain auth loading screen with a branded MEDORA loading card, inline mark, subtle CSS orbs, progress motion, and reduced-motion fallback; TypeScript, branding/auth tests (4), and production build passed.
 
 - [x] Remove provider-branded console labels from the shipped debug collector while preserving its internal runtime identifiers, and extend branding regression coverage; TypeScript, 3 branding tests, and production build passed.
 
@@ -495,7 +495,7 @@
 
 - [x] Run a focused scan for dynamic TRPC error messages after the router hardening; no remaining outward message template using raw error, input, URL, or task identifiers was found in the inspected server files.
 
-- [x] Replace remaining application-owned BDF Service Worker cache/header/message identifiers with ALDO names, update Home messaging, and extend branding regression coverage; 4 branding tests and TypeScript passed. Internal provider proxy paths and offline database migration identifiers remain unchanged for compatibility.
+- [x] Replace remaining application-owned BDF Service Worker cache/header/message identifiers with MEDORA names, update Home messaging, and extend branding regression coverage; 4 branding tests and TypeScript passed. Internal provider proxy paths and offline database migration identifiers remain unchanged for compatibility.
 
 - [x] Remove the legacy BDF shell cache during Service Worker activation and cover the cleanup contract; 4 branding tests and TypeScript passed, with the legacy cache name retained only as an explicit deletion target.
 
@@ -613,15 +613,15 @@
 - [x] Harden external-adapter readiness with explicit endpoint contract, submission acknowledgement, retry, and audit requirements while keeping all unconfigured adapters blocked; 71 test files passed, 223 tests passed, and production build passed.
 - [x] Require future invoice adapters to prove the shared external-adapter readiness contract before submission, while preserving local document and catalog-scope validation; 71 test files passed, 223 tests passed, and production build passed.
 - [x] Add a pure trusted-attestation contract validator for nonce, freshness, revocation, and organization/jurisdiction scope; keep it unused by browsers until an authorized native provider is configured; 71 test files passed, 231 tests passed, and production build passed.
-- [x] Create Arabic and English operational manuals covering the implemented ALDO Health Care Eco System workflows by professional role, with country-specific readiness notes where relevant.
+- [x] Create Arabic and English operational manuals covering the implemented MEDORA Health Care Eco System workflows by professional role, with country-specific readiness notes where relevant.
 - [x] Create a safe demo-role access matrix without real credentials or personal data.
 - [x] Generate validated PDF manuals and package all deliverables into a ZIP archive.
-- [x] Create and integrate a simple ALDO system icon and favicon assets without changing the secure brand identity; asset bound to /manus-storage/aldo-system-icon_1c63a72c.png in HTML and PWA manifest.
+- [x] Create and integrate a simple MEDORA system icon and favicon assets without changing the secure brand identity; asset bound to /manus-storage/medora-system-icon_1c63a72c.png in HTML and PWA manifest.
 - [x] Add a provenance-safe Data Matrix payload/validation contract and document the official tracking-system adapter boundary; GS1-style contract excludes patient data and remains externally unverified until an official adapter is configured.
 - [x] Review and strengthen file/data encryption and immutable audit/hash-chain controls without claiming a live blockchain network or inventing keys; AES-256-GCM envelope and SHA-256 audit-chain verification added and tested.
 - [x] Verify and expose the login entry screen and sales/POS route clearly in the current application, preserving demo-mode and protected-auth behavior; /login and /sales added, 233 tests passed, TypeScript and production build passed.
 - [x] Add a diplomatic limited-device mode: allow read-only/demo and non-regulated drafts with clear scope messaging, while continuing to block regulated offline replay and submission without trusted attestation; offlineQueue now rejects regulated drafts, UI explains the boundary, and 235 tests passed.
-- [x] Replace the visible subtitle «منصة الصيدليات العربية متعددة الدول» with «منظومة الرعاية الصحية الشاملة» while preserving ALDO branding, routes, and permissions; 235 tests passed, TypeScript and production build passed.
+- [x] Replace the visible subtitle «منصة الصيدليات العربية متعددة الدول» with «منظومة الرعاية الصحية الشاملة» while preserving MEDORA branding, routes, and permissions; 235 tests passed, TypeScript and production build passed.
 
 - [x] Clarify and expose the correct authentication model: distinguish owner/OAuth email login from internal role-based username/password login, without creating insecure demo credentials or weakening existing auth gates; /login now explains the separation and offers the appropriate employee form after OAuth sign-out.
 
@@ -683,7 +683,7 @@
 - [x] Verify login, Demo, responsive layouts, TypeScript, Vitest, and production build before checkpoint.
 
 # Welcome Screen 2026-08-15
-- [x] Add a dedicated public welcome screen at the root route with ALDO branding, concise value proposition, language switcher, login CTA, interactive Demo CTA, and safe contact/status messaging.
+- [x] Add a dedicated public welcome screen at the root route with MEDORA branding, concise value proposition, language switcher, login CTA, interactive Demo CTA, and safe contact/status messaging.
 - [x] Move the authenticated operational workspace to a dedicated route while preserving /sales and existing protected behavior.
 - [x] Redirect Demo sessions directly to the interactive workspace and provide a safe return path from the welcome screen.
 - [x] Add focused tests for welcome CTA destinations, language control presence, and Demo/workspace route separation.
@@ -1099,14 +1099,14 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 - [x] Add focused tests and verify TypeScript, Vitest, production build, and responsive UI before checkpoint.
 
 # Comprehensive Security, Resilience, Migration, and Documentation Review
-- [x] Audit and strengthen discreet ownership/provenance protection for ALDO/MEDORA without claiming that code alone creates legal ownership rights.
+- [x] Audit and strengthen discreet ownership/provenance protection for MEDORA/MEDORA without claiming that code alone creates legal ownership rights.
 - [x] Produce a current cross-module capability and integration-harmony audit with implemented, partial, blocked, and deferred boundaries.
 - [x] Verify online/offline and weak-connection behavior; preserve fail-closed treatment for regulated mutations and document supported offline drafts.
 - [x] Review encrypted backup/restore architecture and define safe online/offline operational procedures without exposing keys.
 - [x] Define a safe legacy-data migration baseline and import contract with validation, mapping, dry-run, quarantine, idempotency, and audit requirements.
 - [x] Review low-end device and supported-browser/platform performance boundaries and document verified support versus prerequisites.
 - [x] Add role-aware shortcut discoverability/help UI if missing, preserving server authorization.
-- [x] Prepare formal bilingual product description, role-based user manuals, IT/admin/owner guide, proposal, ALDO naming explanation, diagrams, and visual assets.
+- [x] Prepare formal bilingual product description, role-based user manuals, IT/admin/owner guide, proposal, MEDORA naming explanation, diagrams, and visual assets.
 - [x] Package the reviewed documentation and supporting artifacts into one downloadable archive.
 - [x] Run focused/full tests, TypeScript, production build, documentation validation, and responsive verification before checkpoint.
 
@@ -1343,13 +1343,13 @@ Generated invoice PDF remains a local presentation/export artifact; official ETA
 
 # Post-Login Session Persistence Incident — 2026-08-16
 
-- [x] تحديد سبب نجاح `internalLogin` ثم عدم قراءة الجلسة أو استمرارها عند الرجوع إلى الصفحة العامة. السبب: لم يكن محلل الكوكيز الداخلي موصولاً بطلبات tRPC قبل إنشاء السياق، لذلك لم تصل `aldo_internal_session` إلى `auth.me` بعد نجاح الدخول.
+- [x] تحديد سبب نجاح `internalLogin` ثم عدم قراءة الجلسة أو استمرارها عند الرجوع إلى الصفحة العامة. السبب: لم يكن محلل الكوكيز الداخلي موصولاً بطلبات tRPC قبل إنشاء السياق، لذلك لم تصل `medora_internal_session` إلى `auth.me` بعد نجاح الدخول.
 - [x] إصلاح تثبيت جلسة دخول الموظف وتحديث قراءة الجلسة، ثم توجيه المستخدم إلى `/workspace` محليًا بعد النجاح. أضيف وسيط تحليل الكوكيز قبل tRPC، وأصبح نجاح الدخول يبطل مخزن `auth.me` ويعيد القراءة قبل الانتقال.
 - [ ] اختبار دخول حقيقي من الهاتف للتأكد من الوصول إلى مساحة العمل بحالة مصادقة مستمرة وحفظ الإصلاح.
 
 # Automatic Showcase Session and Logout Incident — 2026-08-16
 
-- [x] تحديد سبب فتح الموقع تلقائيًا بحساب العرض `test` دون إجراء دخول من المستخدم، ومنع أي إنشاء أو استعادة تلقائية لجلسة العرض في الواجهة أو الخادم. تبيّن أن الجلسة السابقة كانت تبقى في كوكي المتصفح، وأن زر الخروج القديم كان يمسح جلسة OAuth فقط دون `aldo_internal_session`؛ لا يوجد مسار دخول تلقائي جديد في الكود.
+- [x] تحديد سبب فتح الموقع تلقائيًا بحساب العرض `test` دون إجراء دخول من المستخدم، ومنع أي إنشاء أو استعادة تلقائية لجلسة العرض في الواجهة أو الخادم. تبيّن أن الجلسة السابقة كانت تبقى في كوكي المتصفح، وأن زر الخروج القديم كان يمسح جلسة OAuth فقط دون `medora_internal_session`؛ لا يوجد مسار دخول تلقائي جديد في الكود.
 - [x] إضافة زر تسجيل خروج واضح في مساحة العمل، مع إبطال جلسة الخادم وإعادة المستخدم إلى صفحة الدخول/البداية بحالة غير مصادق عليها. أصبح الخروج يستدعي `internalLogout` و`logout` ويمسح تخزين ورأس جلسة المعاينة.
 - [ ] إضافة اختبارات تمنع الدخول التلقائي وتثبت أن تسجيل الخروج لا يترك جلسة قابلة لإعادة الاستخدام، ثم التحقق من الهاتف وحفظ الإصدار. الاختبارات الآلية مكتملة؛ تحقق الهاتف ما زال مطلوبًا.
 

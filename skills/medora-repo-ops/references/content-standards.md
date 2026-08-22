@@ -4,7 +4,7 @@ Detailed reference for bilingual content, README/docs conventions, investor pres
 
 ## Bilingual (Arabic/English) content rules
 
-Every user-facing document must be fully bilingual, structured as English sections followed by Arabic equivalents (or side-by-side per section). Arabic must be full sentences, not machine glosses of English. Section headers carry the Arabic translation, e.g. `## 1. Executive summary | الملخص التنفيذي`. Use the branding **MEDORA | ميدورا** everywhere; never reintroduce "ALDORA" branding. Legacy `ALDO_*` env names and old service-worker cache names are historical and deliberately preserved — do not touch them again.
+Every user-facing document must be fully bilingual, structured as English sections followed by Arabic equivalents (or side-by-side per section). Arabic must be full sentences, not machine glosses of English. Section headers carry the Arabic translation, e.g. `## 1. Executive summary | الملخص التنفيذي`. Use the branding **MEDORA | ميدورا** everywhere; never reintroduce "MEDORA" branding. Legacy `MEDORA_*` env names and old service-worker cache names are historical and deliberately preserved — do not touch them again.
 
 ## Repository enrichment pack (apply on every enrichment pass)
 
@@ -12,7 +12,7 @@ The proven enrichment set: bilingual `README.md` (value proposition, product-pro
 
 ## Repository metadata after rename
 
-When GitHub renames the repo (e.g., `ALDORA-Integrated-Health-System` → `MEDORA-Health-Care-Eco-System`), both slugs work with `gh` CLI via redirect. Forward-proof by updating README badges (`gh-actions`/`code-size` badges use the repo slug), clone URLs, Dockerfile `LABEL org.opencontainers.image.source`, and demo badges to the new slug. Sweep with `grep -rni 'aldora\|ALDORA\|ALDO_' . --exclude-dir=node_modules --exclude-dir=.git --exclude=pnpm-lock.yaml`.
+When GitHub renames the repo (e.g., `MEDORA-Integrated-Health-System` → `MEDORA-Health-Care-Eco-System`), both slugs work with `gh` CLI via redirect. Forward-proof by updating README badges (`gh-actions`/`code-size` badges use the repo slug), clone URLs, Dockerfile `LABEL org.opencontainers.image.source`, and demo badges to the new slug. Sweep with `grep -rni 'medora\|MEDORA\|MEDORA_' . --exclude-dir=node_modules --exclude-dir=.git --exclude=pnpm-lock.yaml`.
 
 ## Copyright and legal hardening pack
 
@@ -32,7 +32,7 @@ Create a bilingual (Arabic/English) investor deck in `medora-investor-presentati
 
 ## Content sweep checklist before delivery
 
-- No stale ALDORA references in badges, labels, manifest, index.html.
+- No stale MEDORA references in badges, labels, manifest, index.html.
 - No merge markers (`<<<<<<<`).
 - No secrets; only documented synthetic CI/test placeholders.
 - README quick-start instructions work against current main.

@@ -1,5 +1,5 @@
 {
-  "schema": "aldo-ownership-manifest/v1",
+  "schema": "medora-ownership-manifest/v1",
   "product": "ميدورا | منظومة الرعاية الصحية المتكاملة",
   "productSlug": "medora-integrated-health-system",
   "ownerDeclaredBy": "Hossam Naeim Osman",
