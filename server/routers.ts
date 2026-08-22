@@ -266,6 +266,21 @@ export const appRouter = router({
   aiGovernance: aiGovernanceRouter,
   aiInsights: aiInsightsRouter,
   antiFraud: antiFraudRouter,
+  communication: router({
+    sendWhatsApp: protectedProcedure
+      .input(z.object({
+        to: z.string(),
+        text: z.string().optional(),
+        templateName: z.string().optional()
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!["admin", "manager", "operations_manager"].includes(ctx.user.role)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك صلاحية إرسال رسائل التواصل." });
+        }
+        const { sendWhatsAppMessage } = await import("./connectors/whatsapp");
+        return await sendWhatsAppMessage(input);
+      }),
+  }),
   reference: router({
     nlmIcd10CmSearch: protectedProcedure.input(z.object({ terms: z.string().min(2).max(120), count: z.number().int().min(1).max(50).optional() })).query(async ({ ctx, input }) => {
       if (!["admin", "manager", "pharmacist"].includes(ctx.user.role)) throw new TRPCError({ code: "FORBIDDEN", message: "لا تملك صلاحية البحث السريري المرجعي." });
