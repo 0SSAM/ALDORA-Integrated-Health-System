@@ -30,6 +30,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
+import { ProcurementActionTrigger } from "./OperationsManagementWorkspace";
 
 type Props = {
   organizationId: number | null;
@@ -38,6 +39,9 @@ type Props = {
 };
 type Insight = {
   id: number;
+  organizationId: number;
+  branchId: number | null;
+  jurisdictionId: number | null;
   insightType: string;
   status: string;
   title: string;
@@ -425,6 +429,28 @@ function InsightDetail({
           </Button>
         </div>
         <p className="flex items-start gap-2 text-xs leading-5 text-slate-500"><FileText className="mt-0.5 h-4 w-4 shrink-0" /> هذه الحالة لا تنفذ شراءً ولا تعدل المخزون أو الأسعار. أي إجراء لاحق يجب أن يتم عبر سير العمل التشغيلي المعتاد وبصلاحية منفصلة.</p>
+        
+        {item.status === "accepted" && isPurchasing && (
+          <div className="mt-4 rounded-xl border border-cyan-200 bg-cyan-50/50 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <PackageSearch className="h-4 w-4 text-cyan-700" />
+                <span className="text-sm font-semibold text-cyan-900">إجراء تشغيلي مقترح</span>
+              </div>
+              <Badge className="bg-cyan-700">تحويل سريع</Badge>
+            </div>
+            <p className="mb-4 text-xs leading-5 text-cyan-800">
+              بما أن التوصية مقبولة، يمكنك الآن تحويلها مباشرة إلى مسودة طلب شراء داخلي لمراجعتها في وحدة المشتريات.
+            </p>
+            <ProcurementActionTrigger
+              organizationId={item.organizationId}
+              branchId={item.branchId}
+              jurisdictionId={item.jurisdictionId}
+              initialTitle={item.title}
+              initialJustification={item.summary}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   );

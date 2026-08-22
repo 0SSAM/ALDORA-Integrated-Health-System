@@ -49,10 +49,28 @@ export function OperationsManagementWorkspace({ organizationId, branchId, jurisd
     catch (error) { setStatus(error instanceof Error ? error.message : "تعذر إنشاء ملف الموظف."); }
   };
 
-  const addProcurement = async () => {
-    if (!organizationId || !branchId || !procurementNumber.trim() || !procurementTitle.trim() || procurementJustification.trim().length < 5) return setStatus("أكمل رقم الطلب والعنوان والمبرر (خمسة أحرف على الأقل) واختر فرعًا.");
-    try { await createProcurement.mutateAsync({ organizationId, branchId, jurisdictionId: jurisdictionId ?? undefined, requestNumber: procurementNumber, requestType: "stock", title: procurementTitle.trim(), businessJustification: procurementJustification.trim(), currencyCode: "EGP" }); }
-    catch (error) { setStatus(error instanceof Error ? error.message : "تعذر حفظ طلب الشراء."); }
+  const addProcurement = async (manualData?: { title: string; justification: string }) => {
+    const title = manualData?.title ?? procurementTitle;
+    const justification = manualData?.justification ?? procurementJustification;
+    const reqNum = manualData ? `AI-${Date.now().toString().slice(-6)}` : procurementNumber;
+
+    if (!organizationId || !branchId || !reqNum.trim() || !title.trim() || justification.trim().length < 5) {
+      return setStatus("أكمل رقم الطلب والعنوان والمبرر (خمسة أحرف على الأقل) واختر فرعًا.");
+    }
+    try {
+      await createProcurement.mutateAsync({
+        organizationId,
+        branchId,
+        jurisdictionId: jurisdictionId ?? undefined,
+        requestNumber: reqNum,
+        requestType: "stock",
+        title: title.trim(),
+        businessJustification: justification.trim(),
+        currencyCode: "EGP",
+      });
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "تعذر حفظ طلب الشراء.");
+    }
   };
 
   const addLead = async () => {
@@ -66,7 +84,7 @@ export function OperationsManagementWorkspace({ organizationId, branchId, jurisd
   );
 
   const renderProcurement = () => (
-    <Card className="border-0 bg-white shadow-sm"><CardHeader><CardTitle>طلبات الشراء الداخلية</CardTitle><p className="text-sm leading-6 text-slate-500">تبدأ كل المعاملات كمسودة قابلة للتدقيق وتتطلب اعتمادًا قبل التنفيذ؛ لا يوجد اتصال بمورد أو جهة خارجية.</p></CardHeader><CardContent className="space-y-4"><ScopeWarning organizationId={organizationId} branchId={branchId} needBranch /><div className="grid gap-2 sm:grid-cols-2"><Input value={procurementNumber} onChange={e => setProcurementNumber(e.target.value)} placeholder="رقم طلب الشراء" aria-label="رقم طلب الشراء" /><Input value={procurementTitle} onChange={e => setProcurementTitle(e.target.value)} placeholder="عنوان الطلب" aria-label="عنوان الطلب" /></div><Input value={procurementJustification} onChange={e => setProcurementJustification(e.target.value)} placeholder="المبرر التشغيلي" aria-label="المبرر التشغيلي" /><Button onClick={addProcurement} disabled={!branchReady || createProcurement.isPending} className="bg-[#0d1b2a]">{createProcurement.isPending ? "جارٍ الحفظ…" : "حفظ طلب شراء كمسودة"}</Button>{procurements.isError ? <p className="text-sm text-rose-700">تعذر تحميل طلبات الشراء.</p> : procurements.data?.length ? <div className="space-y-2">{procurements.data.slice(0, 5).map(request => <div key={request.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3 text-sm"><div><p className="font-medium">{request.requestNumber} · {request.title}</p><p className="text-xs text-slate-500">{request.requestType} · {request.currencyCode}</p></div><Badge variant="secondary">{request.status}</Badge></div>)}</div> : <p className="rounded-xl border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">لا توجد طلبات شراء ضمن النطاق الحالي.</p>}</CardContent></Card>
+    <Card className="border-0 bg-white shadow-sm"><CardHeader><CardTitle>طلبات الشراء الداخلية</CardTitle><p className="text-sm leading-6 text-slate-500">تبدأ كل المعاملات كمسودة قابلة للتدقيق وتتطلب اعتمادًا قبل التنفيذ؛ لا يوجد اتصال بمورد أو جهة خارجية.</p></CardHeader><CardContent className="space-y-4"><ScopeWarning organizationId={organizationId} branchId={branchId} needBranch /><div className="grid gap-2 sm:grid-cols-2"><Input value={procurementNumber} onChange={e => setProcurementNumber(e.target.value)} placeholder="رقم طلب الشراء" aria-label="رقم طلب الشراء" /><Input value={procurementTitle} onChange={e => setProcurementTitle(e.target.value)} placeholder="عنوان الطلب" aria-label="عنوان الطلب" /></div><Input value={procurementJustification} onChange={e => setProcurementJustification(e.target.value)} placeholder="المبرر التشغيلي" aria-label="المبرر التشغيلي" /><Button onClick={() => addProcurement()} disabled={!branchReady || createProcurement.isPending} className="bg-[#0d1b2a]">{createProcurement.isPending ? "جارٍ الحفظ…" : "حفظ طلب شراء كمسودة"}</Button>{procurements.isError ? <p className="text-sm text-rose-700">تعذر تحميل طلبات الشراء.</p> : procurements.data?.length ? <div className="space-y-2">{procurements.data.slice(0, 5).map(request => <div key={request.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3 text-sm"><div><p className="font-medium">{request.requestNumber} · {request.title}</p><p className="text-xs text-slate-500">{request.requestType} · {request.currencyCode}</p></div><Badge variant="secondary">{request.status}</Badge></div>)}</div> : <p className="rounded-xl border border-dashed border-slate-300 p-4 text-center text-sm text-slate-500">لا توجد طلبات شراء ضمن النطاق الحالي.</p>}</CardContent></Card>
   );
 
   const renderCrm = () => (
@@ -77,10 +95,65 @@ export function OperationsManagementWorkspace({ organizationId, branchId, jurisd
   if (section === "crm") return <div className="space-y-5">{renderCrm()}</div>;
   if (section === "procurement") return <div className="space-y-5">{renderProcurement()}</div>;
 
-  return <div className="grid gap-5 xl:grid-cols-2">
-    {renderHr()}
-    {renderProcurement()}
-    <div className="xl:col-span-2">{renderCrm()}</div>
-    <div className="xl:col-span-2"><StatusNote text={status} /></div>
-  </div>;
+  return (
+    <div className="grid gap-5 xl:grid-cols-2">
+      {renderHr()}
+      {renderProcurement()}
+      <div className="xl:col-span-2">{renderCrm()}</div>
+      <div className="xl:col-span-2"><StatusNote text={status} /></div>
+    </div>
+  );
+}
+
+export function ProcurementActionTrigger({
+  organizationId,
+  branchId,
+  jurisdictionId,
+  initialTitle,
+  initialJustification,
+  onComplete,
+}: Scope & {
+  initialTitle: string;
+  initialJustification: string;
+  onComplete?: () => void;
+}) {
+  const [status, setStatus] = useState("");
+  const createProcurement = trpc.operations.procurement.create.useMutation({
+    onSuccess: () => {
+      setStatus("تم إنشاء مسودة طلب الشراء بنجاح.");
+      onComplete?.();
+    },
+  });
+
+  const handleAction = async () => {
+    if (!organizationId || !branchId) return setStatus("النطاق غير مكتمل.");
+    try {
+      await createProcurement.mutateAsync({
+        organizationId,
+        branchId,
+        jurisdictionId: jurisdictionId ?? undefined,
+        requestNumber: `AI-${Date.now().toString().slice(-6)}`,
+        requestType: "stock",
+        title: initialTitle,
+        businessJustification: initialJustification,
+        currencyCode: "EGP",
+      });
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "تعذر التنفيذ");
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <Button
+        size="sm"
+        onClick={handleAction}
+        disabled={createProcurement.isPending}
+        className="bg-cyan-700 hover:bg-cyan-800"
+      >
+        {createProcurement.isPending ? "جارٍ التنفيذ..." : "تحويل لتوصية شراء"}
+      </Button>
+      {status && <p className="text-[10px] text-cyan-700">{status}</p>}
+    </div>
+  );
 }
