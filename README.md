@@ -1,223 +1,91 @@
-<div align="center">
-
 # MEDORA | ميدورا
 
-### The operating layer for connected healthcare / طبقة التشغيل للرعاية الصحية المتصلة
+> **A governed, bilingual healthcare operations workspace.**
+> **مساحة عمل تشغيلية صحية محكومة وثنائية اللغة.**
 
-> **MEDORA turns complex healthcare operations into one trusted, bilingual workflow — from the first sale and stock movement to prescription review, auditability, and growth across branches.**
+MEDORA brings day-to-day healthcare operations into a deliberate workflow for pharmacy, hospital, and multi-site teams. It connects the operational foundations around point of sale, inventory, prescription review, access control, and auditability—without presenting roadmap work or external integrations as live guarantees.
+
+تجمع ميدورا العمليات اليومية لجهات الرعاية الصحية ضمن مسار عمل منضبط للصيدليات والمستشفيات والفرق متعددة المواقع. وهي تربط الأسس التشغيلية لنقاط البيع والمخزون ومراجعة الوصفات والتحكم في الوصول والتدقيق، دون عرض عناصر خارطة الطريق أو التكاملات الخارجية كوعود تشغيلية قائمة.
+
+**[Open the MEDORA workspace](https://aldorapharm-fwilugbd.manus.space)** &nbsp;·&nbsp; **[Explore the product](docs/MEDORA-product-description-ar-en.md)** &nbsp;·&nbsp; **[Read the security boundary](docs/security-review.md)**
+
+> The published workspace currently uses a protected sign-in route. The visible host name is a deployment identifier; **MEDORA** is the product identity. A custom MEDORA domain requires an owner-authorized domain change.
 >
-> **تحوّل ميدورا تعقيدات التشغيل الصحي إلى مسار عمل ثنائي اللغة وموثوق — من أول عملية بيع وحركة مخزون إلى مراجعة الوصفة والتدقيق والتوسع عبر الفروع.**
-
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-C5F74F?style=for-the-badge&logo=drizzle&logoColor=black)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
-![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
-
-[![CI Status](https://img.shields.io/github/actions/workflow/status/0SSAM/MEDORA-Health-Care-Eco-System/ci.yml?style=for-the-badge&label=CI%2FCD&logo=githubactions&logoColor=white)](https://github.com/0SSAM/MEDORA-Health-Care-Eco-System/actions/workflows/ci.yml)
-[![CodeQL](https://img.shields.io/badge/CodeQL-Security%20Verified-green?style=for-the-badge&logo=github&logoColor=white)](https://github.com/0SSAM/MEDORA-Health-Care-Eco-System/security/code-scanning)
-[![License](https://img.shields.io/badge/License-Private-red?style=for-the-badge)]()
-[![Last Commit](https://img.shields.io/github/last-commit/0SSAM/MEDORA-Health-Care-Eco-System?style=for-the-badge&logo=git&logoColor=white)]()
-
-🔗 **[🌐 Live Demo — العرض المباشر](https://medorapharm-fwilugbd.manus.space)**
+> تستخدم مساحة العمل المنشورة حاليًا مسار دخول محميًا. اسم المضيف الظاهر هو معرّف للنشر، بينما **MEDORA** هي هوية المنتج. يحتاج نطاق MEDORA مخصص إلى تغيير نطاق معتمد من مالك المشروع.
 
 ---
 
-### 🇬🇧 English Overview
+## Start here | ابدأ من هنا
 
-**MEDORA** is an enterprise healthcare operations platform for pharmacy groups, hospitals, and healthcare networks. It brings **POS, inventory, prescription intelligence, financial controls, regulatory workflows, multi-tenant access, and offline-first execution** into one coherent product surface—so operators can see the whole operation, act with context, and scale with control.
+| Path | What it gives you | ما الذي ستجده؟ |
+|---|---|---|
+| [Product overview](docs/MEDORA-product-description-ar-en.md) | The intended operational scope and audience. | نطاق المنتج والجمهور المستهدف. |
+| [User manuals](docs/MEDORA-user-manuals-ar-en.md) | Role-oriented guides for using the workspace. | أدلة استخدام حسب الدور الوظيفي. |
+| [Architecture](docs/architecture.md) | The implementation structure and engineering boundaries. | البنية التقنية وحدود التنفيذ. |
+| [Security review](docs/security-review.md) | Security posture, evidence, and open boundaries. | وضع الأمان والأدلة والحدود المفتوحة. |
+| [Release readiness](docs/FINAL-RELEASE-READINESS-2026-08-22.md) | What has been verified and what still needs owner or external action. | ما تم التحقق منه وما يحتاج إجراءً من المالك أو طرف خارجي. |
 
-### 🇪🇬 نظرة عامة بالعربية
+## What MEDORA is built to support | ما الذي تدعمه ميدورا؟
 
-**ميدورا** هي منصة تشغيل صحية مؤسسية لسلاسل الصيدليات والمستشفيات وشبكات الرعاية الصحية. تجمع **نقاط البيع، وإدارة المخزون، وذكاء الوصفات، والضوابط المالية، ومسارات الامتثال، وتعدد المستأجرين، والتشغيل دون اتصال** في منظومة واحدة تساعد المشغلين على رؤية العملية كاملة، واتخاذ القرار في سياقه، والتوسع مع الحفاظ على السيطرة.
+| Operational area | Product intent | النية التشغيلية |
+|---|---|---|
+| **Point of sale & stock** | Controlled selling, stock movement, batch-aware work, and branch context. | بيع منضبط، وحركة مخزون، والعمل الواعي بالدفعات والفروع. |
+| **Prescription review** | Human-confirmed assistance around prescription-related workflows. | مساعدة تخضع لتأكيد بشري في مسارات الوصفات. |
+| **Governance & auditability** | Role boundaries, organization context, and traceable operational activity. | حدود صلاحيات وسياق مؤسسي ونشاط تشغيلي قابل للتتبع. |
+| **Bilingual continuity** | Arabic RTL and English-oriented workflows across responsive surfaces. | مسارات عربية RTL وإنجليزية عبر واجهات متجاوبة. |
 
----
+> **Responsible-use boundary:** MEDORA supports human work and decision support. It does not claim clinical autonomy, regulatory approval, live government connectivity, or guaranteed outcomes unless a specific verified integration record says otherwise.
+>
+> **حد الاستخدام المسؤول:** تدعم ميدورا العمل البشري والمساعدة في اتخاذ القرار. ولا تدعي الاستقلال السريري أو الاعتماد التنظيمي أو الاتصال الحكومي الحي أو النتائج المضمونة ما لم يثبت سجل تكامل محدد ذلك صراحةً.
 
-</div>
+## Repository map | خريطة المستودع
 
-## Product promise | وعد المنتج
-
-MEDORA is designed to help healthcare operators **see the whole operation, act with context, and scale with control**. The repository documents the implemented platform foundation, its security boundaries, and the integration surfaces required for future expansion; roadmap items are intentionally distinguished from live capabilities.
-
-صُممت ميدورا لمساعدة مشغلي الرعاية الصحية على **رؤية العملية كاملة، واتخاذ القرار في سياقه، والتوسع مع الحفاظ على السيطرة**. يوثق المستودع الأساس البرمجي المنفذ وحدود الأمان وواجهات التكامل اللازمة للتوسع المستقبلي، مع تمييز واضح بين الميزات الحالية وعناصر خارطة الطريق.
-
-| English | العربية |
+| Location | Purpose |
 |---|---|
-| **One operational picture:** connect revenue, inventory, clinical review, finance, and compliance instead of managing disconnected tools. | **صورة تشغيلية واحدة:** ربط الإيرادات والمخزون والمراجعة السريرية والمالية والامتثال بدل إدارة أدوات متفرقة. |
-| **Built for continuity:** Arabic-first RTL workflows, installable PWA experiences, offline queues, and branch-aware operations. | **مصممة للاستمرارية:** مسارات RTL عربية، وتجربة PWA قابلة للتثبيت، وقوائم انتظار دون اتصال، وتشغيل واعٍ بالفروع. |
-| **Trust by design:** role boundaries, tenant isolation, tamper-evident audit trails, and human confirmation around prescription intelligence. | **الثقة في صميم التصميم:** حدود صلاحيات واضحة، وعزل للمستأجرين، وسجلات تدقيق مقاومة للتلاعب، وتأكيد بشري حول ذكاء الوصفات. |
+| `client/` | React application and responsive user experience. |
+| `server/` | API, domain logic, access controls, and operational procedures. |
+| `drizzle/` | Database schema and migration history. |
+| `docs/` | Product, operating, security, and readiness documentation. |
+| `e2e/` | End-to-end coverage and journey checks. |
+| `scripts/` | Repeatable maintenance and verification utilities. |
 
-## 📊 Quick Stats | إحصائيات سريعة
-
-| Metric | Value | المقياس | القيمة |
-|---|---|---|---|
-| 📁 Total Files | 565 | إجمالي الملفات | 565 |
-| 💻 Lines of Code | ~183,700+ | أسطر الكود | +183,700 |
-| 🖥️ Server Modules | 214 TypeScript | وحدات الخادم | 214 TypeScript |
-| 📱 Client Components | 85 React/TSX | مكونات الواجهة | 85 React/TSX |
-| 🧪 Test Suites | 122 | مجموعات الاختبار | 122 |
-| 📚 Documentation | 114 files | الوثائق | 114 ملف |
-| 🌍 Languages | Arabic (RTL) + English | اللغات | العربية + الإنجليزية |
-
-## ✨ Key Features | الميزات الرئيسية
-
-<details open>
-<summary><b>🛒 Point of Sale (POS) — نقطة البيع</b></summary>
-
-- **English:** Full POS with fractional unit sales, FEFO (First-Expiry-First-Out) batch allocation, MOH pricing validation with 7% max discount cap, and multi-branch inventory sync.
-- **العربية:** نظام نقاط بيع متكامل مع دعم بيع الوحدات الكسرية، تخصيص الدفعات بنظام FEFO (الأولوية للأقرب انتهاءً)، التحقق من أسعار وزارة الصحة مع سقف خصم 7%، ومزامنة المخزون بين الفروع.
-</details>
-
-<details>
-<summary><b>💊 Inventory & Supply Chain — المخزون وسلسلة التوريد</b></summary>
-
-- **English:** Batch tracking, expiry management, reorder points, cold-chain monitoring, FEFO deduction, multi-branch transfers, and automated daily scans.
-- **العربية:** تتبع الدفعات، إدارة الصلاحية، نقاط إعادة الطلب، مراقبة السلسلة الباردة، خصم FEFO، التحويلات بين الفروع، والفحوصات اليومية التلقائية.
-</details>
-
-<details>
-<summary><b>🤖 AI-Powered Prescription Processing — معالجة الوصفات بالذكاء الاصطناعي</b></summary>
-
-- **English:** Built-in LLM vision extraction from prescription images — drug names, dosages, quantities, confidence scoring. Requires pharmacist confirmation before dispensing.
-- **العربية:** استخراج بالذكاء الاصطناعي من صور الوصفات الطبية — أسماء الأدوية، الجرعات، الكميات، مع تقييم الثقة. يتطلب تأكيد الصيدلي قبل الصرف.
-</details>
-
-<details>
-<summary><b>🏛️ Regulatory Compliance — الامتثال التنظيمي</b></summary>
-
-- **English:** Egyptian MOH pricing, EDA drug catalog, ETA e-invoicing, NFSA food safety, UHIA insurance integration, syndicate workflows, and QR/barcode compliance labels.
-- **العربية:** أسعار وزارة الصحة المصرية، كتالوج الهيئة المصرية للدواء، الفواتير الإلكترونية لمصلحة الضرائب، سلامة الغذاء NFSA، تكامل التأمين الصحي الشامل UHIA، ومُلصقات QR والباركود.
-</details>
-
-<details>
-<summary><b>🔒 Security & Multi-Tenancy — الأمان وتعدد المستأجرين</b></summary>
-
-- **English:** Role-based access (Admin, Pharmacist, Cashier, Manager), tamper-evident audit trails, encrypted data storage, and strict tenant isolation.
-- **العربية:** صلاحيات مبنية على الأدوار (مدير، صيدلي، كاشير، مشرف)، سجلات تدقيق مقاومة للتلاعب، تخزين مشفر، وعزل صارم بين المستأجرين.
-</details>
-
-<details>
-<summary><b>📡 Offline-First PWA — تطبيق يعمل بدون إنترنت</b></summary>
-
-- **English:** Service Worker caching, background sync, installable on desktop & mobile, responsive RTL/Arabic-first design.
-- **العربية:** تخزين عبر Service Worker، مزامنة خلفية، قابل للتثبيت على الحاسوب والهاتف، تصميم عربي RTL متجاوب.
-</details>
-
-<details>
-<summary><b>💰 Finance & Payroll — المالية والرواتب</b></summary>
-
-- **English:** Tax validation, balanced cash-flow rules, InstaPay/Meeza integration boundary, payroll with overtime and shift rules.
-- **العربية:** التحقق الضريبي، قواعد التدفق النقدي المتوازن، حدود تكامل إنستا باي/ميزة، والرواتب مع قواعد العمل الإضافي والنوبات.
-</details>
-
-<details>
-<summary><b>🧪 Compounding & Manufacturing — التحضيرات الصيدلانية</b></summary>
-
-- **English:** BOM (Bill of Materials), costing/pricing, liability rules, and sterile compounding persistence.
-- **العربية:** قائمة المواد (BOM)، حساب التكلفة والتسعير، قواعد المسؤولية، وتحضيرات معقمة.
-</details>
-
-## 🏗️ Architecture | البنية التقنية
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    MEDORA Health Ecosystem                    │
-│                  منظومة ميدورا الصحية                        │
-├─────────────────────────────────────────────────────────────┤
-│  🖥️ Frontend (React + Vite + TailwindCSS + shadcn/ui)       │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  PWA Shell │ POS │ Inventory │ Rx AI │ Dashboard     │   │
-│  │  Service Worker │ Offline Queue │ RTL Arabic UI      │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                                                             │
-│  🔧 Backend (Node.js + Express + TypeScript)                 │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  Auth │ POS │ Inventory │ Finance │ AI Vision        │   │
-│  │  Audit │ Scheduled Tasks │ Multi-Tenant Router       │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                                                             │
-│  🗄️ Database (PostgreSQL + Drizzle ORM)                      │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  Schema Migrations │ Isolated Lifecycle │ Backup      │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## 🚀 Getting Started | البدء السريع
+## Run locally | التشغيل محليًا
 
 ```bash
-# Clone the repository
 git clone https://github.com/0SSAM/MEDORA-Health-Care-Eco-System.git
 cd MEDORA-Health-Care-Eco-System
-
-# Install dependencies with pnpm
 pnpm install
-
-# Start development server
 pnpm dev
+```
 
-# Run tests
+Use the project’s configured environment rather than committing secrets. Before production work, review the current environment and deployment documentation. Run the quality gates with:
+
+```bash
 pnpm test
-
-# Build for production
+pnpm exec tsc --noEmit
 pnpm build
 ```
 
-### 🔑 Test Accounts | حسابات الاختبار
+## Technology | التقنية
 
-For development and demonstration purposes, a default test account is available. See the full guide for details:
-لأغراض التطوير والعرض التوضيحي، يتوفر حساب اختبار افتراضي. راجع الدليل الكامل للحصول على التفاصيل:
+`TypeScript` · `React` · `Vite` · `Node.js` · `Express` · `tRPC` · `Drizzle` · `Tailwind CSS` · `Vitest` · `PWA`
 
-- **[Test Accounts & Credentials Guide](docs/TEST_ACCOUNTS.md)**
-- **[دليل حسابات الاختبار وبيانات الاعتماد](docs/TEST_ACCOUNTS.md)**
+## Contribution and repository safety | المساهمة وسلامة المستودع
 
+Use an integration branch and a pull request for code or documentation changes. Keep credentials, protected data, and production exports out of Git. The repository is currently publicly visible; an application sign-in or NDA gate does **not** make source code private. Repository visibility and collaborator settings require an authorized owner action.
 
-## 📁 Project Structure | هيكل المشروع
+استخدم فرع تكامل وطلب دمج لأي تعديل برمجي أو توثيقي. لا تضع بيانات الاعتماد أو البيانات المحمية أو صادرات الإنتاج داخل Git. المستودع ظاهر للعامة حاليًا؛ تسجيل الدخول أو بوابة NDA داخل التطبيق **لا** يجعل الشفرة المصدرية خاصة. تتطلب خصوصية المستودع وإعدادات المتعاونين إجراءً معتمدًا من مالكه.
 
-```
-MEDORA-Health-Care-Eco-System/
-├── client/          # 🖥️ React frontend (85+ components)
-├── server/          # 🔧 Node.js backend (214+ modules)
-├── shared/          # 🔗 Shared types & utilities
-├── docs/            # 📚 114 documentation files
-├── drizzle/         # 🗄️ Database migrations
-├── patches/         # 🩹 Package patches
-├── scripts/         # 🛠️ Utility scripts
-├── .github/         # ⚙️ CI/CD workflows
-├── package.json     # 📦 Dependencies
-├── tsconfig.json    # ⚙️ TypeScript config
-├── vite.config.ts   # 🚀 Vite config
-├── vitest.config.ts # 🧪 Test config
-└── todo.md          # ✅ Project roadmap
-```
+## License and ownership | الترخيص والملكية
 
-## 🛡️ Security | الأمان
+**MEDORA Health Care Eco System**
 
-- ✅ **CodeQL Security Analysis** — Automated code scanning on every PR
-- ✅ **Dependency Review** — Automated vulnerability checks via Dependabot
-- ✅ **Tamper-Evident Audit Trails** — Cryptographic hash chains for all operations
-- ✅ **Role-Based Access Control** — 4 roles with strict permission boundaries
-- ✅ **Encrypted Storage** — Sensitive data protected at rest
-- ✅ **Branch Protection** — Required CI checks + review before merge to main
-
-## 📋 License & Author | الترخيص والمؤلف
-
-- **Author:** Hossam Naeim Osman | حسام نعيم عثمان
-- **License:** Private / UNLICENSED
-- **Copyright:** © 2026 MEDORA Health Care Eco System
+Copyright © 2026 Hossam Naeim Osman. All rights reserved.
+Repository license: **UNLICENSED**.
 
 ---
 
-<div align="center">
+**MEDORA | ميدورا**
 
-**🏥 MEDORA — Where Healthcare Meets Innovation**
-**ميدورا — حيث تلتقي الرعاية الصحية بالابتكار**
-
-*Built with ❤️ for the healthcare community*
-*مُصمم بحب ❤️ لمجتمع الرعاية الصحية*
-
-</div>
+*Healthcare operations, with clarity, accountability, and human control.*
+*تشغيل صحي بوضوح ومساءلة وتحكم بشري.*
