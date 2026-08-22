@@ -54,7 +54,7 @@ export function ReportsWorkspace({ organizationId, jurisdictionId, section }: Sc
   const automation = trpc.reports.automationStatus.useQuery(undefined, { retry: false });
   const definitions = trpc.reports.definitions.useQuery(enabled ? { organizationId: organizationId!, jurisdictionId: jurisdictionId ?? undefined } : skipToken, { retry: false });
   const runs = trpc.reports.runs.useQuery(enabled ? { organizationId: organizationId! } : skipToken, { retry: false });
-  const create = trpc.reports.createDefinition.useMutation({ onSuccess: async result => { setStatus(`تم إنشاء تعريف التقرير #${result.definitionId} كمسودة. التسليم التلقائي معطل حتى الجدولة الصريحة.`); await definitions.refetch(); } });
+  const create = trpc.reports.createDefinition.useMutation({ onSuccess: async result => { setStatus(`تم إنشاء تعريف التقرير #${result.definitionId} كمسودة. لا تُرسل إشعارات تلقائياً قبل الجدولة الصريحة.`); await definitions.refetch(); } });
   const schedule = trpc.reports.schedule.useMutation({ onSuccess: async result => { setStatus(result.status === "scheduled" ? "تمت جدولة التقرير عبر خدمة الجدولة." : "التقرير مجدول مسبقاً."); await definitions.refetch(); } });
   const submit = async () => { if (!organizationId || !jurisdictionId) return setStatus("المؤسسة والاختصاص المؤكد مطلوبان."); try { await create.mutateAsync({ organizationId, jurisdictionId, reportKey: reportKey as "inventory.alerts" | "sales.daily" | "compliance.expiry" | "operations.summary", name: name.trim() || undefined, recipientRole: "operations_manager" }); } catch (error) { setStatus(error instanceof Error ? error.message : "تعذر إنشاء تعريف التقرير"); } };
   
